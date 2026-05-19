@@ -5,3 +5,8 @@ disableKinds = ['taxonomy', 'term', 'RSS', 'section']
 
 [params]
   description = "Générations Médecins Île-de-France, un syndicat indépendant, démocratique et opérationnel pour redonner une voix aux médecins."
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
