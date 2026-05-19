@@ -1,15 +1,28 @@
+<section class="hero">
+<div class="hero-text">
+
+Bureau
+
 # Le Bureau
 
-## Dr Klein (pas un vrai docteur, et pas vraiment du bureau)
+**Les membres élus de Générations Médecins Île-de-France**
 
-Une petite bio.
+</div>
+</section>
 
-![Logo Générations Médecins](/Voyage2.png)
+<section>
+<div class="section-grid">
+<div>
 
-## Dr Klein Louise-Anne Vice-présidente Communication et Réseaux Sociaux
+## Alexis BOURLA
 
+**Président**
 
+</div>
+<div>
 
-# Minh-Hanh TA 
-## Secrétaire de GM 
-hello hello
+![Alexis BOURLA, Président](/bourla.png)
+
+</div>
+</div>
+</section>
