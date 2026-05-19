@@ -1,7 +1,7 @@
 <section class="hero">
 <div class="hero-text">
 
-Bureau
+Bureau poil au dos
 
 # Le Bureau
 
