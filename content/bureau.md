@@ -2,4 +2,4 @@
 
 ## Les castors
 
-![Logo Générations Médecins](Voyages2.png)
+![Logo Générations Médecins](/Voyages2.png)
