@@ -4,7 +4,7 @@
 
 Une petite bio.
 
-![Logo Générations Médecins](/Voyage2.png)
+![Logo Générations Médecins](/Voyages2.png)
 
 ## Dr Klein Louise-Anne Vice-présidente Communication et Réseaux Sociaux
 
