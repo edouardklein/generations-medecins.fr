@@ -1,0 +1,243 @@
+/*
+  Rules from the original design that do not map cleanly to the new
+  Markdown-driven markup. They targeted classes/structures that no longer
+  exist (or would apply too broadly/fragilely if naively transferred).
+
+  The old page used explicit section wrappers, grid containers, and
+  utility classes. The new page is flat Markdown inside <main>:
+  headings, paragraphs, lists, blockquotes and links without classes.
+
+  Each block notes what it used to target and why it is hard to port.
+*/
+
+/* ── Hero section ────────────────────────────────────────────────
+   Old: <section class="hero"> containing eyebrow, h1, subtitle,
+        text, actions and the logo image.
+   New: the hero content is a flat sequence of <p>, <h1>, <p>, <p>,
+        <p><a>…</a> <a>…</a></p>, <p><img>…</img></p> with no wrapper.
+   No single selector can isolate the hero block without relying on
+   positional pseudo-classes (nth-child) that break on every edit. */
+
+.hero {
+  min-height: calc(100svh - 112px);
+  padding: clamp(48px, 8vw, 104px) 0 clamp(44px, 7vw, 84px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 390px);
+  gap: clamp(32px, 6vw, 72px);
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 16px;
+  color: var(--blue);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hero-subtitle {
+  margin: 18px 0 0;
+  color: var(--teal);
+  font-size: clamp(1.4rem, 3vw, 2.15rem);
+  font-weight: 800;
+  line-height: 1.18;
+}
+
+.hero-text {
+  max-width: 42rem;
+  margin: 22px 0 0;
+  color: var(--muted);
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+}
+
+.hero-actions {
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hero-logo {
+  justify-self: center;
+  width: min(100%, 360px);
+  border-radius: 42px;
+  background: var(--white);
+  box-shadow: 0 24px 70px rgba(23, 54, 95, 0.12);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────
+   Old: <a class="button button-primary"> etc.
+   New: plain <a> elements mixed with text links and header links.
+   Styling all <a> as buttons would break the header nav and every
+   inline text link. */
+
+.button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 12px 20px;
+  text-decoration: none;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.button-primary {
+  color: var(--white);
+  background: var(--blue);
+  box-shadow: 0 14px 34px rgba(50, 106, 162, 0.22);
+}
+
+.button-secondary {
+  color: var(--blue-dark);
+  border: 1px solid rgba(50, 106, 162, 0.24);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+/* ── Section wrappers ────────────────────────────────────────────
+   Old: <section class="section"> with a <div class="section-grid">
+        that placed the <h2> in a left column and the content in a
+        right column.
+   New: flat <h2> followed immediately by <p> and <ul> siblings.
+   The two-column grid and the section padding/border cannot be
+   expressed without re-introducing wrapper elements. */
+
+.section {
+  padding: clamp(56px, 8vw, 92px) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.section-grid {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(28px, 6vw, 76px);
+  align-items: start;
+}
+
+/* ── Paragraph spacing inside sections ───────────────────────────
+   Old: .section p { margin: 0; } and .section p + p { margin-top: 14px; }
+   New: paragraphs are not grouped under any section container.
+   Applying these to main p { … } would also zero the margins of
+   hero paragraphs and closing paragraphs, breaking their distinct
+   spacing. */
+
+.section p {
+  margin: 0;
+}
+
+.section p + p {
+  margin-top: 14px;
+}
+
+/* ── Lead paragraph ──────────────────────────────────────────────
+   Old: <p class="lead"> inside sections.
+   New: plain <p>; indistinguishable from other paragraphs. */
+
+.lead {
+  color: var(--muted);
+  font-size: clamp(1.08rem, 2vw, 1.22rem);
+}
+
+/* ── Plain-list modifier ─────────────────────────────────────────
+   Old: <ul class="list plain-list"> to add margin-top.
+   New: plain <ul>; cannot target the specific list that used to
+        carry this modifier. */
+
+.plain-list {
+  margin-top: 26px;
+}
+
+/* ── Closing / CTA section ───────────────────────────────────────
+   Old: <section class="closing"> wrapper with centred text and
+        special sizing for its h2 and paragraphs.
+   New: flat <h2> and <p> siblings at the end of <main>.
+   No wrapper means the centred layout rules would hit every h2
+   and paragraph on the page if naively ported. */
+
+.closing {
+  padding: clamp(62px, 9vw, 108px) 0;
+  text-align: center;
+}
+
+.closing h2 {
+  margin-inline: auto;
+  max-width: 18ch;
+}
+
+.closing p {
+  max-width: 42rem;
+  margin: 18px auto 0;
+  color: var(--muted);
+  font-size: clamp(1.08rem, 2vw, 1.22rem);
+}
+
+/* ── Final actions (CTA button row) ──────────────────────────────
+   Old: <div class="final-actions"> inside .closing.
+   New: the single CTA link sits in a plain <p> along with text
+        links elsewhere. Cannot isolate without a wrapper. */
+
+.final-actions {
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* ── Contact note paragraph ──────────────────────────────────────
+   Old: <p class="contact-note" id="contact">…</p>
+   New: the contact line is the last plain <p> in <main>.
+   Using :last-of-type or :last-child would be fragile and break
+   as soon as another paragraph is appended. The scroll-margin and
+   muted colour cannot be applied safely without a class or id. */
+
+.contact-note {
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: 1rem;
+  scroll-margin-top: 24px;
+}
+
+/* ── Contact-flash animation (needs :target on #contact) ─────────
+   Old: .contact-note:target .email-obfuscated { animation … }
+   New: the surrounding <p> no longer carries id="contact", so
+        the :target pseudo-class can never match. */
+
+.contact-note:target .email-obfuscated {
+  animation: contact-flash 2s ease-in-out 0.7s 2;
+}
+
+@keyframes contact-flash {
+  0%, 100% {
+    background: transparent;
+    box-shadow: none;
+  }
+  35%, 65% {
+    background: rgba(137, 200, 106, 0.28);
+    box-shadow: 0 0 0 6px rgba(137, 200, 106, 0.28);
+  }
+}
+
+/* ── Mobile rules for removed structures ─────────────────────────
+   These depend on .hero, .section-grid, .hero-logo and .button
+   classes that no longer exist in the markup. */
+
+@media (max-width: 760px) {
+  .hero {
+    min-height: auto;
+    padding-top: 38px;
+  }
+
+  .hero-logo {
+    order: -1;
+    width: min(78vw, 280px);
+    border-radius: 30px;
+  }
+
+  .button {
+    width: 100%;
+  }
+}

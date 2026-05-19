@@ -2,6 +2,9 @@
 title: "Générations Médecins Île-de-France"
 ---
 
+<section class="hero">
+<div class="hero-text">
+
 Île-de-France
 
 # Générations Médecins
@@ -13,7 +16,11 @@ Un syndicat **indépendant, démocratique et opérationnel**.
 [Adhérer](https://skezia.skezi.eu/cohorts/11e799a9-71bc-494a-9b61-398d9e1a33a5/cc0350b3-03af-485a-9eff-97074f163f36/public)
 [Découvrir nos actions](#actions)
 
+</div>
+
 ![Logo Générations Médecins](logoGM.jpeg)
+
+</section>
 
 ## Pourquoi nous existons
 
