@@ -1,0 +1,7 @@
+baseURL = 'https://generations-medecins.fr'
+locale = 'fr_FR'
+title = 'Générations Médecins Île-de-France'
+disableKinds = ['taxonomy', 'term', 'RSS', 'section']
+
+[params]
+  description = "Générations Médecins Île-de-France, un syndicat indépendant, démocratique et opérationnel pour redonner une voix aux médecins."
