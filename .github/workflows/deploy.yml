@@ -38,4 +38,4 @@ jobs:
             git remote set-url deploy "git@deploy:${DEPLOY_REPO}"
 
       - name: Push to deploy
-        run: git push deploy master:deploy
+        run: git push deploy master:deploy --force
