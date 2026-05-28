@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plaidoyer — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .tracker-list { display: grid; gap: 16px; }
+
+    .tracker-item {
+      display: grid;
+      grid-template-columns: 1fr 160px;
+      gap: 32px;
+      align-items: center;
+      padding: 26px 28px;
+      border-radius: var(--r);
+      border: 1.5px solid var(--line);
+      background: white;
+      transition: border-color 0.2s;
+    }
+    .tracker-item:hover { border-color: rgba(50,106,162,0.3); }
+
+    .tracker-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 7px;
+    }
+    .tracker-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .tracker-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+      line-height: 1.55;
+    }
+    .progress-wrap {
+      width: 100%;
+      height: 8px;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .progress-bar {
+      height: 100%;
+      border-radius: 999px;
+    }
+    .bar-green { background: linear-gradient(90deg, var(--teal), var(--green)); }
+    .bar-blue  { background: linear-gradient(90deg, var(--blue), var(--teal)); }
+    .bar-orange{ background: linear-gradient(90deg, #f59e0b, #f97316); }
+    .bar-gray  { background: var(--muted); }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.73rem;
+      color: var(--muted);
+    }
+
+    .tracker-status { text-align: center; }
+    .t-status-pill {
+      display: inline-block;
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .s-active   { background: rgba(137,200,106,0.13); color: #3d8a1a; }
+    .s-progress { background: rgba(50,106,162,0.09);  color: var(--blue); }
+    .s-watch    { background: rgba(245,158,11,0.1);   color: #b06c00; }
+    .s-done     { background: rgba(88,170,179,0.12);  color: #2a7a83; }
+
+    .tracker-date { font-size: 0.72rem; color: var(--muted); }
+
+    .chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .chip-blue { background: rgba(50,106,162,0.08); color: var(--blue); }
+
+    .quarter-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin-bottom: 20px;
+      margin-top: 44px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .quarter-title:first-of-type { margin-top: 0; }
+
+    @media (max-width: 620px) {
+      .tracker-item { grid-template-columns: 1fr; }
+      .tracker-status { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge">GM</div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html" class="active">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <span class="badge badge-teal">⚖️ Roadmap publique</span>
+      <h1>Plaidoyer</h1>
+      <p>Tous les dossiers que nous portons, leur état d'avancement, en temps réel. La transparence n'est pas une option — c'est notre fonctionnement.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+
+      <div class="quarter-title">
+        <span>T2 2025 — Dossiers en cours</span>
+        <span class="chip chip-blue">3 actifs · 1 veille</span>
+      </div>
+
+      <div class="tracker-list">
+        <div class="tracker-item">
+          <div>
+            <div class="tracker-top">
+              <div class="tracker-name">Revalorisation des gardes hospitalières</div>
+            </div>
+            <p class="tracker-desc">Courrier envoyé au Ministère le 12 mai. Réponse attendue avant le 15 juin. Pétition lancée : 1 240 signatures collectées à ce jour. Prochain point bureau : 5 juin.</p>
+            <div class="progress-wrap">
+              <div class="progress-bar bar-green" style="width:72%"></div>
+            </div>
+            <div class="progress-meta">
+              <span>Dossier déposé · En attente réponse</span>
+              <span style="font-weight:700;color:#3d8a1a">72%</span>
+            </div>
+          </div>
+          <div class="tracker-status">
+            <div class="t-status-pill s-active">● Actif</div>
+            <div class="tracker-date">Màj : 26 mai 2025</div>
+          </div>
+        </div>
+
+        <div class="tracker-item">
+          <div>
+            <div class="tracker-top">
+              <div class="tracker-name">Accès au DMP pour les médecins remplaçants</div>
+            </div>
+            <p class="tracker-desc">Rencontre planifiée avec la DSS le 3 juin. Préparation du dossier technique en cours avec le bureau juridique. Soutien de 4 autres syndicats obtenu.</p>
+            <div class="progress-wrap">
+              <div class="progress-bar bar-blue" style="width:40%"></div>
+            </div>
+            <div class="progress-meta">
+              <span>Dossier en constitution</span>
+              <span style="font-weight:700;color:var(--blue)">40%</span>
+            </div>
+          </div>
+          <div class="tracker-status">
+            <div class="t-status-pill s-progress">↗ En cours</div>
+            <div class="tracker-date">Màj : 20 mai 2025</div>
+          </div>
+        </div>
+
+        <div class="tracker-item">
+          <div>
+            <div class="tracker-top">
+              <div class="tracker-name">Numerus apertus en psychiatrie — Île-de-France</div>
+            </div>
+            <p class="tracker-desc">Demande de révision des capacités de formation en psychiatrie pour l'IDF. Cartographie des besoins finalisée. Présentation prévue à l'ARS le 18 juin.</p>
+            <div class="progress-wrap">
+              <div class="progress-bar bar-blue" style="width:55%"></div>
+            </div>
+            <div class="progress-meta">
+              <span>Présentation ARS · 18 juin</span>
+              <span style="font-weight:700;color:var(--blue)">55%</span>
+            </div>
+          </div>
+          <div class="tracker-status">
+            <div class="t-status-pill s-progress">↗ En cours</div>
+            <div class="tracker-date">Màj : 15 mai 2025</div>
+          </div>
+        </div>
+
+        <div class="tracker-item">
+          <div>
+            <div class="tracker-top">
+              <div class="tracker-name">Simplification des obligations RGPD en cabinet libéral</div>
+            </div>
+            <p class="tracker-desc">Veille législative active. Proposition de simplification en cours de rédaction avec nos juristes partenaires. Consultation des adhérents prévue en juillet.</p>
+            <div class="progress-wrap">
+              <div class="progress-bar bar-orange" style="width:20%"></div>
+            </div>
+            <div class="progress-meta">
+              <span>Phase de veille et rédaction</span>
+              <span style="font-weight:700;color:#b06c00">20%</span>
+            </div>
+          </div>
+          <div class="tracker-status">
+            <div class="t-status-pill s-watch">👁 Veille</div>
+            <div class="tracker-date">Màj : 10 mai 2025</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quarter-title" style="margin-top:60px">
+        <span>T1 2025 — Dossiers clôturés</span>
+        <span class="chip" style="background:rgba(88,170,179,0.1);color:#2a7a83">2 obtenus · 1 en suspens</span>
+      </div>
+
+      <div class="tracker-list">
+        <div class="tracker-item" style="opacity:0.75">
+          <div>
+            <div class="tracker-name">Forfait structure : revalorisation des cabinets de groupe</div>
+            <p class="tracker-desc">Revalorisation de 15% du forfait structure pour les MSP et cabinets de groupe de plus de 3 médecins. Obtenu dans l'avenant n°9.</p>
+            <div class="progress-wrap">
+              <div class="progress-bar bar-green" style="width:100%"></div>
+            </div>
+            <div class="progress-meta"><span>Obtenu — Avenant n°9</span><span style="font-weight:700;color:#3d8a1a">100%</span></div>
+          </div>
+          <div class="tracker-status">
+            <div class="t-status-pill s-done">✓ Obtenu</div>
+            <div class="tracker-date">Clôturé : mars 2025</div>
+          </div>
+        </div>
+
+        <div class="tracker-item" style="opacity:0.75">
+          <div>
+            <div class="tracker-name">Publication des données d'activité CPAM par département</div>
+            <p class="tracker-desc">Demande d'open data sur les données de remboursement agrégées pour alimenter l'Observatoire. Accord de principe obtenu de la CNAM.</p>
+            <div class="progress-wrap">
+              <div class="progress-bar bar-green" style="width:100%"></div>
+            </div>
+            <div class="progress-meta"><span>Accord CNAM obtenu</span><span style="font-weight:700;color:#3d8a1a">100%</span></div>
+          </div>
+          <div class="tracker-status">
+            <div class="t-status-pill s-done">✓ Obtenu</div>
+            <div class="tracker-date">Clôturé : fév. 2025</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Participez au plaidoyer.</h2>
+    <p>En adhérant, vous contribuez directement à la force des dossiers que nous portons. Plus nous sommes nombreux, plus nous sommes entendus.</p>
+    <a href="adherer.html" class="btn btn-white btn-lg">Adhérer et peser →</a>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge">GM</div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Syndicat médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adhérer — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .adherer-grid {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 56px;
+      align-items: start;
+    }
+
+    .plan-card {
+      padding: 36px;
+      border-radius: 20px;
+      border: 2px solid var(--blue);
+      background: white;
+      position: sticky;
+      top: 88px;
+      box-shadow: 0 8px 40px rgba(50,106,162,0.12);
+    }
+
+    .plan-price {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--blue-dark);
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .plan-price span {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0;
+    }
+
+    .plan-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 28px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .perks { display: grid; gap: 12px; margin-bottom: 28px; }
+    .perk {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: var(--ink);
+    }
+    .perk::before {
+      content: '✓';
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      background: rgba(137,200,106,0.15);
+      color: #3d8a1a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      margin-top: 1px;
+    }
+
+    .benefits-list { display: grid; gap: 20px; }
+    .benefit {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+    }
+    .benefit-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .benefit-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .benefit-desc {
+      font-size: 0.83rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .testimonial {
+      padding: 24px;
+      border-radius: var(--r);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      margin-top: 36px;
+    }
+    .testimonial-text {
+      font-size: 0.92rem;
+      color: var(--ink);
+      line-height: 1.6;
+      font-style: italic;
+      margin-bottom: 14px;
+    }
+    .testimonial-author {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    @media (max-width: 860px) {
+      .adherer-grid { grid-template-columns: 1fr; }
+      .plan-card { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge">GM</div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <span class="badge badge-green"><span class="dot-green"></span> 320 adhérents</span>
+      <h1>Adhérer à<br>Générations Médecins</h1>
+      <p>Rejoindre, ce n'est pas simplement cotiser. C'est participer à une représentation qui vous ressemble vraiment.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="adherer-grid">
+
+        <!-- Bénéfices -->
+        <div>
+          <h2 class="section-title" style="margin-bottom:36px">Ce que vous obtenez</h2>
+
+          <div class="benefits-list">
+            <div class="benefit">
+              <div class="benefit-icon">📰</div>
+              <div>
+                <div class="benefit-title">Décrypteurs — veille personnalisée</div>
+                <div class="benefit-desc">Alertes automatiques dès qu'une nouvelle règle impacte votre spécialité. Reformulation IA en impact concret.</div>
+              </div>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">🚨</div>
+              <div>
+                <div class="benefit-title">SOS Juridique — délai garanti 48h</div>
+                <div class="benefit-desc">Décrivez votre situation. Un LLM l'analyse et vous route vers un avocat partenaire avec réponse garantie sous 48h.</div>
+              </div>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">👥</div>
+              <div>
+                <div class="benefit-title">Accès à la Communauté</div>
+                <div class="benefit-desc">Canaux par spécialité et région, petites annonces vérifiées (remplacements, cessions), espace d'échange entre pairs.</div>
+              </div>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">🗳️</div>
+              <div>
+                <div class="benefit-title">Droit de vote et de consultation</div>
+                <div class="benefit-desc">Participez aux votes du bureau, aux consultations avant chaque prise de position. Votre voix compte dans chaque dossier.</div>
+              </div>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">🛠️</div>
+              <div>
+                <div class="benefit-title">Accès à tous les outils</div>
+                <div class="benefit-desc">Simulateur de revenus, bibliothèque de courriers, calculateur URSSAF/CARMF, petites annonces.</div>
+              </div>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">💳</div>
+              <div>
+                <div class="benefit-title">Carte d'adhérent digitale</div>
+                <div class="benefit-desc">Carte numérique via HelloAsso avec accès à des avantages partenaires.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial">
+            <p class="testimonial-text">"Enfin un syndicat qui répond à mes questions en 24h et qui me dit clairement ce qui change pour moi, pas ce qui change en général. La bibliothèque de courriers m'a déjà sauvé deux fois."</p>
+            <div class="testimonial-author">— Dr. M.T., Généraliste S1, Val-de-Marne</div>
+          </div>
+        </div>
+
+        <!-- Plan card -->
+        <div class="plan-card">
+          <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--blue);margin-bottom:12px">Adhésion annuelle</div>
+          <div class="plan-price">120 €<span> / an</span></div>
+          <p class="plan-desc">Soit 10 € par mois. Déductible des frais professionnels.</p>
+
+          <div class="perks">
+            <div class="perk">Décrypteurs avec veille personnalisée</div>
+            <div class="perk">SOS Juridique — délai garanti 48h</div>
+            <div class="perk">Accès à la Communauté</div>
+            <div class="perk">Droit de vote et de consultation</div>
+            <div class="perk">Bibliothèque de courriers complète</div>
+            <div class="perk">Simulateur de revenus avancé</div>
+            <div class="perk">Carte d'adhérent digitale</div>
+          </div>
+
+          <a href="https://skezia.skezi.eu/cohorts/11e799a9-71bc-494a-9b61-398d9e1a33a5/cc0350b3-03af-485a-9eff-97074f163f36/public" class="btn btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:14px">
+            Adhérer maintenant →
+          </a>
+
+          <p style="font-size:0.75rem;color:var(--muted);text-align:center;margin-top:14px">
+            Paiement sécurisé via HelloAsso · Sans engagement
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge">GM</div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Syndicat médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
