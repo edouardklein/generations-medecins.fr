@@ -98,51 +98,63 @@
     /* ——— CARD STACK ——— */
     .card-stack {
       position: relative;
-      height: 500px;
+      height: 520px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .stack-card {
       position: absolute;
-      width: 308px;
+      width: 300px;
       background: white;
       border-radius: 20px;
-      padding: 22px;
+      padding: 0;
+      overflow: hidden;
       box-shadow:
-        0 2px 4px rgba(23,54,95,0.04),
-        0 8px 24px rgba(23,54,95,0.08),
-        0 24px 64px rgba(23,54,95,0.1);
-      border: 1px solid rgba(226,234,240,0.9);
+        0 4px 8px rgba(26,74,128,0.08),
+        0 16px 40px rgba(26,74,128,0.14),
+        0 36px 80px rgba(26,74,128,0.1);
+      border: 1px solid rgba(220,234,245,0.8);
     }
 
+    .card-accent {
+      height: 5px;
+      width: 100%;
+    }
+    .card-accent-blue  { background: linear-gradient(90deg, #2a6db8, #38a8b5); }
+    .card-accent-teal  { background: linear-gradient(90deg, #38a8b5, #62c040); }
+    .card-accent-green { background: var(--grad); }
+
+    .card-inner { padding: 20px 22px 22px; }
+
     .stack-card:nth-child(1) {
-      transform: rotate(-9deg) translate(20px, 80px);
+      transform: rotate(-10deg) translate(-60px, 80px);
       z-index: 1;
-      opacity: 0.82;
       animation: float1 6s ease-in-out infinite;
     }
     .stack-card:nth-child(2) {
-      transform: rotate(-3deg) translate(60px, 36px);
+      transform: rotate(-4deg) translate(-20px, 30px);
       z-index: 2;
-      opacity: 0.92;
       animation: float2 6s ease-in-out infinite 1s;
     }
     .stack-card:nth-child(3) {
-      transform: rotate(2deg) translate(90px, 0px);
+      transform: rotate(3deg) translate(40px, -20px);
       z-index: 3;
       animation: float3 6s ease-in-out infinite 2s;
     }
 
     @keyframes float1 {
-      0%,100% { transform: rotate(-9deg) translate(20px, 80px); }
-      50%      { transform: rotate(-8deg) translate(20px, 68px); }
+      0%,100% { transform: rotate(-10deg) translate(-60px, 80px); }
+      50%      { transform: rotate(-9deg) translate(-60px, 68px); }
     }
     @keyframes float2 {
-      0%,100% { transform: rotate(-3deg) translate(60px, 36px); }
-      50%      { transform: rotate(-2.5deg) translate(60px, 26px); }
+      0%,100% { transform: rotate(-4deg) translate(-20px, 30px); }
+      50%      { transform: rotate(-3.5deg) translate(-20px, 20px); }
     }
     @keyframes float3 {
-      0%,100% { transform: rotate(2deg) translate(90px, 0px); }
-      50%      { transform: rotate(1.5deg) translate(90px, -12px); }
+      0%,100% { transform: rotate(3deg) translate(40px, -20px); }
+      50%      { transform: rotate(2.5deg) translate(40px, -32px); }
     }
 
     .card-tag {
@@ -452,7 +464,7 @@
   <header>
     <div class="header-inner">
       <a href="index.html" class="logo">
-        <div class="logo-badge">GM</div>
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
         <span>Générations<br>Médecins</span>
       </a>
       <nav>
@@ -461,6 +473,7 @@
         <a href="plaidoyer.html">Plaidoyer</a>
         <a href="outils.html">Outils</a>
         <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
         <a href="bureau.html">Bureau</a>
       </nav>
       <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
@@ -480,7 +493,7 @@
         </div>
         <div class="hero-stats">
           <div>
-            <div class="stat-value">320+</div>
+            <div class="stat-value">3 000+</div>
             <div class="stat-label">Adhérents actifs</div>
           </div>
           <div>
@@ -499,40 +512,49 @@
 
         <!-- Card 1 : Décrypteur -->
         <div class="stack-card">
-          <div class="card-tag tag-blue">📰 Décrypteur</div>
-          <div class="card-title">Avenant n°9 : ce qui change pour vous</div>
-          <div class="card-body-text">Généraliste secteur 1 : +18% sur les consultations longues. Nouveau forfait patientèle à partir du 1er juillet.</div>
-          <div style="display:flex;align-items:center;justify-content:space-between">
-            <span class="chip chip-green">✓ Vérifié</span>
-            <span style="font-size:0.72rem;color:var(--muted)">Il y a 2 jours</span>
+          <div class="card-accent card-accent-blue"></div>
+          <div class="card-inner">
+            <div class="card-tag tag-blue">📰 Décrypteur</div>
+            <div class="card-title">Avenant n°9 : ce qui change pour vous</div>
+            <div class="card-body-text">Généraliste secteur 1 : +18% sur les consultations longues. Nouveau forfait patientèle à partir du 1er juillet.</div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span class="chip chip-green">✓ Vérifié</span>
+              <span style="font-size:0.72rem;color:var(--muted)">Il y a 2 jours</span>
+            </div>
           </div>
         </div>
 
         <!-- Card 2 : Plaidoyer -->
         <div class="stack-card">
-          <div class="card-tag tag-teal">⚖️ Plaidoyer</div>
-          <div class="card-title">Numerus apertus en psychiatrie</div>
-          <div class="mini-progress">
-            <div class="mini-progress-bar" style="width:65%"></div>
+          <div class="card-accent card-accent-teal"></div>
+          <div class="card-inner">
+            <div class="card-tag tag-teal">⚖️ Plaidoyer</div>
+            <div class="card-title">Numerus apertus en psychiatrie</div>
+            <div class="mini-progress">
+              <div class="mini-progress-bar" style="width:65%"></div>
+            </div>
+            <div class="mini-progress-labels">
+              <span>En cours · Dossier déposé</span>
+              <span style="font-weight:700;color:var(--blue)">65%</span>
+            </div>
+            <div style="margin-top:12px;font-size:0.72rem;color:var(--muted)">Prochain RDV : 3 juin — DSS</div>
           </div>
-          <div class="mini-progress-labels">
-            <span>En cours · Dossier déposé</span>
-            <span style="font-weight:700;color:var(--blue)">65%</span>
-          </div>
-          <div style="margin-top:12px;font-size:0.72rem;color:var(--muted)">Prochain RDV : 3 juin — DSS</div>
         </div>
 
         <!-- Card 3 : Simulateur -->
         <div class="stack-card">
-          <div class="card-tag tag-green">🧮 Simulateur</div>
-          <div class="card-title">Revenus nets estimés</div>
-          <div class="card-body-text">Généraliste · Secteur 1 · Libéral · 28 actes/j</div>
-          <div style="display:flex;justify-content:space-between;align-items:flex-end">
-            <div>
-              <div style="font-size:0.7rem;color:var(--muted);margin-bottom:3px">Net mensuel estimé</div>
-              <div style="font-size:1.5rem;font-weight:900;color:var(--blue-dark);letter-spacing:-0.02em">6 840 €</div>
+          <div class="card-accent card-accent-green"></div>
+          <div class="card-inner">
+            <div class="card-tag tag-green">🧮 Simulateur</div>
+            <div class="card-title">Revenus nets estimés</div>
+            <div class="card-body-text">Généraliste · Secteur 1 · Libéral · 28 actes/j</div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end">
+              <div>
+                <div style="font-size:0.7rem;color:var(--muted);margin-bottom:3px">Net mensuel estimé</div>
+                <div style="font-size:1.5rem;font-weight:900;color:var(--blue-dark);letter-spacing:-0.02em">6 840 €</div>
+              </div>
+              <span class="chip chip-green">↑ +12% vs 2024</span>
             </div>
-            <span class="chip chip-green">↑ +12% vs 2024</span>
           </div>
         </div>
 
@@ -771,7 +793,7 @@
   <!-- CTA -->
   <section class="cta-section">
     <h2>Rejoignez le mouvement.</h2>
-    <p>320 médecins d'Île-de-France ont choisi un syndicat qui leur ressemble. Participez à une représentation qui vous représente vraiment.</p>
+    <p>Plus de 3 000 médecins ont choisi un syndicat qui leur ressemble. Participez à une représentation qui vous représente vraiment.</p>
     <a href="adherer.html" class="btn btn-white btn-lg">Adhérer maintenant →</a>
   </section>
 
@@ -780,7 +802,7 @@
     <div class="footer-inner">
       <div>
         <a href="index.html" class="logo" style="margin-bottom:6px">
-          <div class="logo-badge">GM</div>
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
           <span>Générations Médecins Île-de-France</span>
         </a>
         <p class="footer-copy">Syndicat médical indépendant · Île-de-France</p>

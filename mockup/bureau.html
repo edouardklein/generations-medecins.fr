@@ -8,54 +8,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
-    .team-grid {
+    /* Featured president */
+    .president-card {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-    }
-
-    .member-card {
-      border-radius: 20px;
+      grid-template-columns: 340px 1fr;
+      border-radius: 24px;
       border: 1.5px solid var(--line);
       background: white;
       overflow: hidden;
-      transition: all 0.2s;
-    }
-    .member-card:hover {
-      box-shadow: 0 8px 32px rgba(50,106,162,0.1);
-      transform: translateY(-2px);
+      margin-bottom: 48px;
+      box-shadow: 0 8px 40px rgba(26,74,128,0.08);
     }
 
-    .member-card.featured {
-      grid-column: span 3;
-      display: grid;
-      grid-template-columns: 320px 1fr;
-    }
-
-    .member-photo {
-      aspect-ratio: 1;
-      background: linear-gradient(135deg, var(--surface), #d4eaf0);
+    .president-photo {
+      background: var(--surface);
       overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
-
-    .member-photo img {
+    .president-photo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
 
-    .member-card.featured .member-photo {
-      aspect-ratio: auto;
-      height: 320px;
-    }
-
-    .member-info { padding: 24px; }
-
-    .member-card.featured .member-info {
-      padding: 36px;
+    .president-info {
+      padding: 48px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -65,72 +42,113 @@
       font-size: 0.72rem;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       color: var(--blue);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .member-name {
-      font-size: 1.2rem;
+      font-size: 2rem;
       font-weight: 900;
       color: var(--blue-dark);
-      letter-spacing: -0.015em;
-      margin-bottom: 12px;
-    }
-
-    .member-card.featured .member-name {
-      font-size: 1.8rem;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+      margin-bottom: 16px;
     }
 
     .member-bio {
-      font-size: 0.85rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .member-card.featured .member-bio {
       font-size: 1rem;
-    }
-
-    .member-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 16px;
-    }
-
-    .member-tag {
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      background: var(--surface);
       color: var(--muted);
-      border: 1px solid var(--line);
+      line-height: 1.65;
     }
 
-    .placeholder-photo {
-      width: 100%;
-      height: 100%;
+    /* Grid membres */
+    .section-title-sm {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      letter-spacing: -0.01em;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--line);
+    }
+
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .member-card {
+      padding: 24px;
+      border-radius: var(--r);
+      border: 1.5px solid var(--line);
+      background: white;
+      transition: all 0.2s;
+    }
+    .member-card:hover {
+      border-color: rgba(42,109,184,0.3);
+      box-shadow: 0 8px 24px rgba(42,109,184,0.08);
+    }
+
+    .member-card .member-role {
+      font-size: 0.68rem;
+    }
+    .member-card .member-name {
+      font-size: 1rem;
+      margin-bottom: 0;
+    }
+
+    .member-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--grad);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 3rem;
-      background: linear-gradient(135deg, var(--surface), #d4eaf0);
+      font-size: 1rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 14px;
+      letter-spacing: 0.02em;
+    }
+
+    /* Gouvernance */
+    .gouvernance-block {
+      padding: 36px;
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1.5px solid var(--line);
+      text-align: center;
+      margin-top: 16px;
+    }
+    .gouvernance-block h3 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin-bottom: 10px;
+    }
+    .gouvernance-block p {
+      font-size: 0.92rem;
       color: var(--muted);
+      max-width: 56ch;
+      margin: 0 auto 24px;
+      line-height: 1.65;
     }
 
-    @media (max-width: 900px) {
-      .member-card.featured {
-        grid-column: span 1;
-        grid-template-columns: 1fr;
-      }
-      .member-card.featured .member-photo { height: 240px; }
-      .team-grid { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 860px) {
+      .president-card { grid-template-columns: 1fr; }
+      .president-photo { height: 280px; }
+      .president-info { padding: 32px; }
+      .member-name { font-size: 1.5rem; }
     }
-
-    @media (max-width: 520px) {
-      .team-grid { grid-template-columns: 1fr; }
+    @media (max-width: 620px) {
+      .members-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 420px) {
+      .members-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -139,7 +157,7 @@
   <header>
     <div class="header-inner">
       <a href="index.html" class="logo">
-        <div class="logo-badge">GM</div>
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
         <span>Générations<br>Médecins</span>
       </a>
       <nav>
@@ -148,6 +166,7 @@
         <a href="plaidoyer.html">Plaidoyer</a>
         <a href="outils.html">Outils</a>
         <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
         <a href="bureau.html" class="active">Bureau</a>
       </nav>
       <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
@@ -156,77 +175,85 @@
 
   <div class="page-hero">
     <div class="page-hero-inner">
-      <span class="badge badge-blue">🏛️ Bureau élu</span>
+      <span class="badge badge-blue">🏛️ Bureau</span>
       <h1>Le Bureau</h1>
-      <p>Les médecins qui portent Générations Médecins Île-de-France. Élus par les adhérents, responsables devant eux.</p>
+      <p>Les médecins qui portent Générations Médecins. Renouvelés régulièrement pour assurer un dynamisme, responsables devant les adhérents.</p>
     </div>
   </div>
 
   <section class="section">
     <div class="section-inner">
-      <div class="team-grid">
 
-        <!-- Président — featured -->
-        <div class="member-card featured">
-          <div class="member-photo">
-            <img src="../static/bourla.png" alt="Alexis BOURLA" onerror="this.parentElement.innerHTML='<div class=\'placeholder-photo\'>👨‍⚕️</div>'">
-          </div>
-          <div class="member-info">
-            <div class="member-role">Président</div>
-            <div class="member-name">Alexis BOURLA</div>
-            <p class="member-bio">Médecin fondateur de Générations Médecins Île-de-France. Convaincu qu'un syndicat médical ne peut être légitime que s'il consulte réellement ses membres et assume ses positions en toute transparence.</p>
-            <div class="member-tags">
-              <span class="member-tag">Médecine générale</span>
-              <span class="member-tag">Île-de-France</span>
-              <span class="member-tag">Fondateur</span>
-            </div>
-          </div>
+      <!-- Président -->
+      <div class="president-card">
+        <div class="president-photo">
+          <img src="../static/bourla.png" alt="Alexis BOURLA"
+               onerror="this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;background:var(--surface);font-size:5rem\'>👨‍⚕️</div>'">
         </div>
-
-        <!-- Membres du bureau — placeholders -->
-        <div class="member-card">
-          <div class="member-photo" style="height:180px">
-            <div class="placeholder-photo" style="font-size:2.5rem">👩‍⚕️</div>
-          </div>
-          <div class="member-info">
-            <div class="member-role">Vice-présidente Communication</div>
-            <div class="member-name">Poste à pourvoir</div>
-            <p class="member-bio">Membre du bureau en charge de la communication et des réseaux sociaux.</p>
-          </div>
+        <div class="president-info">
+          <div class="member-role">Président</div>
+          <div class="member-name">Alexis BOURLA</div>
+          <p class="member-bio">Convaincu qu'un syndicat médical ne peut être légitime que s'il consulte réellement ses membres et assume ses positions en toute transparence.</p>
         </div>
-
-        <div class="member-card">
-          <div class="member-photo" style="height:180px">
-            <div class="placeholder-photo" style="font-size:2.5rem">👨‍⚕️</div>
-          </div>
-          <div class="member-info">
-            <div class="member-role">Secrétaire général</div>
-            <div class="member-name">Poste à pourvoir</div>
-            <p class="member-bio">Coordination administrative et suivi des dossiers en cours.</p>
-          </div>
-        </div>
-
-        <div class="member-card">
-          <div class="member-photo" style="height:180px">
-            <div class="placeholder-photo" style="font-size:2.5rem">👩‍⚕️</div>
-          </div>
-          <div class="member-info">
-            <div class="member-role">Trésorière</div>
-            <div class="member-name">Poste à pourvoir</div>
-            <p class="member-bio">Gestion financière et transparence des comptes du syndicat.</p>
-          </div>
-        </div>
-
       </div>
-    </div>
-  </section>
 
-  <section class="section section-alt">
-    <div class="section-inner" style="text-align:center;max-width:600px;margin:0 auto">
-      <div class="section-label">Gouvernance</div>
-      <h2 class="section-title">Un bureau élu, responsable, transparent.</h2>
-      <p class="section-sub" style="margin:0 auto 36px">Le bureau est élu chaque année par les adhérents. Toutes les positions portées au nom de Générations Médecins sont soumises à consultation avant publication.</p>
-      <a href="adherer.html" class="btn btn-primary btn-lg">Adhérer et voter →</a>
+      <!-- Vice-présidents -->
+      <div class="section-title-sm">Vice-président·e·s</div>
+      <div class="members-grid">
+        <div class="member-card">
+          <div class="member-avatar">PH</div>
+          <div class="member-role">Vice-président</div>
+          <div class="member-name">Pierre Hamann</div>
+        </div>
+        <div class="member-card">
+          <div class="member-avatar">LAK</div>
+          <div class="member-role">Vice-présidente</div>
+          <div class="member-name">Louise Anne Klein</div>
+        </div>
+        <div class="member-card">
+          <div class="member-avatar">CC</div>
+          <div class="member-role">Vice-présidente</div>
+          <div class="member-name">Cherifa Cheurfa</div>
+        </div>
+      </div>
+
+      <!-- Autres membres -->
+      <div class="section-title-sm">Secrétariat & Trésorerie</div>
+      <div class="members-grid" style="grid-template-columns:repeat(2,1fr);max-width:640px">
+        <div class="member-card">
+          <div class="member-avatar">MHT</div>
+          <div class="member-role">Secrétaire générale</div>
+          <div class="member-name">Minh-Hanh Ta</div>
+        </div>
+        <div class="member-card">
+          <div class="member-avatar">FV</div>
+          <div class="member-role">Trésorier</div>
+          <div class="member-name">Franck Verdonk</div>
+        </div>
+      </div>
+
+      <!-- Chargées de mission -->
+      <div class="section-title-sm">Chargées de mission</div>
+      <div class="members-grid" style="grid-template-columns:repeat(2,1fr);max-width:640px">
+        <div class="member-card">
+          <div class="member-avatar">RB</div>
+          <div class="member-role">Chargée de mission</div>
+          <div class="member-name">Rivka Bendrihem</div>
+        </div>
+        <div class="member-card">
+          <div class="member-avatar">SH</div>
+          <div class="member-role">Chargée de mission</div>
+          <div class="member-name">Soraya Hugain</div>
+        </div>
+      </div>
+
+      <!-- Gouvernance -->
+      <div class="gouvernance-block">
+        <h3>Un bureau renouvelé, transparent, responsable.</h3>
+        <p>Le bureau est renouvelé régulièrement pour assurer un dynamisme. Toutes les positions portées au nom de Générations Médecins sont soumises à consultation avant publication.</p>
+        <a href="adherer.html" class="btn btn-primary">Adhérer et participer →</a>
+      </div>
+
     </div>
   </section>
 
@@ -234,7 +261,7 @@
     <div class="footer-inner">
       <div>
         <a href="index.html" class="logo" style="margin-bottom:6px">
-          <div class="logo-badge">GM</div>
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
           <span>Générations Médecins Île-de-France</span>
         </a>
         <p class="footer-copy">Syndicat médical indépendant · Île-de-France</p>
@@ -243,6 +270,7 @@
         <a href="decrypteurs.html">Décrypteurs</a>
         <a href="plaidoyer.html">Plaidoyer</a>
         <a href="outils.html">Outils</a>
+        <a href="regions.html">Régions</a>
         <a href="bureau.html">Bureau</a>
         <a href="#">Contact</a>
       </div>
