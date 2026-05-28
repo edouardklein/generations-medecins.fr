@@ -129,32 +129,34 @@
     .card-inner { padding: 20px 22px 22px; }
 
     .stack-card:nth-child(1) {
-      transform: rotate(-10deg) translate(-60px, 80px);
+      transform: rotate(-9deg) translate(-90px, 70px);
       z-index: 1;
       animation: float1 6s ease-in-out infinite;
+      opacity: 0.92;
     }
     .stack-card:nth-child(2) {
-      transform: rotate(-4deg) translate(-20px, 30px);
+      transform: rotate(-3deg) translate(-44px, 28px);
       z-index: 2;
       animation: float2 6s ease-in-out infinite 1s;
+      opacity: 0.96;
     }
     .stack-card:nth-child(3) {
-      transform: rotate(3deg) translate(40px, -20px);
+      transform: rotate(2deg) translate(20px, -16px);
       z-index: 3;
       animation: float3 6s ease-in-out infinite 2s;
     }
 
     @keyframes float1 {
-      0%,100% { transform: rotate(-10deg) translate(-60px, 80px); }
-      50%      { transform: rotate(-9deg) translate(-60px, 68px); }
+      0%,100% { transform: rotate(-9deg) translate(-90px, 70px); opacity: 0.92; }
+      50%      { transform: rotate(-8deg) translate(-90px, 58px); opacity: 0.92; }
     }
     @keyframes float2 {
-      0%,100% { transform: rotate(-4deg) translate(-20px, 30px); }
-      50%      { transform: rotate(-3.5deg) translate(-20px, 20px); }
+      0%,100% { transform: rotate(-3deg) translate(-44px, 28px); opacity: 0.96; }
+      50%      { transform: rotate(-2.5deg) translate(-44px, 18px); opacity: 0.96; }
     }
     @keyframes float3 {
-      0%,100% { transform: rotate(3deg) translate(40px, -20px); }
-      50%      { transform: rotate(2.5deg) translate(40px, -32px); }
+      0%,100% { transform: rotate(2deg) translate(20px, -16px); }
+      50%      { transform: rotate(1.5deg) translate(20px, -28px); }
     }
 
     .card-tag {
@@ -524,24 +526,7 @@
           </div>
         </div>
 
-        <!-- Card 2 : Plaidoyer -->
-        <div class="stack-card">
-          <div class="card-accent card-accent-teal"></div>
-          <div class="card-inner">
-            <div class="card-tag tag-teal">⚖️ Plaidoyer</div>
-            <div class="card-title">Numerus apertus en psychiatrie</div>
-            <div class="mini-progress">
-              <div class="mini-progress-bar" style="width:65%"></div>
-            </div>
-            <div class="mini-progress-labels">
-              <span>En cours · Dossier déposé</span>
-              <span style="font-weight:700;color:var(--blue)">65%</span>
-            </div>
-            <div style="margin-top:12px;font-size:0.72rem;color:var(--muted)">Prochain RDV : 3 juin — DSS</div>
-          </div>
-        </div>
-
-        <!-- Card 3 : Simulateur -->
+        <!-- Card 2 : Simulateur -->
         <div class="stack-card">
           <div class="card-accent card-accent-green"></div>
           <div class="card-inner">
@@ -555,6 +540,23 @@
               </div>
               <span class="chip chip-green">↑ +12% vs 2024</span>
             </div>
+          </div>
+        </div>
+
+        <!-- Card 3 : Plaidoyer (front) -->
+        <div class="stack-card">
+          <div class="card-accent card-accent-teal"></div>
+          <div class="card-inner">
+            <div class="card-tag tag-teal">⚖️ Plaidoyer</div>
+            <div class="card-title">Revalorisation des gardes hospitalières</div>
+            <div class="mini-progress">
+              <div class="mini-progress-bar" style="width:72%"></div>
+            </div>
+            <div class="mini-progress-labels">
+              <span>Dossier déposé · En attente réponse</span>
+              <span style="font-weight:700;color:var(--blue)">72%</span>
+            </div>
+            <div style="margin-top:12px;font-size:0.72rem;color:var(--muted)">1 240 signatures · Réponse attendue 15 juin</div>
           </div>
         </div>
 

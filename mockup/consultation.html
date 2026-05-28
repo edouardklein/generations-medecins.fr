@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consultation des adhérents — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .gate {
+      max-width: 560px;
+      margin: 0 auto 56px;
+      text-align: center;
+    }
+    .gate-icon { font-size: 3rem; margin-bottom: 20px; display: block; }
+    .gate h2 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--blue-dark);
+      margin-bottom: 14px;
+      letter-spacing: -0.02em;
+    }
+    .gate p {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 32px;
+    }
+    .gate-actions { display: flex; gap: 12px; justify-content: center; }
+
+    .votes-preview {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .vote-card {
+      padding: 28px;
+      border-radius: var(--r);
+      background: white;
+      border: 1.5px solid var(--line);
+      position: relative;
+    }
+
+    .vote-status {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .vote-open   { background: rgba(137,200,106,0.13); color: #3d8a1a; }
+    .vote-closed { background: rgba(88,170,179,0.12);  color: #2a7a83; }
+    .vote-coming { background: rgba(245,158,11,0.1);   color: #b06c00; }
+
+    .vote-type {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .vote-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin-bottom: 8px;
+      padding-right: 100px;
+    }
+
+    .vote-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+
+    .vote-options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .vote-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1.5px solid var(--line);
+      background: var(--surface);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vote-option-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      background: rgba(50,106,162,0.08);
+      border-radius: 10px;
+    }
+
+    .vote-option-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--ink);
+      position: relative;
+      z-index: 1;
+      flex: 1;
+    }
+
+    .vote-option-pct {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--blue);
+      position: relative;
+      z-index: 1;
+    }
+
+    .vote-meta {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      margin-top: 20px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .vote-meta strong { color: var(--ink); }
+
+    .vote-blur {
+      position: relative;
+    }
+    .vote-blur::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      background: rgba(255,255,255,0.6);
+      border-radius: var(--r);
+    }
+
+    .how-works-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+
+    .how-item {
+      padding: 28px 24px;
+      border-radius: var(--r);
+      background: white;
+      border: 1.5px solid var(--line);
+    }
+    .how-icon { font-size: 1.8rem; margin-bottom: 14px; display: block; }
+    .how-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+      margin-bottom: 8px;
+    }
+    .how-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .principle-block {
+      padding: 36px;
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1.5px solid var(--line);
+      margin-bottom: 48px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    .principle-icon { font-size: 2.5rem; }
+    .principle-text h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin-bottom: 10px;
+    }
+    .principle-text p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    @media (max-width: 620px) {
+      .how-works-list { grid-template-columns: 1fr; }
+      .gate-actions { flex-direction: column; }
+      .principle-block { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html" class="active">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <span class="badge badge-blue">🗳️ Adhérents · À venir</span>
+      <h1>Consultation des adhérents</h1>
+      <p>Chaque décision importante est prise avec vous, pas à votre place. Votes, sondages, consultations — votre voix dans chaque dossier que nous portons.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+
+      <!-- Principe fort -->
+      <div class="principle-block">
+        <div class="principle-icon">🗳️</div>
+        <div class="principle-text">
+          <h3>Le syndicat ne parle pas en votre nom sans vous consulter.</h3>
+          <p>Avant chaque prise de position publique, avant chaque communiqué engageant l'ensemble des adhérents, le bureau soumet une consultation. Ce n'est pas un gadget — c'est notre fonctionnement. Les résultats sont publiés avec le taux de participation, pour que chacun puisse juger la représentativité de la décision prise.</p>
+        </div>
+      </div>
+
+      <!-- Aperçu flouté -->
+      <div class="section-label" style="margin-bottom:16px">Consultations en cours — Aperçu</div>
+
+      <div class="votes-preview">
+
+        <!-- Vote 1 — visible mais flouté -->
+        <div class="vote-card vote-blur">
+          <div class="vote-status vote-open">● Vote ouvert</div>
+          <div class="vote-type">Prise de position</div>
+          <div class="vote-title">Position sur le projet de loi "Accès aux soins non programmés"</div>
+          <p class="vote-desc">Le bureau demande l'avis des adhérents avant de publier une position officielle sur le projet de loi débattu à l'Assemblée nationale le 12 juin.</p>
+          <div class="vote-options">
+            <div class="vote-option">
+              <div class="vote-option-bar" style="width:62%"></div>
+              <span class="vote-option-label">Soutien avec réserves sur l'article 4</span>
+              <span class="vote-option-pct">62%</span>
+            </div>
+            <div class="vote-option">
+              <div class="vote-option-bar" style="width:24%"></div>
+              <span class="vote-option-label">Opposition totale</span>
+              <span class="vote-option-pct">24%</span>
+            </div>
+            <div class="vote-option">
+              <div class="vote-option-bar" style="width:14%"></div>
+              <span class="vote-option-label">Soutien sans réserve</span>
+              <span class="vote-option-pct">14%</span>
+            </div>
+          </div>
+          <div class="vote-meta">
+            <span><strong>287</strong> votants</span>
+            <span>Ferme le <strong>8 juin 2025</strong></span>
+            <span>Résultats <strong>publics après clôture</strong></span>
+          </div>
+        </div>
+
+        <!-- Vote 2 — visible mais flouté -->
+        <div class="vote-card vote-blur">
+          <div class="vote-status vote-coming">⏳ À venir</div>
+          <div class="vote-type">Sondage interne</div>
+          <div class="vote-title">Priorités plaidoyer T3 2025 — Quels dossiers porter en priorité ?</div>
+          <p class="vote-desc">Classement de 6 sujets potentiels pour le trimestre suivant. Le résultat déterminera l'ordre de traitement du bureau.</p>
+          <div class="vote-meta">
+            <span>Ouverture le <strong>15 juin 2025</strong></span>
+            <span>Adhérents uniquement</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Gate -->
+      <div class="gate">
+        <span class="gate-icon">🔒</span>
+        <h2>Réservé aux adhérents</h2>
+        <p>Le module de consultation est en cours de déploiement. En adhérant maintenant, vous faites partie des premiers à voter lors des consultations du bureau.</p>
+        <div class="gate-actions">
+          <a href="adherer.html" class="btn btn-primary btn-lg">Adhérer et voter →</a>
+          <a href="plaidoyer.html" class="btn btn-outline btn-lg">Voir les dossiers en cours</a>
+        </div>
+      </div>
+
+      <!-- Comment ça fonctionne -->
+      <div class="section-label" style="margin-bottom:20px">Comment ça fonctionne</div>
+      <div class="how-works-list">
+        <div class="how-item">
+          <span class="how-icon">📣</span>
+          <div class="how-title">Le bureau soumet une question</div>
+          <p class="how-desc">Avant chaque prise de position ou décision importante, une consultation est ouverte pendant 5 à 10 jours. Tous les adhérents reçoivent une notification.</p>
+        </div>
+        <div class="how-item">
+          <span class="how-icon">🗳️</span>
+          <div class="how-title">Vous votez ou commentez</div>
+          <p class="how-desc">Vote anonyme sur les options proposées, plus un champ libre pour nuancer votre position. Une voix = un adhérent vérifié.</p>
+        </div>
+        <div class="how-item">
+          <span class="how-icon">📊</span>
+          <div class="how-title">Résultats publiés et suivis</div>
+          <p class="how-desc">Les résultats sont publiés après clôture, avec le taux de participation. La position prise par le bureau doit s'aligner ou expliquer l'écart.</p>
+        </div>
+      </div>
+
+      <div class="coming-soon-block">
+        <span class="icon">🗳️</span>
+        <h3>Module en cours de déploiement</h3>
+        <p>Le système de consultation sera actif dès le T3 2025. Les adhérents fondateurs seront les premiers à voter.</p>
+        <a href="adherer.html" class="btn btn-primary">Adhérer maintenant →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Votre voix dans chaque décision.</h2>
+    <p>Un syndicat légitime, c'est un syndicat qui consulte. Rejoignez les membres fondateurs et participez aux premières consultations dès leur ouverture.</p>
+    <a href="adherer.html" class="btn btn-white btn-lg">Adhérer maintenant →</a>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Syndicat médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

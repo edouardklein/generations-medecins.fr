@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module Mobilisation — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .mobilisation-preview {
+      border-radius: 20px;
+      border: 1.5px solid var(--line);
+      background: white;
+      overflow: hidden;
+      margin-bottom: 48px;
+    }
+
+    .alert-banner {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .alert-banner-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .alert-banner-text h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 3px;
+    }
+    .alert-banner-text p {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.8);
+    }
+    .alert-banner-cta {
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .mobilisation-body {
+      padding: 32px 28px;
+    }
+
+    .sign-count {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .sign-number {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--blue-dark);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+    .sign-label {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .sign-target {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .progress-big {
+      width: 100%;
+      height: 12px;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .progress-big-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #dc2626, #f97316);
+    }
+
+    .mobilisation-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 1px solid var(--line);
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .form-field input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1.5px solid var(--line);
+      font-size: 0.88rem;
+      font-family: inherit;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+    .form-field input:focus { border-color: var(--blue); }
+
+    .share-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      align-items: center;
+    }
+    .share-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .share-btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: 1.5px solid var(--line);
+      background: white;
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+    }
+    .share-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+    .how-it-works {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+    .step-card {
+      padding: 24px;
+      border-radius: var(--r);
+      background: white;
+      border: 1.5px solid var(--line);
+      text-align: center;
+    }
+    .step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--grad);
+      color: white;
+      font-size: 0.88rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+    }
+    .step-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+      margin-bottom: 8px;
+    }
+    .step-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 800px) {
+      .how-it-works { grid-template-columns: 1fr 1fr; }
+      .mobilisation-form { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .how-it-works { grid-template-columns: 1fr; }
+      .alert-banner { flex-direction: column; }
+      .alert-banner-cta { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html" class="active">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <span class="badge badge-blue">📣 À venir</span>
+      <h1>Module Mobilisation</h1>
+      <p>Quand un sujet chaud arrive — grève, pétition, urgence — un bandeau visible, un formulaire de signature et un partage social préformaté en un clic.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+
+      <div class="section-label" style="margin-bottom:10px">Aperçu du module</div>
+      <h2 class="section-title" style="margin-bottom:8px">Mobilisez en un clic.</h2>
+      <p class="section-sub">Voici à quoi ressemblera le module lors d'une mobilisation active. Actuellement en cours de déploiement.</p>
+
+      <!-- Preview du module en action -->
+      <div class="mobilisation-preview">
+        <div class="alert-banner">
+          <div class="alert-banner-icon">🚨</div>
+          <div class="alert-banner-text">
+            <h3>Mobilisation en cours — Revalorisation des gardes hospitalières</h3>
+            <p>Signez maintenant. Chaque signature compte pour le dossier déposé au Ministère.</p>
+          </div>
+          <div class="alert-banner-cta">
+            <span style="padding:8px 18px;background:white;color:#dc2626;border-radius:8px;font-size:0.82rem;font-weight:800">Signer →</span>
+          </div>
+        </div>
+        <div class="mobilisation-body">
+          <div class="sign-count">
+            <div class="sign-number">1 240</div>
+            <div>
+              <div class="sign-label">signatures collectées</div>
+              <div class="sign-target">Objectif : 2 000</div>
+            </div>
+          </div>
+          <div class="progress-big">
+            <div class="progress-big-fill" style="width:62%"></div>
+          </div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0">62% de l'objectif atteint · 3 jours restants</div>
+
+          <div class="mobilisation-form">
+            <div class="form-field">
+              <label>Nom &amp; prénom</label>
+              <input type="text" placeholder="Dr. Dupont Marie">
+            </div>
+            <div class="form-field">
+              <label>Email professionnel</label>
+              <input type="email" placeholder="m.dupont@cabinet-dupont.fr">
+            </div>
+            <a href="adherer.html" class="btn btn-primary" style="white-space:nowrap">Signer →</a>
+          </div>
+
+          <div class="share-row">
+            <span class="share-label">Partager :</span>
+            <a href="#" class="share-btn">𝕏 Twitter</a>
+            <a href="#" class="share-btn">in LinkedIn</a>
+            <a href="#" class="share-btn">📧 Email</a>
+            <a href="#" class="share-btn">📋 Copier le lien</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comment ça marche -->
+      <div class="section-label" style="margin-bottom:20px">Comment ça fonctionne</div>
+      <div class="how-it-works">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-title">Sujet détecté</div>
+          <p class="step-desc">Le bureau déclenche une mobilisation sur un sujet urgent (grève, pétition, courrier collectif).</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-title">Bandeau activé</div>
+          <p class="step-desc">Un bandeau d'alerte apparaît en haut du site. Tous les adhérents reçoivent une notification email.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-title">Signature en 1 clic</div>
+          <p class="step-desc">Les médecins signent en 10 secondes. Identité vérifiée via l'adhésion — pas d'anonyme.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-title">Résultat transmis</div>
+          <p class="step-desc">La liste des signatures, avec n° RPPS, est transmise directement aux destinataires institutionnels.</p>
+        </div>
+      </div>
+
+      <div class="coming-soon-block">
+        <span class="icon">🔄</span>
+        <h3>Module en cours de développement</h3>
+        <p>Le module Mobilisation sera actif dès la prochaine campagne. En adhérant maintenant, vous faites partie des premiers mobilisés.</p>
+        <a href="adherer.html" class="btn btn-primary">Adhérer et être notifié →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Syndicat médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
