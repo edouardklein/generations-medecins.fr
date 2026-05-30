@@ -50,7 +50,7 @@ export default function LandingPage() {
               Générations Médecins <span className="text-gold-500">Île-de-France</span>
             </h1>
             <p className="mt-3 text-navy-200 max-w-xl">
-              Espace partenaires — sélectionnez votre logo pour accéder à votre book sur-mesure.
+              Espace partenaires — sélectionnez votre logo pour accéder au book.
             </p>
           </div>
           <div className="hidden md:block text-right text-navy-300 text-sm">

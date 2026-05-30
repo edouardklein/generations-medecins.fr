@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 200" fill-rule="evenodd">
+  <defs>
+    <linearGradient id="redArch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#C73523"/>
+      <stop offset="100%" stop-color="#8A2415"/>
+    </linearGradient>
+    <linearGradient id="orangeArch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F18D1F"/>
+      <stop offset="100%" stop-color="#C46518"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#redArch)" d="
+    M 18 178
+    L 18 60
+    Q 18 18 62 18
+    Q 106 18 106 60
+    L 106 178
+    L 80 178
+    L 80 65
+    Q 80 42 62 42
+    Q 44 42 44 65
+    L 44 178
+    Z
+  "/>
+  <path fill="url(#orangeArch)" d="
+    M 102 178
+    L 102 60
+    Q 102 18 146 18
+    Q 190 18 190 60
+    L 190 178
+    L 164 178
+    L 164 65
+    Q 164 42 146 42
+    Q 128 42 128 65
+    L 128 178
+    Z
+  "/>
+</svg>
