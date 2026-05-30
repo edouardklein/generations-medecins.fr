@@ -640,7 +640,7 @@
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'connexion.html'; return; }
 
-    const { data: adminRow } = await sb.from('admins').select('id').eq('user_id', session.user.id).single();
+    const { data: adminRow } = await sb.from('admins').select('user_id').eq('user_id', session.user.id).single();
     if (!adminRow) { window.location.href = 'espace-membre.html'; return; }
 
     document.body.style.visibility = 'visible';
