@@ -419,10 +419,16 @@
 
     // 1. Créer le compte auth
     const { data, error: authError } = await sb.auth.signUp({ email, password });
-    if (authError) return showError(authError.message);
+    if (authError) {
+      if (authError.message.includes('already registered')) return showError('Un compte existe déjà avec cet email.');
+      return showError(authError.message);
+    }
 
     const userId = data.user?.id;
     if (!userId) return showError('Erreur lors de la création du compte. Réessayez.');
+
+    // Sans session = confirmation email activée dans Supabase → désactiver dans Auth > Providers > Email
+    if (!data.session) return showError('Configuration requise : désactivez la confirmation email dans Supabase Auth.');
 
     // 2. Créer le profil membre
     const { error: memberError } = await sb.from('membres').insert({
