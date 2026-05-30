@@ -21,7 +21,7 @@ const SlideFrame = forwardRef<HTMLDivElement, Props>(function SlideFrame(
     <div
       ref={ref}
       data-slide-index={index}
-      className={`slide-canvas relative ${isLight ? 'text-navy-900' : 'text-navy-50'} ${className}`}
+      className={`slide-canvas slide-card relative ${isLight ? 'text-navy-900' : 'text-navy-50'} ${className}`}
       style={{
         background: isLight
           ? 'linear-gradient(180deg,#f3f6fb 0%, #e9eff7 100%)'

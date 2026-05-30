@@ -20,12 +20,7 @@ export default function BookViewer({ envelope }: Props) {
   const hasSlides = Array.isArray(book.slides) && book.slides.length > 0
 
   const slideVariants = useMemo(
-    () =>
-      book.slides.map((_, i) =>
-        i % 2 === 0 || book.slides[i].type === 'plan' || book.slides[i].type === 'stats'
-          ? 'dark'
-          : 'light',
-      ) as Array<'dark' | 'light'>,
+    () => book.slides.map(() => 'dark') as Array<'dark' | 'light'>,
     [book.slides],
   )
 
