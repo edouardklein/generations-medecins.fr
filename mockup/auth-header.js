@@ -13,7 +13,18 @@
 
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) return; // non connecté → bouton Adhérer reste intact
+    if (!session) {
+      // Non connecté → ajouter un lien "Se connecter" à côté du bouton Adhérer
+      const adhererBtn = document.querySelector('a[href="adherer.html"].btn.btn-primary, a[href="adherer.html"].btn-primary');
+      if (adhererBtn) {
+        const loginLink = document.createElement('a');
+        loginLink.href = 'connexion.html';
+        loginLink.textContent = 'Se connecter';
+        loginLink.style.cssText = 'font-size:0.85rem;font-weight:700;color:var(--blue-dark,#1a4a80);text-decoration:none;white-space:nowrap;';
+        adhererBtn.parentNode.insertBefore(loginLink, adhererBtn);
+      }
+      return;
+    }
 
     // Récupérer prénom/nom du membre
     const { data: membre } = await sb.from('membres')
