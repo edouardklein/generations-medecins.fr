@@ -342,9 +342,9 @@ declare
           "caption": "cabinets, salles partenaires, locaux HYC"
         },
         {
-          "value": "3",
+          "value": "4",
           "label": "Thèmes phares",
-          "caption": "innovation, exercice, entrepreneuriat"
+          "caption": "innovation, exercice, entrepreneuriat, formats"
         }
       ],
       "program": [
@@ -402,7 +402,7 @@ declare
         },
         {
           "label": "Intervenants",
-          "value": "Partenaires, FAF"
+          "value": "Partenaires, URPS, ARS, FAF, etc."
         },
         {
           "label": "Format",
@@ -516,7 +516,7 @@ declare
     "props": {
       "eyebrow": "04 • Nos partenaires",
       "title": "Nos partenaires",
-      "subtitle": "Une communauté de partenaires fidèles. Cette présentation est faite pour vous séduire — il serait cool que vous soyez là.",
+      "subtitle": "Une communauté de partenaires fidèles. Cette présentation est faite pour vous séduire — votre place est avec nous.",
       "partners": [
         {
           "name": "Crédit Agricole",
@@ -558,9 +558,7 @@ declare
           "name": "Nebimage",
           "logo": "/logos/NEB.png"
         }
-      ],
-      "inviteSlot": true,
-      "inviteText": "Votre place ici"
+      ]
     }
   },
   {
@@ -673,4 +671,3 @@ end;
 $fn$;
 
 revoke all on function public.apply_default_book(text) from public;
--- service_role only — do not grant to anon.

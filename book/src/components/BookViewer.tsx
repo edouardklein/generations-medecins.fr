@@ -55,6 +55,21 @@ export default function BookViewer({ envelope }: Props) {
     const nodes = slideRefs.current.filter(Boolean) as HTMLElement[]
     const fileName = `${(partner?.slug ?? 'gm-idf')}-book-2026.pdf`
     document.documentElement.classList.add('capture-mode')
+
+    // Pre-scroll every slide so Framer Motion `whileInView` reveals all play
+    // before we start capturing. Otherwise slides we never scrolled to stay
+    // at their initial `opacity: 0` and the PDF page is blank.
+    const hosts = scrollerRef.current?.querySelectorAll<HTMLDivElement>('.book-slide-host')
+    if (hosts && hosts.length) {
+      for (let i = 0; i < hosts.length; i++) {
+        hosts[i].scrollIntoView({ block: 'center' })
+        await new Promise((r) => requestAnimationFrame(() => r(null)))
+      }
+      // Let the longest fade-up/stagger settle before capture starts.
+      await new Promise((r) => setTimeout(r, 600))
+      hosts[0].scrollIntoView({ block: 'center' })
+    }
+
     try {
       await exportBookToPdf({
         slides: nodes,

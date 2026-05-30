@@ -242,7 +242,7 @@ export const defaultBook: Book = {
         keyFacts: [
           { value: '12', label: 'Événements / an', caption: 'un par mois, hors été' },
           { value: '20–35', label: 'Participants', caption: 'cabinets, salles partenaires, locaux HYC' },
-          { value: '3', label: 'Thèmes phares', caption: 'innovation, exercice, entrepreneuriat' },
+          { value: '4', label: 'Thèmes phares', caption: 'innovation, exercice, entrepreneuriat, formats' },
         ],
         program: [
           { time: '19h00', label: 'Accueil & verre de bienvenue' },
@@ -267,7 +267,7 @@ export const defaultBook: Book = {
         subtitle: 'Le grand rendez-vous annuel — peut-être deux à terme',
         meta: [
           { label: 'Public', value: '200 personnes' },
-          { label: 'Intervenants', value: 'Partenaires, FAF' },
+          { label: 'Intervenants', value: 'Partenaires, URPS, ARS, FAF, etc.' },
           { label: 'Format', value: '½ journée + soirée festive' },
           { label: 'Hôte soirée', value: 'House Clinics' },
         ],
@@ -380,10 +380,8 @@ export const defaultBook: Book = {
         eyebrow: '04 • Nos partenaires',
         title: 'Nos partenaires',
         subtitle:
-          "Une communauté de partenaires fidèles. Cette présentation est faite pour vous séduire — il serait cool que vous soyez là.",
+          "Une communauté de partenaires fidèles. Cette présentation est faite pour vous séduire — votre place est avec nous.",
         partners: knownPartners,
-        inviteSlot: true,
-        inviteText: 'Votre place ici',
       },
     },
     {
