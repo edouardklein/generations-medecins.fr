@@ -73,7 +73,10 @@ export default function LogoCard({ partner, onClick }: Props) {
           <img
             src={partner.logo_url}
             alt={partner.name}
-            onError={() => setImgError(true)}
+            onError={() => {
+              console.warn(`[gm-book] Failed to load logo for "${partner.name}": ${partner.logo_url}`)
+              setImgError(true)
+            }}
             className="max-h-[72%] max-w-[72%] object-contain transition-transform duration-500 group-hover:scale-[1.06]"
             style={{
               filter: hovering
