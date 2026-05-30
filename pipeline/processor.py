@@ -142,9 +142,10 @@ def process(article: dict, texte_complet: str) -> dict | None:
     return {
         "titre":     article["titre"],
         "slug":      article["slug"],
-        "resume":    resume,
+        "extrait":   resume,          # colonne existante
+        "resume":    resume,          # colonne ajoutée migration 005
         "categorie": meta["categorie"],
-        "tags":      meta["tags"],
+        "tags":      meta["tags"],    # text[]
         "source":    article["source"],
         "url":       article["url"],
         "publie_le": article["publie_le"],

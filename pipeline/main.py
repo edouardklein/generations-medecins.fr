@@ -24,12 +24,16 @@ HEADERS = {
 def get_existing_slugs() -> set[str]:
     """Récupère tous les slugs déjà en base pour éviter les doublons."""
     r = httpx.get(
-        f"{SUPABASE_URL}/rest/v1/decrypteurs?select=slug",
+        f"{SUPABASE_URL}/rest/v1/decrypteurs?select=slug&limit=1000",
         headers=HEADERS,
         timeout=15,
     )
-    r.raise_for_status()
-    return {row["slug"] for row in r.json()}
+    if r.status_code != 200:
+        print(f"⚠ get_existing_slugs HTTP {r.status_code}: {r.text[:300]}")
+        r.raise_for_status()
+    data = r.json()
+    print(f"→ {len(data)} articles déjà en base")
+    return {row["slug"] for row in data}
 
 
 def insert_article(article: dict) -> bool:
@@ -41,7 +45,7 @@ def insert_article(article: dict) -> bool:
     )
     if r.status_code in (200, 201):
         return True
-    print(f"  ✗ INSERT échoué ({r.status_code}): {r.text[:200]}")
+    print(f"  ✗ INSERT échoué HTTP {r.status_code}: {r.text[:400]}")
     return False
 
 
