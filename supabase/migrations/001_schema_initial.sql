@@ -378,7 +378,7 @@ INSERT INTO plaidoyer_dossiers (titre, description, statut, progression, trimest
 ),
 (
     'Forfait structure — revalorisation cabinets de groupe',
-    'Revalorisation de 15% du forfait structure pour les MSP et cabinets de groupe. Obtenu dans l'avenant n°9.',
+    'Revalorisation de 15% du forfait structure pour les MSP et cabinets de groupe. Obtenu dans l''avenant n°9.',
     'obtenu', 100, 'T1 2025',
     'Obtenu — Avenant n°9 — mars 2025', 5
 ),
