@@ -391,6 +391,8 @@
             <thead>
               <tr>
                 <th>Membre</th>
+                <th>Téléphone</th>
+                <th>CP</th>
                 <th>RPPS</th>
                 <th>Spécialité</th>
                 <th>Mode exercice</th>
@@ -401,7 +403,7 @@
               </tr>
             </thead>
             <tbody id="membres-tbody">
-              <tr><td colspan="8" class="table-loading">Chargement…</td></tr>
+              <tr><td colspan="10" class="table-loading">Chargement…</td></tr>
             </tbody>
           </table>
         </div>
@@ -612,6 +614,41 @@
     </main>
   </div>
 
+  <!-- Plaidoyer dossier modal -->
+  <div class="modal-overlay" id="dossier-modal-overlay" onclick="closeDossierModal(event)">
+    <div class="modal" style="min-width:520px;max-width:640px" onclick="event.stopPropagation()">
+      <h3 style="margin-bottom:16px">Dossier plaidoyer</h3>
+
+      <div style="margin-bottom:18px">
+        <label style="font-size:.8rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">TITRE</label>
+        <div style="display:flex;gap:8px">
+          <input id="dossier-titre-input" type="text" style="flex:1;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:.9rem;font-family:inherit" placeholder="Titre du dossier">
+          <button class="btn-primary-sm" onclick="saveDossierTitre()">Sauvegarder</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <label style="font-size:.8rem;font-weight:700;color:var(--muted);display:block;margin-bottom:8px">ÉTAPES</label>
+        <div id="etapes-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px"></div>
+        <div style="display:grid;grid-template-columns:1fr 80px auto;gap:8px;align-items:end">
+          <div>
+            <label style="font-size:.75rem;color:var(--muted)">Description de l'étape</label>
+            <input id="etape-texte" type="text" style="width:100%;padding:7px 10px;border:1.5px solid var(--line);border-radius:7px;font-size:.85rem;font-family:inherit;box-sizing:border-box" placeholder="Ex : Réunion URPS obtenue">
+          </div>
+          <div>
+            <label style="font-size:.75rem;color:var(--muted)">% jalón</label>
+            <input id="etape-pct" type="number" min="0" max="100" style="width:100%;padding:7px 10px;border:1.5px solid var(--line);border-radius:7px;font-size:.85rem;font-family:inherit;box-sizing:border-box" placeholder="60">
+          </div>
+          <button class="btn-primary-sm" onclick="addEtape()" style="margin-bottom:1px">+ Ajouter</button>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:20px">
+        <button class="btn-cancel" onclick="closeDossierModal()">Fermer</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Delete confirm modal -->
   <div class="modal-overlay" id="modal-overlay">
     <div class="modal">
@@ -729,6 +766,8 @@
           <div class="td-name">${esc(m.prenom)} ${esc(m.nom)}</div>
           <div class="td-email">${esc(m.email)}</div>
         </td>
+        <td style="font-size:0.82rem">${esc(m.telephone || '—')}</td>
+        <td style="font-size:0.82rem">${esc(m.code_postal || '—')}</td>
         <td class="td-rpps">${esc(m.rpps || '—')}</td>
         <td>${esc(m.specialite || '—')}</td>
         <td>${esc(m.mode_exercice || '—')}</td>
@@ -884,7 +923,11 @@
     }
     tbody.innerHTML = data.map(d => `
       <tr>
-        <td style="font-weight:700">${esc(d.titre)}</td>
+        <td>
+          <span style="font-weight:700;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="openDossierModal('${d.id}','${esc(d.titre).replace(/'/g,"\\'")}')">
+            ${esc(d.titre)}
+          </span>
+        </td>
         <td>${esc(d.trimestre || '—')}</td>
         <td>${statusBadge(d.statut)}</td>
         <td>
@@ -898,7 +941,6 @@
         <td>
           <div class="actions">
             <button class="btn-action btn-valider" onclick="setDossierStatut('${d.id}','victoire')">Victoire</button>
-            <button class="btn-action btn-suspendre" onclick="promptAvancement('${d.id}', ${d.avancement_pct || 0})">% avancement</button>
             <button class="btn-action btn-supprimer" onclick="deleteDossier('${d.id}')">Supprimer</button>
           </div>
         </td>
@@ -927,20 +969,77 @@
     loadPlaidoyer();
   };
 
+  // ── Dossier modal (titre + étapes) ─────────────────────────
+  let currentDossierId = null;
+
+  window.openDossierModal = async function(id, titre) {
+    currentDossierId = id;
+    document.getElementById('dossier-titre-input').value = titre;
+    document.getElementById('etape-texte').value = '';
+    document.getElementById('etape-pct').value = '';
+    document.getElementById('dossier-modal-overlay').classList.add('open');
+    await renderEtapes();
+  };
+
+  window.closeDossierModal = function(e) {
+    if (e && e.target !== document.getElementById('dossier-modal-overlay')) return;
+    document.getElementById('dossier-modal-overlay').classList.remove('open');
+    currentDossierId = null;
+  };
+
+  async function renderEtapes() {
+    const el = document.getElementById('etapes-list');
+    if (!currentDossierId) return;
+    const { data } = await sb.from('plaidoyer_etapes')
+      .select('*').eq('dossier_id', currentDossierId).order('pourcentage');
+    if (!data || !data.length) {
+      el.innerHTML = '<div style="font-size:.83rem;color:var(--muted);font-style:italic">Aucune étape — ajoutez-en une ci-dessous.</div>';
+      return;
+    }
+    el.innerHTML = data.map(e => `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border-radius:8px">
+        <div style="width:38px;height:38px;border-radius:50%;background:var(--grad);color:#fff;font-size:.75rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${e.pourcentage}%</div>
+        <div style="flex:1;font-size:.85rem;font-weight:600">${esc(e.texte)}</div>
+        <button onclick="deleteEtape('${e.id}')" style="border:none;background:none;cursor:pointer;color:var(--danger);font-size:.8rem;padding:2px 6px">✕</button>
+      </div>`).join('');
+  }
+
+  window.addEtape = async function() {
+    const texte = document.getElementById('etape-texte').value.trim();
+    const pct   = parseInt(document.getElementById('etape-pct').value) || 0;
+    if (!texte) { toast('Décrivez l\'étape', 'error'); return; }
+    if (!currentDossierId) return;
+    const { error } = await sb.from('plaidoyer_etapes').insert({ dossier_id: currentDossierId, texte, pourcentage: pct });
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    // Update dossier avancement_pct to match the highest étape
+    await sb.from('plaidoyer_dossiers').update({ avancement_pct: pct }).eq('id', currentDossierId);
+    document.getElementById('etape-texte').value = '';
+    document.getElementById('etape-pct').value = '';
+    toast('Étape ajoutée ✓', 'success');
+    await renderEtapes();
+    loadPlaidoyer();
+  };
+
+  window.deleteEtape = async function(id) {
+    const { error } = await sb.from('plaidoyer_etapes').delete().eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Étape supprimée', 'success');
+    await renderEtapes();
+  };
+
+  window.saveDossierTitre = async function() {
+    const titre = document.getElementById('dossier-titre-input').value.trim();
+    if (!titre || !currentDossierId) return;
+    const { error } = await sb.from('plaidoyer_dossiers').update({ titre }).eq('id', currentDossierId);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Titre mis à jour ✓', 'success');
+    loadPlaidoyer();
+  };
+
   window.setDossierStatut = async function(id, statut) {
     const { error } = await sb.from('plaidoyer_dossiers').update({ statut }).eq('id', id);
     if (error) { toast('Erreur : ' + error.message, 'error'); return; }
     toast('Statut mis à jour ✓', 'success');
-    loadPlaidoyer();
-  };
-
-  window.promptAvancement = async function(id, current) {
-    const val = prompt(`Nouvel avancement (0-100) — actuellement ${current}%`, current);
-    if (val === null) return;
-    const pct = Math.min(100, Math.max(0, parseInt(val) || 0));
-    const { error } = await sb.from('plaidoyer_dossiers').update({ avancement_pct: pct }).eq('id', id);
-    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
-    toast('Avancement mis à jour ✓', 'success');
     loadPlaidoyer();
   };
 
