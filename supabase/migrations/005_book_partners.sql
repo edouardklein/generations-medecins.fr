@@ -70,7 +70,7 @@ returns table (
 )
 language sql
 security definer
-set search_path = public
+set search_path = public, extensions
 stable
 as $$
   select p.id, p.slug, p.name, p.logo_url, p.display_order
@@ -90,7 +90,7 @@ create or replace function public.verify_partner_book(p_slug text, p_password te
 returns jsonb
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   v_partner public.partners%rowtype;
@@ -153,7 +153,7 @@ create or replace function public.create_partner(
 returns uuid
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   v_id uuid;
