@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lanceur d'alerte — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .alerte-hero-block {
+      padding: 48px 52px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #17365f, #1e293b);
+      color: white;
+      margin-bottom: 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .alerte-hero-block h2 {
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: -0.025em;
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+
+    .alerte-hero-block p {
+      font-size: 0.92rem;
+      color: rgba(255,255,255,0.72);
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+
+    .shield-display {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .shield-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .shield-icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .shield-text-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 2px;
+    }
+    .shield-text-sub {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.55);
+    }
+
+    .use-cases {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+
+    .use-case {
+      padding: 28px 24px;
+      border-radius: var(--r);
+      background: white;
+      border: 1.5px solid var(--line);
+    }
+    .use-case-icon { font-size: 1.8rem; margin-bottom: 14px; display: block; }
+    .use-case-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+      margin-bottom: 8px;
+    }
+    .use-case-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 48px;
+      align-items: start;
+    }
+
+    .process-step {
+      text-align: center;
+      position: relative;
+    }
+    .process-step::after {
+      content: '→';
+      position: absolute;
+      right: -10px;
+      top: 18px;
+      font-size: 1rem;
+      color: var(--muted);
+    }
+    .process-step:last-child::after { display: none; }
+
+    .process-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 2px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      margin: 0 auto 12px;
+    }
+    .process-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .process-desc {
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .guarantee-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+
+    .guarantee-card {
+      padding: 28px;
+      border-radius: var(--r);
+      background: white;
+      border: 1.5px solid var(--line);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .guarantee-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .guarantee-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+      margin-bottom: 6px;
+    }
+    .guarantee-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 860px) {
+      .alerte-hero-block { grid-template-columns: 1fr; padding: 32px; }
+      .use-cases { grid-template-columns: 1fr 1fr; }
+      .process-steps { grid-template-columns: 1fr; }
+      .process-step::after { display: none; }
+      .guarantee-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .use-cases { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html" class="active">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <span class="badge badge-blue">🔒 À venir</span>
+      <h1>Lanceur d'alerte</h1>
+      <p>Un huissier de justice certifie la réalité de votre témoignage. Après cette étape, votre identité est scellée — anonymat total garanti pour toute la suite.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+
+      <!-- Bloc hero -->
+      <div class="alerte-hero-block">
+        <div>
+          <h2>Parlez. Sans risquer votre carrière.</h2>
+          <p>Certaines situations méritent d'être documentées mais ne peuvent pas être dénoncées publiquement. Le module Lanceur d'alerte repose sur un principe simple : un huissier certifie la véracité de votre témoignage, puis votre identité est scellée. Ce qui compte ensuite, c'est le fait — pas qui l'a dit.</p>
+          <a href="adherer.html" class="btn btn-white">Être notifié à l'ouverture →</a>
+        </div>
+        <div class="shield-display">
+          <div class="shield-item">
+            <div class="shield-icon-wrap">🔐</div>
+            <div>
+              <div class="shield-text-title">Anonymat garanti vers l'extérieur</div>
+              <div class="shield-text-sub">Aucune identité transmise sans votre accord</div>
+            </div>
+          </div>
+          <div class="shield-item">
+            <div class="shield-icon-wrap">🏛️</div>
+            <div>
+              <div class="shield-text-title">Validation par huissier de justice</div>
+              <div class="shield-text-sub">Le témoignage est certifié légalement avant scellage</div>
+            </div>
+          </div>
+          <div class="shield-item">
+            <div class="shield-icon-wrap">⚖️</div>
+            <div>
+              <div class="shield-text-title">Prise en charge juridique</div>
+              <div class="shield-text-sub">Évaluation par nos juristes partenaires</div>
+            </div>
+          </div>
+          <div class="shield-item">
+            <div class="shield-icon-wrap">📊</div>
+            <div>
+              <div class="shield-text-title">Agrégation des signalements</div>
+              <div class="shield-text-sub">Force collective : 1 cas peut en cacher 100</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cas d'usage -->
+      <div class="section-label" style="margin-bottom:20px">Pour quelles situations</div>
+      <div class="use-cases">
+        <div class="use-case">
+          <span class="use-case-icon">🏥</span>
+          <div class="use-case-title">Pressions institutionnelles</div>
+          <p class="use-case-desc">Directeur de CHU qui fait pression pour réduire les arrêts maladie, ARS qui menace sur les prescriptions... Documentez sans vous exposer.</p>
+        </div>
+        <div class="use-case">
+          <span class="use-case-icon">💊</span>
+          <div class="use-case-title">Pratiques pharmaceutiques</div>
+          <p class="use-case-desc">Représentants qui contournent les règles, conflits d'intérêts non déclarés, pressions sur les prescriptions. Signalez les abus.</p>
+        </div>
+        <div class="use-case">
+          <span class="use-case-icon">🩺</span>
+          <div class="use-case-title">Conditions d'exercice dégradées</div>
+          <p class="use-case-desc">Déserts médicaux, manque de matériel dans les services, gardes non pourvues. Chaque signalement alimente notre observatoire.</p>
+        </div>
+        <div class="use-case">
+          <span class="use-case-icon">⚖️</span>
+          <div class="use-case-title">Discrimination et harcèlement</div>
+          <p class="use-case-desc">Situations de discrimination ou de harcèlement dans un établissement. Anonyme mais traçable pour une action coordonnée.</p>
+        </div>
+        <div class="use-case">
+          <span class="use-case-icon">📋</span>
+          <div class="use-case-title">Abus administratifs CPAM</div>
+          <p class="use-case-desc">Mises sous accord préalable abusives, contrôles injustifiés, menaces de déconventionnement. Cartographiez les pratiques.</p>
+        </div>
+        <div class="use-case">
+          <span class="use-case-icon">🚨</span>
+          <div class="use-case-title">Alertes de sécurité</div>
+          <p class="use-case-desc">Situations mettant en danger patients ou soignants, dysfonctionnements graves dans un établissement. Alerte protégée.</p>
+        </div>
+      </div>
+
+      <!-- Processus -->
+      <div class="section-label" style="margin-bottom:24px">Comment ça fonctionne</div>
+      <div class="process-steps">
+        <div class="process-step">
+          <div class="process-dot">📝</div>
+          <div class="process-title">Vous déposez</div>
+          <p class="process-desc">Formulaire sécurisé. Vous décrivez les faits et fournissez les éléments que vous souhaitez faire certifier.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-dot">🏛️</div>
+          <div class="process-title">Certification huissier</div>
+          <p class="process-desc">Un huissier de justice partenaire constate et certifie la véracité des faits. Votre identité lui est communiquée à cette étape uniquement.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-dot">🔐</div>
+          <div class="process-title">Scellage et anonymat</div>
+          <p class="process-desc">Une fois certifié, le témoignage est scellé. Votre identité est dissociée du dossier — elle ne peut plus être retrouvée.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-dot">📊</div>
+          <div class="process-title">Agrégation</div>
+          <p class="process-desc">Les signalements similaires sont regroupés anonymement pour identifier des patterns et construire un dossier collectif.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-dot">🎯</div>
+          <div class="process-title">Action collective</div>
+          <p class="process-desc">Le bureau intervient avec un dossier certifié et opposable, sans jamais exposer les témoins.</p>
+        </div>
+      </div>
+
+      <!-- Garanties -->
+      <div class="section-label" style="margin-bottom:20px">Nos garanties</div>
+      <div class="guarantee-grid">
+        <div class="guarantee-card">
+          <div class="guarantee-icon">🔒</div>
+          <div>
+            <div class="guarantee-title">Hébergement HDS certifié</div>
+            <p class="guarantee-desc">Les données sont hébergées sur des serveurs certifiés Hébergeur de Données de Santé (HDS), en France. Aucune donnée transmise à des tiers.</p>
+          </div>
+        </div>
+        <div class="guarantee-card">
+          <div class="guarantee-icon">🏛️</div>
+          <div>
+            <div class="guarantee-title">Force probante de l'acte d'huissier</div>
+            <p class="guarantee-desc">Le constat d'huissier a valeur légale et est opposable devant les tribunaux. Vos faits ne peuvent pas être contestés sur la forme.</p>
+          </div>
+        </div>
+        <div class="guarantee-card">
+          <div class="guarantee-icon">🔐</div>
+          <div>
+            <div class="guarantee-title">Scellage technique irréversible</div>
+            <p class="guarantee-desc">Après certification, l'identité est dissociée du dossier par architecture technique. Même nous ne pouvons pas faire le lien — sauf acte de justice.</p>
+          </div>
+        </div>
+        <div class="guarantee-card">
+          <div class="guarantee-icon">📜</div>
+          <div>
+            <div class="guarantee-title">Protection lanceur d'alerte</div>
+            <p class="guarantee-desc">Conforme à la loi Waserman (2022). La certification huissier renforce encore la protection : vous avez un acte officiel qui précède toute divulgation.</p>
+          </div>
+        </div>
+        <div class="guarantee-card">
+          <div class="guarantee-icon">✅</div>
+          <div>
+            <div class="guarantee-title">Crédibilité sans exposition</div>
+            <p class="guarantee-desc">Le dossier est certifié et opposable sans que votre nom n'apparaisse. C'est le meilleur des deux mondes : poids légal et anonymat total.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="coming-soon-block">
+        <span class="icon">🔒</span>
+        <h3>Module en cours de déploiement</h3>
+        <p>Le module Lanceur d'alerte est en développement avec notre équipe juridique. Adhérez maintenant pour y accéder en priorité dès son ouverture.</p>
+        <a href="adherer.html" class="btn btn-primary">Adhérer et être notifié →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

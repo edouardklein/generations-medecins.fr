@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choisir son mode d'exercice — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Tableau comparatif */
+    .tableau-wrapper {
+      overflow-x: auto;
+      border-radius: var(--r);
+      border: 1.5px solid var(--line);
+      margin-bottom: 48px;
+    }
+
+    .tableau {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      min-width: 680px;
+    }
+
+    .tableau thead tr {
+      background: linear-gradient(135deg, var(--blue-dark), #2558a0, var(--teal));
+    }
+
+    .tableau thead th {
+      padding: 14px 18px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: white;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .tableau thead th:first-child {
+      text-align: left;
+      color: rgba(255,255,255,0.75);
+      font-weight: 500;
+    }
+
+    .tableau tbody tr {
+      border-top: 1px solid var(--line);
+    }
+
+    .tableau tbody tr:nth-child(even) {
+      background: #f8fbfd;
+    }
+
+    .tableau tbody tr:hover {
+      background: rgba(42,109,184,0.04);
+    }
+
+    .tableau tbody td {
+      padding: 13px 18px;
+      font-size: 0.85rem;
+      color: var(--ink);
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .tableau tbody td:first-child {
+      text-align: left;
+      font-weight: 600;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .check-yes {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .check-no {
+      color: #e55050;
+      font-weight: 700;
+    }
+
+    .check-mixed {
+      color: var(--teal);
+      font-weight: 600;
+    }
+
+    /* Fiches détaillées */
+    .fiches-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .fiche-card {
+      padding: 28px 24px;
+      border-radius: var(--r);
+      background: white;
+      border: 1.5px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.2s;
+    }
+    .fiche-card:hover {
+      border-color: rgba(42,109,184,0.3);
+      box-shadow: 0 8px 32px rgba(42,109,184,0.09);
+      transform: translateY(-2px);
+    }
+
+    .fiche-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .fiche-card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .fiche-card-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.65;
+      flex: 1;
+    }
+
+    .fiche-card-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: rgba(42,109,184,0.08);
+      color: var(--blue);
+      align-self: flex-start;
+    }
+
+    @media (max-width: 900px) {
+      .fiches-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html" class="active">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <span class="badge badge-teal">⚖️ Guide comparatif</span>
+      <h1>Choisir son mode d'exercice</h1>
+      <p>S1, S2, OPTAM, MSP, salarié du privé, mixte — comprendre les vraies différences avant de décider.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+
+      <!-- Tableau comparatif -->
+      <div class="section-label" style="margin-bottom:16px">Tableau comparatif</div>
+
+      <div class="tableau-wrapper">
+        <table class="tableau">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Secteur 1</th>
+              <th>Secteur 2</th>
+              <th>OPTAM</th>
+              <th>Salarié</th>
+              <th>Mixte</th>
+              <th>MSP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Liberté tarifaire</td>
+              <td><span class="check-no">✗</span></td>
+              <td><span class="check-yes">✓</span> <small style="color:var(--muted)">(limité)</small></td>
+              <td><span class="check-yes">✓</span> <small style="color:var(--muted)">(limité)</small></td>
+              <td><span class="check-no">✗</span></td>
+              <td><span class="check-mixed">Selon part</span></td>
+              <td><span class="check-no">✗</span></td>
+            </tr>
+            <tr>
+              <td>Dépassements honoraires</td>
+              <td><span class="check-no">✗</span></td>
+              <td><span class="check-mixed">Libres</span></td>
+              <td><span class="check-mixed">Encadrés</span></td>
+              <td><span class="check-no">✗</span></td>
+              <td><span class="check-mixed">Selon part</span></td>
+              <td><span class="check-no">✗</span></td>
+            </tr>
+            <tr>
+              <td>Complémentaire remboursée</td>
+              <td><span class="check-yes">Oui</span></td>
+              <td><span class="check-mixed">Partielle</span></td>
+              <td><span class="check-yes">Oui</span></td>
+              <td><span class="check-mixed">N/A</span></td>
+              <td><span class="check-mixed">Mixte</span></td>
+              <td><span class="check-yes">Oui</span></td>
+            </tr>
+            <tr>
+              <td>Charges sociales</td>
+              <td>~45%</td>
+              <td>~45%</td>
+              <td>~45%</td>
+              <td>~25%</td>
+              <td><span class="check-mixed">Mixte</span></td>
+              <td>~45%</td>
+            </tr>
+            <tr>
+              <td>Retraite CARMF</td>
+              <td><span class="check-yes">Oui</span></td>
+              <td><span class="check-yes">Oui</span></td>
+              <td><span class="check-yes">Oui</span></td>
+              <td><span class="check-no">Non</span> <small style="color:var(--muted)">(CNAV)</small></td>
+              <td><span class="check-mixed">Mixte</span></td>
+              <td><span class="check-yes">Oui</span></td>
+            </tr>
+            <tr>
+              <td>Droit à la grève</td>
+              <td><span class="check-yes">Oui</span></td>
+              <td><span class="check-yes">Oui</span></td>
+              <td><span class="check-yes">Oui</span></td>
+              <td><span class="check-mixed">Encadré</span></td>
+              <td><span class="check-mixed">Mixte</span></td>
+              <td><span class="check-mixed">Encadré</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Fiches détaillées -->
+      <div class="section-label" style="margin-bottom:16px">Fiches détaillées</div>
+      <div class="fiches-grid" style="margin-bottom:48px">
+
+        <div class="fiche-card">
+          <div class="fiche-card-icon">📊</div>
+          <span class="fiche-card-tag">Secteur 2 · Option</span>
+          <div class="fiche-card-title">OPTAM / OPTAM-CO</div>
+          <p class="fiche-card-desc">L'option tarifaire maîtrisée : vous plafonnez vos dépassements en échange d'une meilleure prise en charge complémentaire de vos patients. Accessible aux S2 uniquement. Engagement 3 ans. Avantage fiscal sur URSSAF.</p>
+        </div>
+
+        <div class="fiche-card">
+          <div class="fiche-card-icon">🏠</div>
+          <span class="fiche-card-tag" style="background:rgba(56,168,181,0.1);color:var(--teal)">Collectif · IDF</span>
+          <div class="fiche-card-title">MSP — Maison de Santé Pluriprofessionnelle</div>
+          <p class="fiche-card-desc">Structure d'exercice collectif avec un projet de santé commun. Accès au forfait structure (jusqu'à 72 000 €/an en IDF), aide à l'installation ARS, partage de la permanence des soins. Nécessite ≥ 2 médecins + au moins un autre professionnel de santé.</p>
+        </div>
+
+        <div class="fiche-card">
+          <div class="fiche-card-icon">🏥</div>
+          <span class="fiche-card-tag" style="background:rgba(98,192,64,0.1);color:#3d8a1a">Salarié · Privé</span>
+          <div class="fiche-card-title">Médecin salarié du secteur privé</div>
+          <p class="fiche-card-desc">Cliniques, centres de santé, établissements de soins privés. Charges sociales réduites (~25%), retraite CNAV/ARRCO, pas de CARMF. En contrepartie : pas de patientèle propre, grilles salariales, moins d'autonomie. En forte croissance depuis 2020.</p>
+        </div>
+
+      </div>
+
+      <!-- Lien retour installation -->
+      <div style="padding: 24px 28px; border-radius: var(--r); background: var(--surface); border: 1.5px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+        <div>
+          <div style="font-size: 0.95rem; font-weight: 700; color: var(--ink); margin-bottom: 4px;">Prêt à passer à l'étape suivante ?</div>
+          <div style="font-size: 0.85rem; color: var(--muted);">Consultez notre guide complet d'installation avec la checklist des démarches administratives.</div>
+        </div>
+        <a href="installation.html" class="btn btn-primary" style="white-space:nowrap;flex-shrink:0">Guide d'installation →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Un doute sur votre situation ?</h2>
+    <p>Les adhérents Générations Médecins peuvent soumettre leurs questions directement aux experts juridiques et fiscaux du mouvement.</p>
+    <a href="adherer.html" class="btn btn-white btn-lg">Adhérer maintenant →</a>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
