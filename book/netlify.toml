@@ -6,6 +6,11 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Skip a build entirely when the change does not touch book/.
+# Returning exit code 0 means "nothing changed, skip build".
+[build.ignore]
+  command = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ."
+
 # SPA fallback — all unknown routes serve index.html so React Router can take over.
 [[redirects]]
   from   = "/*"
