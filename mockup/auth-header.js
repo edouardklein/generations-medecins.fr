@@ -94,10 +94,15 @@
       if (dd) dd.classList.remove('open');
     });
 
-    /* Cacher le lien "Se connecter" statique et remplacer le bouton Adhérer */
+    /* Cacher le lien "Se connecter" statique */
     const loginLinkEl = document.getElementById('header-login-link');
     if (loginLinkEl) loginLinkEl.style.display = 'none';
 
+    /* Masquer TOUS les liens Adhérer dans le header */
+    document.querySelectorAll('header a[href="adherer.html"], header a[href*="adherer"]')
+      .forEach(el => el.style.display = 'none');
+
+    /* Insérer le widget à la place */
     const adhererBtn = getAdhererBtn();
     if (adhererBtn) {
       adhererBtn.replaceWith(widget);
