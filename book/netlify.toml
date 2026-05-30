@@ -2,14 +2,12 @@
   base    = "book"
   publish = "dist"
   command = "npm ci && npm run build"
+  # Skip a build entirely when nothing in `book/` changed (exit 0 = skip).
+  # Path is relative to `base`, so "." means "anywhere inside book/".
+  ignore  = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ."
 
 [build.environment]
   NODE_VERSION = "20"
-
-# Skip a build entirely when the change does not touch book/.
-# Returning exit code 0 means "nothing changed, skip build".
-[build.ignore]
-  command = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ."
 
 # SPA fallback — all unknown routes serve index.html so React Router can take over.
 [[redirects]]
