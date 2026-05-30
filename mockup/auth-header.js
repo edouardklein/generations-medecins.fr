@@ -7,24 +7,27 @@
   const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
 
-  // Supabase est déjà chargé via CDN sur toutes les pages
-  if (typeof supabase === 'undefined') return;
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  function addLoginLink() {
+    const adhererBtn = document.querySelector('a[href="adherer.html"].btn, a[href="adherer.html"][class*="btn"]');
+    if (adhererBtn && !document.getElementById('header-login-link')) {
+      const loginLink = document.createElement('a');
+      loginLink.id   = 'header-login-link';
+      loginLink.href = 'connexion.html';
+      loginLink.textContent = 'Se connecter';
+      loginLink.style.cssText = 'font-size:0.85rem;font-weight:700;color:var(--blue-dark,#1a4a80);text-decoration:none;white-space:nowrap;';
+      adhererBtn.parentNode.insertBefore(loginLink, adhererBtn);
+    }
+  }
 
   async function init() {
+    // Lien connexion visible par défaut (pas besoin de Supabase)
+    addLoginLink();
+
+    if (typeof supabase === 'undefined') return;
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) {
-      // Non connecté → ajouter un lien "Se connecter" à côté du bouton Adhérer
-      const adhererBtn = document.querySelector('a[href="adherer.html"].btn.btn-primary, a[href="adherer.html"].btn-primary');
-      if (adhererBtn) {
-        const loginLink = document.createElement('a');
-        loginLink.href = 'connexion.html';
-        loginLink.textContent = 'Se connecter';
-        loginLink.style.cssText = 'font-size:0.85rem;font-weight:700;color:var(--blue-dark,#1a4a80);text-decoration:none;white-space:nowrap;';
-        adhererBtn.parentNode.insertBefore(loginLink, adhererBtn);
-      }
-      return;
-    }
+    if (!session) return; // lien "Se connecter" déjà ajouté ci-dessus
 
     // Récupérer prénom/nom du membre
     const { data: membre } = await sb.from('membres')
@@ -173,8 +176,12 @@
       </div>
     `;
 
-    // Remplacer le bouton Adhérer
-    const adhererBtn = document.querySelector('a[href="adherer.html"].btn.btn-primary, a[href="adherer.html"].btn-primary');
+    // Supprimer le lien "Se connecter" s'il a été injecté
+    const loginLinkEl = document.getElementById('header-login-link');
+    if (loginLinkEl) loginLinkEl.remove();
+
+    // Remplacer le bouton Adhérer par l'avatar
+    const adhererBtn = document.querySelector('a[href="adherer.html"].btn, a[href="adherer.html"][class*="btn"]');
     if (adhererBtn) adhererBtn.replaceWith(widget);
 
     // Toggle dropdown
