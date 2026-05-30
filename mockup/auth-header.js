@@ -7,34 +7,19 @@
   const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
 
-  /* Trouve le bouton Adhérer dans le header (premier <a> avec href adherer.html) */
+  /* Trouve le bouton Adhérer dans le header */
   function getAdhererBtn() {
     return document.querySelector('header a[href="adherer.html"]')
         || document.querySelector('a[href="adherer.html"].btn');
   }
 
-  /* Ajoute "Se connecter" juste avant le bouton Adhérer */
-  function addLoginLink() {
-    if (document.getElementById('header-login-link')) return;
-    const btn = getAdhererBtn();
-    if (!btn || !btn.parentNode) return;
-    const a = document.createElement('a');
-    a.id          = 'header-login-link';
-    a.href        = 'connexion.html';
-    a.textContent = 'Se connecter';
-    a.style.cssText = 'font-size:.85rem;font-weight:700;color:var(--blue-dark,#1a4a80);text-decoration:none;white-space:nowrap;';
-    btn.parentNode.insertBefore(a, btn);
-  }
-
   async function init() {
-    /* Étape 1 — lien connexion sans Supabase */
-    addLoginLink();
-
     if (typeof supabase === 'undefined') return;
 
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) return;
+
+    if (!session) return; // lien "Se connecter" statique reste visible
 
     /* Étape 2 — utilisateur connecté : charger le profil */
     const { data: membre } = await sb
@@ -109,15 +94,14 @@
       if (dd) dd.classList.remove('open');
     });
 
-    /* Retirer le lien "Se connecter" et remplacer le bouton Adhérer */
+    /* Cacher le lien "Se connecter" statique et remplacer le bouton Adhérer */
     const loginLinkEl = document.getElementById('header-login-link');
-    if (loginLinkEl) loginLinkEl.remove();
+    if (loginLinkEl) loginLinkEl.style.display = 'none';
 
     const adhererBtn = getAdhererBtn();
     if (adhererBtn) {
       adhererBtn.replaceWith(widget);
     } else {
-      /* Fallback : coller le widget à la fin du header-inner */
       const hi = document.querySelector('.header-inner');
       if (hi) hi.appendChild(widget);
     }
