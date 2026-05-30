@@ -17,6 +17,8 @@ export default function BookViewer({ envelope }: Props) {
   const scrollerRef = useRef<HTMLDivElement | null>(null)
   const [current, setCurrent] = useState(0)
 
+  const hasSlides = Array.isArray(book.slides) && book.slides.length > 0
+
   const slideVariants = useMemo(
     () =>
       book.slides.map((_, i) =>
@@ -73,6 +75,10 @@ export default function BookViewer({ envelope }: Props) {
   }
 
   const total = book.slides.length
+
+  if (!hasSlides) {
+    return <ComingSoon partnerName={partner?.name} onBack={() => navigate('/')} />
+  }
 
   return (
     <div className="relative min-h-screen">
@@ -156,6 +162,46 @@ export default function BookViewer({ envelope }: Props) {
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+function ComingSoon({ partnerName, onBack }: { partnerName?: string | null; onBack: () => void }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center px-6">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative max-w-xl text-center rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur p-12"
+      >
+        <div className="eyebrow justify-center">Espace partenaire</div>
+        <h1 className="h-display text-4xl mt-3 text-white">
+          {partnerName ?? 'Votre book'}
+        </h1>
+        <div className="gold-bar mx-auto mt-4" />
+        <p className="mt-6 text-navy-200 leading-relaxed">
+          Votre book partenaire est en cours de préparation. Nous vous l'enverrons dès qu'il sera prêt.
+          En attendant, l'équipe Générations Médecins IDF reste à votre disposition pour tout échange.
+        </p>
+        <div className="mt-8 inline-flex items-center gap-3 text-sm text-navy-200">
+          <span className="text-gold-400">@</span>
+          <a href="mailto:idf@generations-medecins.fr" className="hover:text-white transition">
+            idf@generations-medecins.fr
+          </a>
+        </div>
+        <div className="mt-10">
+          <button
+            onClick={onBack}
+            className="inline-flex items-center gap-2 rounded-full bg-navy-900/70 border border-white/10 px-5 py-2.5 text-sm text-navy-100 hover:bg-navy-800 transition"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+            Retour
+          </button>
+        </div>
+      </motion.div>
     </div>
   )
 }
