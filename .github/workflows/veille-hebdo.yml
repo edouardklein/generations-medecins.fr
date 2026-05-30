@@ -5,12 +5,13 @@ on:
     - cron: "0 6 * * 1"   # Chaque lundi à 6h UTC (7h Paris heure d'hiver)
   workflow_dispatch:        # Lancement manuel possible depuis GitHub Actions
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   veille:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout
