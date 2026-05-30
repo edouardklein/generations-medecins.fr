@@ -11,6 +11,19 @@ type Props = {
 export default function LogoGrid({ partners, loading, onPick }: Props) {
   const skeletons = Array.from({ length: 8 }, (_, i) => i)
 
+  if (!loading && partners.length === 0) {
+    return (
+      <div className="max-w-3xl mx-auto text-center py-20">
+        <div className="inline-block rounded-2xl border border-white/10 bg-white/[0.04] px-8 py-10">
+          <div className="h-display text-3xl text-white">Aucun partenaire actif</div>
+          <p className="mt-3 text-navy-200">
+            Provisionne au moins un partenaire dans la table <code className="text-gold-400">partners</code> via Supabase pour qu'il apparaisse ici.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-7xl mx-auto">
       <motion.div
@@ -27,7 +40,7 @@ export default function LogoGrid({ partners, loading, onPick }: Props) {
               <motion.div
                 key={i}
                 variants={cardVariants}
-                className="aspect-[4/3] rounded-2xl bg-navy-800/60 border border-white/5 shimmer"
+                className="aspect-[4/3] rounded-2xl bg-white/[0.08] border border-white/10 shimmer"
               />
             ))
           : partners.map((p) => (

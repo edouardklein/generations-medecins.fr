@@ -15,10 +15,20 @@ export default function LandingPage() {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    listPartners().then((rows) => {
-      setPartners(rows)
-      setLoading(false)
-    })
+    let alive = true
+    listPartners()
+      .then((rows) => {
+        if (alive) setPartners(rows)
+      })
+      .catch((e) => {
+        console.error('[gm-book] listPartners crashed outside api wrapper', e)
+      })
+      .finally(() => {
+        if (alive) setLoading(false)
+      })
+    return () => {
+      alive = false
+    }
   }, [])
 
   async function handleUnlock(password: string) {
