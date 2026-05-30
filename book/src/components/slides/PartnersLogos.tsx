@@ -2,16 +2,28 @@ import { motion } from 'framer-motion'
 import type { PartnersLogosProps } from '../../lib/types'
 import { fadeUp, stagger, VIEWPORT_ONCE } from './_anim'
 
-export default function PartnersLogos(props: PartnersLogosProps) {
-  const target = props.highlightName?.toLowerCase().trim()
-  // Move the highlighted partner to the very end so they sit in the
-  // "spotlight" slot. Others keep their original order.
-  const others = props.partners.filter((p) => p.name.toLowerCase().trim() !== target)
-  const highlighted = props.partners.find((p) => p.name.toLowerCase().trim() === target)
+const norm = (s: string | undefined | null) =>
+  (s ?? '').normalize('NFC').toLowerCase().replace(/\s+/g, ' ').trim()
 
-  // Decide column count from total visible tiles (others + spotlight).
-  const total = others.length + (highlighted ? 1 : 0)
-  const cols = total > 9 ? 5 : total > 6 ? 4 : 3
+export default function PartnersLogos(props: PartnersLogosProps) {
+  const target = norm(props.highlightName)
+  const others = target ? props.partners.filter((p) => norm(p.name) !== target) : props.partners
+  const highlighted = target ? props.partners.find((p) => norm(p.name) === target) : undefined
+
+  if (typeof window !== 'undefined') {
+    // Help diagnose mismatches between Supabase partner.name and the slide JSON.
+    console.info(
+      `[gm-book] PartnersLogos: highlight="${props.highlightName}" → ${
+        highlighted ? `found "${highlighted.name}"` : 'NO MATCH (logo will stay in main grid)'
+      }`,
+    )
+  }
+
+  // Layout the OTHER partners in a clean grid, leaving the last visual slot
+  // for the highlighted "VOUS" card. We pick a 4-column grid so 9 others fit
+  // in 3 rows minus the last slot, then the spotlight takes that last slot.
+  const cols = 4
+  const slotsForOthers = others.length
 
   return (
     <div className="h-full w-full flex flex-col">
@@ -25,7 +37,7 @@ export default function PartnersLogos(props: PartnersLogosProps) {
         whileInView="show"
         viewport={VIEWPORT_ONCE}
         variants={stagger}
-        className="mt-9 grid gap-5 flex-1 min-h-0"
+        className="mt-8 grid gap-5 flex-1 min-h-0"
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
         {others.map((p, i) => (
@@ -46,40 +58,53 @@ export default function PartnersLogos(props: PartnersLogosProps) {
 
         {highlighted && (
           <motion.div
-            custom={others.length}
+            custom={slotsForOthers}
             variants={fadeUp}
-            whileHover={{ scale: 1.03 }}
-            className="relative rounded-2xl bg-white border-2 border-dashed border-gold-500 p-5 flex items-center justify-center aspect-[5/3] overflow-hidden"
+            whileHover={{ scale: 1.04 }}
+            className="relative rounded-2xl bg-white p-5 flex items-center justify-center aspect-[5/3] overflow-visible"
             style={{
               boxShadow:
-                '0 0 0 1px rgba(196,149,61,0.4), 0 30px 80px -20px rgba(196,149,61,0.55), 0 0 80px -10px rgba(196,149,61,0.65)',
+                '0 0 0 3px rgba(196,149,61,0.85), 0 0 0 8px rgba(196,149,61,0.2), 0 30px 100px -10px rgba(196,149,61,0.7), 0 0 120px 0 rgba(196,149,61,0.55)',
             }}
           >
-            {/* Pulsing gold halo */}
+            {/* Dashed inner border to scream "this is YOUR slot" */}
+            <span
+              className="absolute inset-2 rounded-xl pointer-events-none"
+              style={{
+                border: '2px dashed rgba(196,149,61,0.8)',
+              }}
+            />
+
+            {/* Strong pulsing halo */}
             <motion.span
-              className="absolute inset-0 rounded-2xl pointer-events-none"
-              animate={{ opacity: [0.3, 0.7, 0.3] }}
-              transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute -inset-6 rounded-3xl pointer-events-none"
+              animate={{ opacity: [0.35, 0.9, 0.35], scale: [1, 1.04, 1] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
               style={{
                 background:
-                  'radial-gradient(circle at center, rgba(196,149,61,0.25), transparent 65%)',
+                  'radial-gradient(circle at center, rgba(196,149,61,0.45), transparent 65%)',
               }}
             />
 
             <img
               src={highlighted.logo}
               alt={highlighted.name}
-              className="max-h-[78%] max-w-[78%] object-contain relative z-10"
+              className="max-h-[72%] max-w-[72%] object-contain relative z-10"
               draggable={false}
             />
 
-            {/* "?" pastille top-right — "votre place, prête à briller" */}
-            <span className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-gold-500 text-navy-950 flex items-center justify-center text-xl font-bold shadow-glow z-20">
+            {/* HUGE "?" pastille top-right */}
+            <motion.span
+              animate={{ scale: [1, 1.08, 1] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute -top-5 -right-5 w-16 h-16 rounded-full bg-gold-500 text-navy-950 flex items-center justify-center text-4xl font-bold z-20 shadow-glow"
+              style={{ boxShadow: '0 10px 30px -5px rgba(196,149,61,0.8)' }}
+            >
               ?
-            </span>
+            </motion.span>
 
-            {/* "VOUS" label bottom */}
-            <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] tracking-[0.4em] uppercase text-gold-600 bg-white px-3 py-0.5 rounded-full border border-gold-500/40 z-20">
+            {/* "VOUS" tag bottom */}
+            <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[11px] tracking-[0.4em] uppercase text-navy-950 bg-gold-500 px-4 py-1 rounded-full font-semibold z-20">
               Vous
             </span>
           </motion.div>
