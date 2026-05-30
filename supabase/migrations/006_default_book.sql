@@ -1,9 +1,7 @@
 -- ============================================================================
--- Default book template — applies the full 20-slide GM IDF book to a partner
+-- Default book template — applies the full GM IDF book to a partner
 -- ============================================================================
--- Run once to install the function:
---   psql / SQL Editor → paste this whole file → Run
--- Then attribute the book to any partner with:
+-- Run once to install the function. Then:
 --   select public.apply_default_book('la-medicale');
 -- ============================================================================
 
@@ -27,7 +25,7 @@ declare
         "des médecins",
         "franciliens."
       ],
-      "subtitle": "Un réseau de 3 000 médecins. Une communauté engagée.  Un parcours partenaire pensé pour votre impact.",
+      "subtitle": "Un réseau de 2 000 médecins en Île-de-France. Une communauté engagée. Un parcours partenaire pensé pour votre impact.",
       "footer": "BOOK PARTENAIRES • ÉDITION 2026"
     }
   },
@@ -39,32 +37,32 @@ declare
         {
           "chapter": "01",
           "title": "Qui sommes-nous ?",
-          "description": "Présentation, manifesto, gouvernance",
+          "description": "Manifesto, bureau & KOLs",
           "range": "Slides 03 – 05"
         },
         {
           "chapter": "02",
           "title": "L'opportunité partenaire",
-          "description": "Bénéfices, audience, projets 2026",
-          "range": "Slides 06 – 10"
+          "description": "Bénéfices, audience, leviers d'activation",
+          "range": "Slides 06 – 08"
         },
         {
           "chapter": "03",
-          "title": "Notre visibilité en action",
-          "description": "Partenaires actuels et mockups multicanal",
-          "range": "Slides 11 – 12"
+          "title": "Nos rendez-vous",
+          "description": "Events mensuels et The Big Event",
+          "range": "Slides 09 – 10"
         },
         {
           "chapter": "04",
-          "title": "Forfaits & investissement",
-          "description": "Bronze, Argent, Or et modules cumulables",
-          "range": "Slides 13 – 18"
+          "title": "Plateforme & partenaires",
+          "description": "Nos outils et notre communauté",
+          "range": "Slides 11 – 12"
         },
         {
           "chapter": "05",
-          "title": "Engagement & contact",
-          "description": "Charte de partenariat et points de contact",
-          "range": "Slides 19 – 20"
+          "title": "Besoins & engagement",
+          "description": "Budget, charte et contact",
+          "range": "Slides 13 – 15"
         }
       ]
     }
@@ -72,32 +70,29 @@ declare
   {
     "type": "stats",
     "props": {
-      "eyebrow": "L'impact de notre réseau",
-      "title": "Des chiffres qui parlent",
-      "subtitle": "Le réseau Générations Médecins Île-de-France en chiffres.",
+      "eyebrow": "Notre audience",
+      "title": "Une audience importante",
+      "subtitle": "Générations Médecins Île-de-France en chiffres.",
       "stats": [
         {
-          "label": "Médecins",
-          "value": 3000,
-          "suffix": "+",
-          "caption": "adhérents au Club privé"
+          "label": "Adhérents IDF",
+          "value": 2000,
+          "caption": "médecins en Île-de-France"
         },
         {
-          "label": "Abonnés",
-          "value": 6000,
-          "suffix": "+",
-          "caption": "Instagram • LinkedIn • X • Facebook"
+          "label": "Abonnés LinkedIn",
+          "value": 17000,
+          "caption": "Président GM IDF — LinkedIn"
         },
         {
           "label": "Contacts",
-          "value": 10000,
-          "suffix": "+",
-          "caption": "newsletter & base sondages"
+          "value": 12000,
+          "caption": "Base Médecins en Grève"
         },
         {
-          "label": "Soirées / an",
-          "value": 4,
-          "caption": "afterworks networking qualifiés"
+          "label": "Événements / an",
+          "value": 12,
+          "caption": "soirées networking qualifiées"
         }
       ],
       "quote": "Un partenariat avec GM IDF, c'est un accès direct à un terrain qualifié, une audience engagée et une crédibilité scientifique sans équivalent."
@@ -143,46 +138,57 @@ declare
       "members": [
         {
           "initials": "AB",
-          "name": "Alexis BOURLA",
-          "role": "Président"
+          "name": "Dr. Alexis BOURLA",
+          "role": "Président",
+          "specialty": "Psychiatre",
+          "details": "Direction médicale — Clariane, NeuroStim, Cline Research, Masterclass Médicale"
         },
         {
           "initials": "MT",
-          "name": "Minh-Hanh TA",
-          "role": "Secrétaire générale"
+          "name": "Dr. Minh-Hanh TA",
+          "role": "Secrétaire générale",
+          "specialty": "Onco-radiothérapeute"
         },
         {
           "initials": "PH",
-          "name": "Piérre HAMANN",
-          "role": "Vice-président"
-        },
-        {
-          "initials": "LK",
-          "name": "L-A. KLEIN",
-          "role": "Vice-président"
+          "name": "Dr. Pierre HAMANN",
+          "role": "Vice-président",
+          "specialty": "Dermatologue",
+          "details": "Chef de Service Dermatologie — Kremlin-Bicêtre"
         },
         {
           "initials": "CC",
-          "name": "C. CHEURFA",
-          "role": "Vice-président"
+          "name": "Dr. Cherifa CHEURFA",
+          "role": "Vice-présidente",
+          "specialty": "Anesthésiste-réanimateur"
+        },
+        {
+          "initials": "LK",
+          "name": "Dr. Louise-Anne KLEIN",
+          "role": "Vice-présidente",
+          "specialty": "Gynécologue obstétricienne"
         },
         {
           "initials": "FV",
-          "name": "Franck VERDONK",
-          "role": "Trésorier"
+          "name": "Pr. Franck VERDONK",
+          "role": "Trésorier",
+          "specialty": "Anesthésiste-réanimateur",
+          "details": "Chef de Service de Réanimation — Saint-Antoine"
         },
         {
           "initials": "RB",
-          "name": "R. BENDRIHEM",
-          "role": "Chargée de mission"
+          "name": "R. Bendrihem",
+          "role": "Chargée de mission",
+          "small": true
         },
         {
           "initials": "SH",
-          "name": "S. HUGAIN",
-          "role": "Chargée de mission"
+          "name": "S. Hugain",
+          "role": "Chargée de mission",
+          "small": true
         }
       ],
-      "footnote": "→ Plusieurs spécialités représentées : formation, installation, exercice, prises de parole — un crédit renforcé pour vos partenariats."
+      "footnote": "Plusieurs KOL au sein du bureau • Plusieurs Vice-présidents de la FMF ou de syndicats verticaux • Plusieurs Chefs de Service • Multidisciplinarité forte."
     }
   },
   {
@@ -194,29 +200,44 @@ declare
       "benefits": [
         {
           "num": "01",
-          "title": "Accès aux KOLs",
-          "body": "Connectez-vous aux leaders d'opinion de la médecine francilienne — installation, exercice, innovation, IA, entrepreneuriat.",
-          "arrow": "Audience qualifiée et engagée."
+          "title": "Toucher les médecins au moment de leurs plus grandes décisions financières",
+          "body": "Installation, remplacement, achat immobilier, création de société, prévoyance, retraite, RCP, emprunteur, gestion patrimoniale.",
+          "arrow": "Nos adhérents sont précisément dans la période de vie où ils souscrivent le plus de contrats et changent le plus de prestataires."
         },
         {
           "num": "02",
-          "title": "Visibilité ciblée",
-          "body": "Atteignez 3 000+ médecins via newsletter, réseaux sociaux, événements présentiels et plateformes digitales.",
-          "arrow": "Reach mesurable et reporting détaillé."
+          "title": "Une audience ultra-ciblée et difficile à toucher autrement",
+          "body": "Les médecins sont l'une des populations professionnelles les plus difficiles à atteindre :",
+          "items": [
+            "Peu de temps disponible",
+            "Forte sollicitation commerciale",
+            "Faible efficacité des canaux publicitaires"
+          ],
+          "arrow": "Nos partenaires bénéficient d'un accès direct à une communauté déjà engagée et identifiée."
         },
         {
           "num": "03",
-          "title": "Caution scientifique",
-          "body": "Associez votre marque à un acteur médical légitime, indépendant et reconnu — crédibilité auprès des prescripteurs.",
-          "arrow": "Image et confiance renforcées."
+          "title": "Une recommandation vaut plus qu'une publicité",
+          "body": "Un partenariat avec Générations Médecins place votre marque dans un environnement de confiance plutôt qu'une logique publicitaire.",
+          "arrow": "Taux de conversion significativement supérieurs lorsque la mise en relation passe par une organisation professionnelle reconnue."
         },
         {
           "num": "04",
-          "title": "ROI mesurable",
-          "body": "Reporting trimestriel : impressions newsletter, engagement réseaux, inscriptions événements, replays, conversions.",
-          "arrow": "Chiffres concrets, pas de promesses floues."
+          "title": "Des dispositifs générateurs de leads",
+          "body": "Nous pouvons mettre en place :",
+          "items": [
+            "Webinaires thématiques",
+            "Guides pratiques",
+            "Ateliers installation",
+            "Événements régionaux",
+            "Newsletters ciblées",
+            "Campagnes digitales",
+            "Prises de RDV qualifiées"
+          ],
+          "arrow": "L'objectif n'est pas la visibilité mais la génération de contacts et de nouveaux clients."
         }
-      ]
+      ],
+      "closing": "Nous ne proposons pas que de la visibilité. Nous proposons un accès privilégié à plusieurs centaines de jeunes médecins au moment précis où ils choisissent leur banque, leur assureur, leur prévoyance et leurs partenaires professionnels."
     }
   },
   {
@@ -227,46 +248,41 @@ declare
       "subtitle": "Une communauté médicale francilienne segmentée et activable.",
       "segments": [
         {
-          "label": "Médecins généralistes",
-          "share": 45,
-          "description": "Cœur de cible — installation, exercice, gestion"
-        },
-        {
           "label": "Spécialistes",
-          "share": 35,
-          "description": "Toutes spécialités confondues, IDF"
+          "share": 70,
+          "description": "Cœur de cible — spé > MG"
         },
         {
-          "label": "Internes & jeunes méd.",
+          "label": "< 10 ans depuis le DES",
+          "share": 90,
+          "description": "Jeunes médecins en installation"
+        },
+        {
+          "label": "Internes",
           "share": 15,
           "description": "Futurs prescripteurs et décideurs"
-        },
-        {
-          "label": "Cadres & responsables",
-          "share": 5,
-          "description": "Directions de centres et structures"
         }
       ],
       "channels": [
         {
-          "label": "Newsletter hebdo",
-          "value": "3 000+",
-          "caption": "destinataires actifs"
+          "label": "Mailing",
+          "value": "12 000",
+          "caption": "membres actifs (base sondages)"
         },
         {
-          "label": "Réseaux sociaux",
-          "value": "6 000+",
-          "caption": "abonnés cumulés (Insta/LinkedIn/X/FB)"
+          "label": "LinkedIn",
+          "value": "17 000",
+          "caption": "abonnés (Président GM IDF)"
         },
         {
-          "label": "Base sondages",
-          "value": "10 000+",
-          "caption": "contacts pour études thématiques"
+          "label": "Events mensuels",
+          "value": "360 / an",
+          "caption": "30 participants × 12 soirées"
         },
         {
-          "label": "Soirées networking",
-          "value": "80–140",
-          "caption": "participants qualifiés / an"
+          "label": "Big Event annuel",
+          "value": "200",
+          "caption": "participants qualifiés"
         }
       ]
     }
@@ -280,28 +296,28 @@ declare
       "pillars": [
         {
           "num": "01",
-          "title": "Newsletter hebdomadaire",
-          "body": "Informer, fédérer et orienter vers des ressources utiles pour les médecins franciliens.",
+          "title": "Newsletter récurrente",
+          "body": "Petites annonces, décryptages d'actualité, contenus pratiques pour la vie professionnelle des médecins franciliens.",
           "tags": [
-            "3 000+ destinataires",
+            "12 000 destinataires",
             "Hebdomadaire"
           ]
         },
         {
           "num": "02",
-          "title": "Soirées networking",
-          "body": "Rencontres terrain, afterworks thématiques, prises de parole et échanges qualitatifs.",
+          "title": "Events mensuels",
+          "body": "Soirées en petit comité, format afterwork qualitatif, vraie proximité — les médecins viennent, échangent, se reconnaissent.",
           "tags": [
-            "4 événements / an",
-            "20–35 participants"
+            "12 / an",
+            "30 participants"
           ]
         },
         {
           "num": "03",
-          "title": "Plateformes & contenus",
-          "body": "Positionnement innovant : installation, gestion, IA, outils numériques, formats actionnables.",
+          "title": "Plateforme & contenus",
+          "body": "Mobilisation, lanceurs d'alerte, SOS juridique, outils d'aide à l'installation, consultation des adhérents.",
           "tags": [
-            "Replay & e-learning",
+            "Plateforme membre",
             "Mise à jour continue"
           ]
         }
@@ -311,14 +327,14 @@ declare
   {
     "type": "events",
     "props": {
-      "eyebrow": "02 • L'opportunité",
-      "title": "Soirées événementielles en présentiel",
-      "subtitle": "Partenariat Générations Médecins IDF × Hack Your Care — formats afterwork qualitatifs.",
+      "eyebrow": "03 • Nos rendez-vous",
+      "title": "Events Mensuels avec nos partenaires",
+      "subtitle": "Hack Your Care, Celene, NeuroStim, Clariane — formats afterwork qualitatifs.",
       "keyFacts": [
         {
-          "value": "4",
+          "value": "12",
           "label": "Événements / an",
-          "caption": "hors été — format afterwork"
+          "caption": "un par mois, hors été"
         },
         {
           "value": "20–35",
@@ -349,7 +365,7 @@ declare
           "label": "Networking / Cocktail"
         },
         {
-          "time": "21h30",
+          "time": "22h00",
           "label": "Fin"
         }
       ],
@@ -368,321 +384,232 @@ declare
         },
         {
           "title": "Formats",
-          "body": "Tables rondes • Interventions • Ateliers pratiques • Intervenant extérieur"
+          "body": "Tables rondes • Interventions • Ateliers • Intervenant extérieur"
         }
       ]
     }
   },
   {
-    "type": "projects",
+    "type": "bigEvent",
     "props": {
-      "eyebrow": "02 • L'opportunité",
-      "title": "Projets 2026 — opportunités partenaires",
-      "subtitle": "Une feuille de route 2026 riche, à co-construire avec nos partenaires.",
-      "cards": [
+      "eyebrow": "03 • Nos rendez-vous",
+      "title": "The Big Event",
+      "subtitle": "Le grand rendez-vous annuel — peut-être deux à terme",
+      "meta": [
         {
-          "title": "Soirées networking",
-          "tag": "Lancement année",
-          "arrow": "Innovation • IA"
+          "label": "Public",
+          "value": "200 personnes"
         },
         {
-          "title": "Baromètre GM IDF",
-          "tag": "Sondage stratégique",
-          "arrow": "10 000+ contacts"
+          "label": "Intervenants",
+          "value": "Partenaires, FAF"
         },
         {
-          "title": "Masterclass Médical",
-          "tag": "Événement scientifique",
-          "arrow": "Spé identifiée"
+          "label": "Format",
+          "value": "½ journée + soirée festive"
         },
         {
-          "title": "Demi-journée + soirée",
-          "tag": "OCTOBRE 2026",
-          "arrow": "Temps fort de l'année"
+          "label": "Hôte soirée",
+          "value": "House Clinics"
         }
       ],
-      "footnote": "CHAQUE PROJET = UNE OPPORTUNITÉ DE PARTENARIAT DÉDIÉ"
+      "tracks": [
+        {
+          "num": "1",
+          "title": "Assistants, CCA, jeunes libéraux",
+          "audience": "14h30 – 16h30, pause 17h15",
+          "topics": [
+            "Préparer sa carrière : libérale / hospitalière / mixte",
+            "Connaître ses droits et statuts : congés, formations, etc."
+          ]
+        },
+        {
+          "num": "2",
+          "title": "Hospitaliers (PH, PHU, PU-PH)",
+          "topics": [
+            "Connaître ses droits et statuts : congés, formations, etc.",
+            "Optimisation fiscale, finance, le libéral à l'hôpital"
+          ]
+        },
+        {
+          "num": "3",
+          "title": "Internes",
+          "audience": "En rapprochement avec l'ISNI",
+          "topics": [
+            "Mécanismes d'achat, pied à terre",
+            "Fiscalité, prêt préférentiel CA"
+          ]
+        }
+      ],
+      "commonTitle": "Thèmes communs",
+      "commonTopics": [
+        "Parentalité",
+        "Arrêt maladie",
+        "Prévoyance",
+        "Épuisement professionnel",
+        "Santé mentale",
+        "Dermascan",
+        "IPA",
+        "IA en médecine",
+        "ESS",
+        "Gérer ses salariés",
+        "Faire du réseau",
+        "Lutter contre l'isolement",
+        "Repenser le syndicalisme",
+        "Financiarisation",
+        "Euthanasie",
+        "Directives anticipées",
+        "Consentement",
+        "Examen clinique au 21e",
+        "Plaintes",
+        "Religion en médecine",
+        "Refuser la CMU",
+        "Cotations",
+        "Sexologie",
+        "Influenceurs médicaux"
+      ],
+      "guest": "Soirée chez House Clinics"
     }
   },
   {
-    "type": "partnersGrid",
+    "type": "features",
     "props": {
-      "eyebrow": "03 • Visibilité",
-      "title": "Ils nous font confiance",
-      "subtitle": "Une communauté de partenaires fidèles, qui renouvellent leur engagement année après année.",
-      "partners": [
+      "eyebrow": "04 • Plateforme",
+      "title": "Notre plateforme membre",
+      "subtitle": "Des outils concrets construits par et pour la communauté médicale francilienne.",
+      "features": [
         {
-          "name": "Crédit Agricole IDF",
-          "tagline": "Partenariat reconduit",
-          "body": "Accompagnement bancaire, assurances, solutions pro"
+          "glyph": "⚖️",
+          "tag": "Juridique",
+          "title": "SOS juridique",
+          "body": "Une IA juridique + un avocat de garde : plus rapide, plus accessible et plus à jour qu'un juriste classique. Réponses concrètes, contextualisées au droit médical."
         },
         {
-          "name": "Club privé des médecins",
-          "tagline": "3 000+ adhérents",
-          "body": "Remises exclusives pro & perso"
+          "glyph": "🏥",
+          "tag": "Carrière",
+          "title": "Aide à l'installation",
+          "body": "Parcours pas-à-pas : choix du statut, cotations, démarches CPAM, montage de société, fiscalité. Mis à jour en continu par le bureau."
+        },
+        {
+          "glyph": "🗳️",
+          "tag": "Démocratie",
+          "title": "Consultation des adhérents",
+          "body": "Sondages thématiques, baromètres, votes — chaque adhérent pèse dans les positions du syndicat."
+        },
+        {
+          "glyph": "📢",
+          "tag": "Engagement",
+          "title": "Mobilisation & lanceurs d'alerte",
+          "body": "Espace sécurisé pour signaler des dérives, alimenter le plaidoyer, et coordonner les actions de terrain."
+        },
+        {
+          "glyph": "🧠",
+          "tag": "Contenus",
+          "title": "Décryptages d'actualité",
+          "body": "Newsletter hebdo et fiches courtes : on traduit les évolutions réglementaires et conventionnelles en actions concrètes."
+        }
+      ]
+    }
+  },
+  {
+    "type": "partnersLogos",
+    "props": {
+      "eyebrow": "04 • Nos partenaires",
+      "title": "Nos partenaires",
+      "subtitle": "Une communauté de partenaires fidèles. Cette présentation est faite pour vous séduire — il serait cool que vous soyez là.",
+      "partners": [
+        {
+          "name": "Crédit Agricole",
+          "logo": "/logos/CA.png"
+        },
+        {
+          "name": "La Médicale",
+          "logo": "/logos/LM.png"
+        },
+        {
+          "name": "One Gestion Privée",
+          "logo": "/logos/OGP.png"
         },
         {
           "name": "Hack Your Care",
-          "tagline": "Co-organisation soirées",
-          "body": "Webinaires sur l'innovation médicale"
+          "logo": "/logos/HYC.png"
         },
         {
-          "name": "One Gestion & Guillot-Sanchez",
-          "tagline": "Partenaires spécialisés",
-          "body": "Gestion privée & avocats"
+          "name": "NeuroStim",
+          "logo": "/logos/NST.png"
+        },
+        {
+          "name": "Celene",
+          "logo": "/logos/CLN.jpg"
+        },
+        {
+          "name": "Amarsi",
+          "logo": "/logos/AMA.png"
+        },
+        {
+          "name": "Club Privé des Médecins",
+          "logo": "/logos/CPM.png"
+        },
+        {
+          "name": "Clariane",
+          "logo": "/logos/CLA.png"
+        },
+        {
+          "name": "Nebimage",
+          "logo": "/logos/NEB.png"
         }
       ],
-      "quote": "Nous reconduisons notre partenariat avec GM IDF car nous y trouvons un accès qualifié à la communauté médicale francilienne, un engagement réel des équipes et un suivi rigoureux des actions menées."
+      "inviteSlot": true,
+      "inviteText": "Votre place ici"
     }
   },
   {
-    "type": "visibility",
+    "type": "budget",
     "props": {
-      "eyebrow": "03 • Visibilité",
-      "title": "Votre visibilité en action",
-      "subtitle": "Quatre points de contact stratégiques pour votre marque, tout au long de l’année.",
-      "zones": [
+      "eyebrow": "05 • Investissement",
+      "title": "Nos besoins pour mener nos actions",
+      "subtitle": "Budget annuel global pour déployer l'ensemble du programme 2026 — événements, plateforme, communication.",
+      "items": [
         {
-          "kicker": "Newsletter hebdomadaire",
-          "label": "GM IDF Newsletter",
-          "caption": "3 000+ destinataires actifs — mention ou bannière partenaire"
+          "label": "Events mensuels",
+          "detail": "2 750 € × 12 événements",
+          "amount": 33000
         },
         {
-          "kicker": "Stand événement",
-          "label": "Soirées GM IDF / Demi-journée",
-          "caption": "Visibilité présentielle directe"
+          "label": "Développement des modules",
+          "detail": "Plateforme membre, SOS juridique, outils",
+          "amount": 50000
         },
         {
-          "kicker": "Réseaux sociaux",
-          "label": "Instagram, LinkedIn, X, Facebook",
-          "caption": "6 000+ abonnés cumulés"
+          "label": "Budget communication",
+          "detail": "Production, réseaux, newsletter, design",
+          "amount": 25000
         },
         {
-          "kicker": "Site generations-medecins.fr",
-          "label": "Bannière page d'accueil",
-          "caption": "Visibilité permanente / SEO"
+          "label": "Big Event annuel",
+          "detail": "200 participants — ½ journée + soirée",
+          "amount": 30000
         }
       ],
-      "footnote": "→ Discutons des activations sur-mesure pour votre marque"
-    }
-  },
-  {
-    "type": "plan",
-    "props": {
-      "eyebrow": "04 • Forfaits & investissement",
-      "title": "Forfait Bronze",
-      "subtitle": "Le forfait d'entrée pour amorcer votre visibilité auprès de notre communauté.",
-      "tier": "BRONZE",
-      "price": "2 000 €",
-      "priceCaption": "HT / an",
-      "features": [
-        "Logo page Partenaires + supports digitaux",
-        "Mention Partenaire dans la newsletter (X semaines)",
-        "Post / story de mise en avant sur nos réseaux sociaux",
-        "Visibilité sur les supports d'événements GM IDF",
-        "Accès à un point de contact dédié"
-      ]
-    }
-  },
-  {
-    "type": "plan",
-    "props": {
-      "eyebrow": "04 • Forfaits & investissement",
-      "title": "Forfait Argent",
-      "subtitle": "Inclut le forfait Bronze + activations média et reporting détaillé.",
-      "tier": "ARGENT",
-      "price": "5 000 €",
-      "priceCaption": "HT / an",
-      "features": [
-        "✦ Inclut l’intégralité du forfait Bronze",
-        "Webinaire co-brandé avec inscriptions et replay",
-        "Reporting (inscriptions, replay, clics, engagement)",
-        "Diffusion étendue sur tous nos canaux digitaux",
-        "Tarifs préférentiels sur les options à la carte"
-      ]
-    }
-  },
-  {
-    "type": "plan",
-    "props": {
-      "eyebrow": "04 • Forfaits & investissement",
-      "title": "Forfait Or",
-      "subtitle": "Inclut Argent + visibilité événementielle premium et co-création de contenu.",
-      "tier": "OR",
-      "price": "10 000 €",
-      "priceCaption": "HT / an",
-      "premium": true,
-      "features": [
-        "✦ Inclut l’intégralité du forfait Argent",
-        "Visibilité événement GM IDF (présence physique)",
-        "Atelier ou prise de parole sponsor",
-        "Contenu co-brandé + diffusion multicanal",
-        "Accès KOLs et réunion de pilotage annuelle"
-      ]
-    }
-  },
-  {
-    "type": "plansCompare",
-    "props": {
-      "eyebrow": "04 • Forfaits & investissement",
-      "title": "Comparatif des 3 forfaits",
-      "subtitle": "Une vue d'ensemble pour choisir le niveau adapté à vos objectifs.",
-      "tiers": [
-        {
-          "name": "BRONZE",
-          "price": "2 000 €"
-        },
-        {
-          "name": "ARGENT",
-          "price": "5 000 €"
-        },
-        {
-          "name": "OR",
-          "price": "10 000 €",
-          "premium": true
-        }
-      ],
-      "features": [
-        "Logo page Partenaires / supports digitaux",
-        "Mention dans la newsletter",
-        "Post / story de mise en avant",
-        "Webinaire co-brandé",
-        "Reporting (inscriptions, clics, replay)",
-        "Visibilité événement GM IDF",
-        "Atelier / prise de parole sponsor",
-        "Contenu co-brandé + diffusion"
-      ],
-      "matrix": [
-        [
-          true,
-          true,
-          true
-        ],
-        [
-          true,
-          true,
-          true
-        ],
-        [
-          true,
-          true,
-          true
-        ],
-        [
-          false,
-          true,
-          true
-        ],
-        [
-          false,
-          true,
-          true
-        ],
-        [
-          false,
-          false,
-          true
-        ],
-        [
-          false,
-          false,
-          true
-        ],
-        [
-          false,
-          false,
-          true
-        ]
-      ]
-    }
-  },
-  {
-    "type": "modules",
-    "props": {
-      "eyebrow": "04 • Forfaits & investissement",
-      "title": "Modules cumulables",
-      "subtitle": "Cinq modules composables selon vos objectifs — cumulables entre eux et avec les forfaits.",
-      "modules": [
-        {
-          "name": "Starter-Visibilité",
-          "price": "2 000 €",
-          "body": "Logo partenaires, mention newsletter, post réseaux sociaux, diffusion infos."
-        },
-        {
-          "name": "Media",
-          "price": "5 000 €",
-          "body": "Webinaire co-brandé, inscriptions, reporting, replay et post dédiés."
-        },
-        {
-          "name": "Événement GM IDF",
-          "price": "5 000 €",
-          "body": "Logo programme, stand, inscriptions collaborateurs, insertions, mention scène."
-        },
-        {
-          "name": "Soirée",
-          "price": "3 500 €",
-          "body": "Inscriptions collaborateurs, logo, présentation/animation, insertions."
-        },
-        {
-          "name": "Expert",
-          "price": "4 500 €",
-          "body": "Contenu co-brandé, consulting panel, sondage + synthèse complète."
-        }
-      ],
-      "footnote": "→ Modules composables selon vos objectifs — tarifs HT / an."
-    }
-  },
-  {
-    "type": "options",
-    "props": {
-      "eyebrow": "04 • Forfaits & investissement",
-      "title": "Options à la carte",
-      "subtitle": "Des extensions sur-mesure pour amplifier votre partenariat.",
-      "options": [
-        {
-          "name": "Sponsor soirée networking",
-          "body": "Naming, animation, goodies — visibilité maximale auprès des participants qualifiés."
-        },
-        {
-          "name": "Sponsoring Baromètre",
-          "body": "Questionnaire + synthèse + publication — accès aux insights du marché médical IDF."
-        },
-        {
-          "name": "Pack multi-événements",
-          "body": "Engagement annuel sur l'ensemble des événements — tarif préférentiel et visibilité continue."
-        },
-        {
-          "name": "Sponsoring numéraire",
-          "body": "Partenariat financier classique — flexibilité d'allocation selon les actions retenues."
-        },
-        {
-          "name": "Sponsoring en nature",
-          "body": "Traiteur, locaux, services — apport en valeur pour les événements GM IDF."
-        },
-        {
-          "name": "Billetterie événement",
-          "body": "Co-financement des entrées partenaires — adossement marque à l’événement."
-        }
-      ],
-      "footnote": "→ Tarification de chaque option sur devis personnalisé."
+      "totalLabel": "Total annuel"
     }
   },
   {
     "type": "charter",
     "props": {
-      "eyebrow": "05 • Engagement",
+      "eyebrow": "06 • Engagement",
       "title": "Notre charte de partenariat",
       "subtitle": "Une relation transparente, encadrée et bénéfique pour tous.",
       "pillars": [
         {
           "glyph": "§",
           "title": "Éthique & déontologie",
-          "body": "Conformité à l’éthique professionnelle, aux réglementations applicables et à la déontologie médicale."
+          "body": "Conformité à l'éthique professionnelle, aux réglementations applicables et à la déontologie médicale."
         },
         {
           "glyph": "○",
           "title": "Indépendance",
-          "body": "Respect absolu de l’indépendance scientifique et éditoriale de Générations Médecins IDF."
+          "body": "Respect absolu de l'indépendance scientifique et éditoriale de Générations Médecins IDF."
         },
         {
           "glyph": "◆",
@@ -702,7 +629,7 @@ declare
     "props": {
       "eyebrow": "Contact",
       "title": "Construisons ensemble un partenariat utile et visible.",
-      "body": "Échangeons sur vos objectifs et co-construisons l’activation qui vous ressemble.",
+      "body": "Échangeons sur vos objectifs et co-construisons l'activation qui vous ressemble.",
       "channels": [
         {
           "glyph": "@",

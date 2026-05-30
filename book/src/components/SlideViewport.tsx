@@ -32,7 +32,7 @@ export default function SlideViewport({ children }: { children: ReactNode }) {
         // height-constrained width that keeps 16:9 within the available height.
         // The host (.book-slide-host) caps vertical room via its padding, so
         // `100vh - 200px` matches the worst-case top+bottom padding budget.
-        width: 'min(100%, 1600px, calc((100vh - 200px) * 16 / 9))',
+        width: 'min(100%, 1600px, calc((100vh - 130px) * 16 / 9))',
         aspectRatio: '16 / 9',
       }}
     >

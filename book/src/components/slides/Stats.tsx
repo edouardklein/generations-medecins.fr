@@ -43,10 +43,12 @@ export default function Stats(props: StatsProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={VIEWPORT_ONCE}
           transition={{ delay: 0.5, duration: 0.6 }}
-          className="mt-10 relative bg-white/[0.05] border-l-[3px] border-gold-500 px-8 py-6 rounded-r-xl"
+          className="mt-auto pt-10 relative"
         >
-          <span className="absolute top-3 left-3 text-gold-500 text-4xl leading-none font-serif">“</span>
-          <p className="italic text-[20px] text-white pl-6 max-w-[1100px]">{props.quote}</p>
+          <div className="relative bg-white/[0.05] border-l-[4px] border-gold-500 px-10 py-7 rounded-r-2xl">
+            <span className="absolute -top-2 left-4 text-gold-500 text-6xl leading-none font-serif">“</span>
+            <p className="italic text-[28px] leading-snug text-white pl-6">{props.quote}</p>
+          </div>
         </motion.blockquote>
       )}
     </div>

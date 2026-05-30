@@ -17,6 +17,10 @@ export type Slide =
   | { type: 'pillars'; props: PillarsProps }
   | { type: 'events'; props: EventsProps }
   | { type: 'projects'; props: ProjectsProps }
+  | { type: 'bigEvent'; props: BigEventProps }
+  | { type: 'features'; props: FeaturesProps }
+  | { type: 'partnersLogos'; props: PartnersLogosProps }
+  | { type: 'budget'; props: BudgetProps }
   | { type: 'partnersGrid'; props: PartnersGridProps }
   | { type: 'visibility'; props: VisibilityProps }
   | { type: 'plan'; props: PlanProps }
@@ -90,6 +94,9 @@ export type BureauMember = {
   initials: string
   name: string
   role: string
+  specialty?: string
+  details?: string
+  small?: boolean
 }
 export type BureauProps = {
   eyebrow?: string
@@ -103,6 +110,7 @@ export type Benefit = {
   num: string
   title: string
   body: string
+  items?: string[]
   arrow: string
 }
 export type BenefitsProps = {
@@ -110,6 +118,7 @@ export type BenefitsProps = {
   title: string
   subtitle?: string
   benefits: Benefit[]
+  closing?: string
 }
 
 export type AudienceSegment = { label: string; share: number; description: string }
@@ -211,4 +220,41 @@ export type ContactProps = {
   body?: string
   channels: { glyph: string; label: string; value: string }[]
   footer?: string
+}
+
+export type BigEventProps = {
+  eyebrow?: string
+  title: string
+  subtitle?: string
+  meta: { label: string; value: string }[]
+  tracks: { num: string; title: string; audience?: string; topics: string[] }[]
+  commonTitle?: string
+  commonTopics: string[]
+  guest?: string
+}
+
+export type FeaturesProps = {
+  eyebrow?: string
+  title: string
+  subtitle?: string
+  features: { glyph: string; tag?: string; title: string; body: string }[]
+}
+
+export type PartnersLogosProps = {
+  eyebrow?: string
+  title: string
+  subtitle?: string
+  partners: { name: string; logo: string }[]
+  highlightName?: string
+  inviteSlot?: boolean
+  inviteText?: string
+}
+
+export type BudgetProps = {
+  eyebrow?: string
+  title: string
+  subtitle?: string
+  items: { label: string; detail?: string; amount: number }[]
+  currency?: string
+  totalLabel?: string
 }

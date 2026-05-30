@@ -91,14 +91,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Top is generous so the floating toolbar (download button, breadcrumb)
-     never overlaps the slide content. */
-  padding: 96px 56px 64px 56px;
+  /* Top is just enough to clear the floating toolbar; sides give a hint of
+     'page resting on the canvas' without making the slide look small. */
+  padding: 72px 32px 40px 32px;
 }
 
 @media (max-width: 768px) {
   .book-slide-host {
-    padding: 84px 16px 32px 16px;
+    padding: 72px 12px 24px 12px;
   }
 }
 

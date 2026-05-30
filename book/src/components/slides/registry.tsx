@@ -9,6 +9,10 @@ import Audience from './Audience'
 import Pillars from './Pillars'
 import Events from './Events'
 import Projects from './Projects'
+import BigEvent from './BigEvent'
+import Features from './Features'
+import PartnersLogos from './PartnersLogos'
+import Budget from './Budget'
 import PartnersGrid from './PartnersGrid'
 import Visibility from './Visibility'
 import Plan from './Plan'
@@ -45,6 +49,19 @@ export function renderSlide(slide: Slide, ctx: SlideContext) {
       return <Events {...slide.props} />
     case 'projects':
       return <Projects {...slide.props} />
+    case 'bigEvent':
+      return <BigEvent {...slide.props} />
+    case 'features':
+      return <Features {...slide.props} />
+    case 'partnersLogos':
+      return (
+        <PartnersLogos
+          {...slide.props}
+          highlightName={slide.props.highlightName ?? ctx.partnerName ?? undefined}
+        />
+      )
+    case 'budget':
+      return <Budget {...slide.props} />
     case 'partnersGrid':
       return <PartnersGrid {...slide.props} />
     case 'visibility':
