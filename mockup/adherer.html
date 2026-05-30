@@ -8,15 +8,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     .adherer-grid {
       display: grid;
-      grid-template-columns: 1fr 420px;
+      grid-template-columns: 1fr 460px;
       gap: 56px;
       align-items: start;
     }
-
-    .plan-card {
+    .signup-card {
       padding: 36px;
       border-radius: 20px;
       border: 2px solid var(--blue);
@@ -25,106 +25,123 @@
       top: 88px;
       box-shadow: 0 8px 40px rgba(50,106,162,0.12);
     }
-
-    .plan-price {
-      font-size: 3rem;
+    .signup-card h2 {
+      font-size: 1.25rem;
       font-weight: 900;
       color: var(--blue-dark);
-      letter-spacing: -0.04em;
-      line-height: 1;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
-    .plan-price span {
-      font-size: 1rem;
-      font-weight: 500;
+    .signup-card .subtitle {
+      font-size: 0.82rem;
       color: var(--muted);
-      letter-spacing: 0;
-    }
-
-    .plan-desc {
-      font-size: 0.88rem;
-      color: var(--muted);
-      margin-bottom: 28px;
-      padding-bottom: 24px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
       border-bottom: 1px solid var(--line);
     }
-
-    .perks { display: grid; gap: 12px; margin-bottom: 28px; }
-    .perk {
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 5px;
+    }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1.5px solid var(--line);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      color: var(--ink);
+      background: white;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+      appearance: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus { outline: none; border-color: var(--blue); }
+    .form-group input.error { border-color: #dc2626; }
+    .form-hint {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .form-error {
+      font-size: 0.72rem;
+      color: #dc2626;
+      margin-top: 4px;
+      display: none;
+    }
+    .form-error.show { display: block; }
+    .cgu-row {
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      font-size: 0.88rem;
-      color: var(--ink);
+      margin: 16px 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
     }
-    .perk::before {
-      content: '✓';
-      flex-shrink: 0;
-      width: 20px;
-      height: 20px;
-      background: rgba(137,200,106,0.15);
-      color: #3d8a1a;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
+    .cgu-row input[type=checkbox] { flex-shrink: 0; margin-top: 2px; width: 16px; height: 16px; cursor: pointer; }
+    .btn-submit {
+      width: 100%;
+      padding: 13px;
+      background: var(--grad);
+      color: white;
+      border: none;
+      border-radius: 11px;
+      font-family: inherit;
+      font-size: 1rem;
       font-weight: 800;
-      margin-top: 1px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
     }
+    .btn-submit:hover { opacity: 0.92; transform: translateY(-1px); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .alert {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.83rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .alert.show { display: block; }
+    .alert-success { background: rgba(98,192,64,0.1); color: #2d6b10; border: 1px solid rgba(98,192,64,0.3); }
+    .alert-error   { background: rgba(220,38,38,0.08); color: #b91c1c; border: 1px solid rgba(220,38,38,0.2); }
+    .already-member {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+    .already-member a { color: var(--blue); font-weight: 700; text-decoration: none; }
 
     .benefits-list { display: grid; gap: 20px; }
-    .benefit {
-      display: flex;
-      gap: 18px;
-      align-items: flex-start;
-    }
+    .benefit { display: flex; gap: 18px; align-items: flex-start; }
     .benefit-icon {
-      font-size: 1.5rem;
-      flex-shrink: 0;
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
+      font-size: 1.5rem; flex-shrink: 0;
+      width: 48px; height: 48px; border-radius: 14px;
       background: var(--surface);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
     }
-    .benefit-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--ink);
-      margin-bottom: 4px;
-    }
-    .benefit-desc {
-      font-size: 0.83rem;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-
+    .benefit-title { font-size: 0.95rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .benefit-desc  { font-size: 0.83rem; color: var(--muted); line-height: 1.55; }
     .testimonial {
-      padding: 24px;
-      border-radius: var(--r);
-      background: var(--surface);
-      border: 1px solid var(--line);
-      margin-top: 36px;
+      padding: 24px; border-radius: var(--r);
+      background: var(--surface); border: 1px solid var(--line); margin-top: 36px;
     }
-    .testimonial-text {
-      font-size: 0.92rem;
-      color: var(--ink);
-      line-height: 1.6;
-      font-style: italic;
-      margin-bottom: 14px;
-    }
-    .testimonial-author {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--muted);
-    }
+    .testimonial-text  { font-size: 0.92rem; color: var(--ink); line-height: 1.6; font-style: italic; margin-bottom: 14px; }
+    .testimonial-author{ font-size: 0.8rem; font-weight: 700; color: var(--muted); }
 
-    @media (max-width: 860px) {
+    @media (max-width: 900px) {
       .adherer-grid { grid-template-columns: 1fr; }
-      .plan-card { position: static; }
+      .signup-card { position: static; }
+    }
+    @media (max-width: 520px) {
+      .form-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -151,9 +168,9 @@
 
   <div class="page-hero">
     <div class="page-hero-inner">
-      <span class="badge badge-green"><span class="dot-green"></span> 3 000+ adhérents</span>
-      <h1>Adhérer à<br>Générations Médecins</h1>
-      <p>Rejoindre, ce n'est pas simplement cotiser. C'est participer à une représentation qui vous ressemble vraiment.</p>
+      <span class="badge badge-green"><span class="dot-green"></span> Adhésion gratuite</span>
+      <h1>Rejoindre<br>Générations Médecins</h1>
+      <p>Inscription en 2 minutes. Accès immédiat aux outils, décrypteurs et à la communauté.</p>
     </div>
   </div>
 
@@ -164,13 +181,12 @@
         <!-- Bénéfices -->
         <div>
           <h2 class="section-title" style="margin-bottom:36px">Ce que vous obtenez</h2>
-
           <div class="benefits-list">
             <div class="benefit">
               <div class="benefit-icon">📰</div>
               <div>
                 <div class="benefit-title">Décrypteurs — veille personnalisée</div>
-                <div class="benefit-desc">Alertes automatiques dès qu'une nouvelle règle impacte votre spécialité. Reformulation IA en impact concret.</div>
+                <div class="benefit-desc">Alertes dès qu'une nouvelle règle impacte votre spécialité. Reformulation en impact concret, pas en jargon juridique.</div>
               </div>
             </div>
             <div class="benefit">
@@ -181,63 +197,145 @@
               </div>
             </div>
             <div class="benefit">
-              <div class="benefit-icon">👥</div>
+              <div class="benefit-icon">📋</div>
               <div>
-                <div class="benefit-title">Accès à la Communauté</div>
-                <div class="benefit-desc">Canaux par spécialité et région, petites annonces vérifiées (remplacements, cessions), espace d'échange entre pairs.</div>
+                <div class="benefit-title">Bibliothèque de courriers complète</div>
+                <div class="benefit-desc">Accès à tous les modèles : CPAM, RGPD, patients, contrats. Générateur IA inclus.</div>
               </div>
             </div>
             <div class="benefit">
               <div class="benefit-icon">🗳️</div>
               <div>
                 <div class="benefit-title">Droit de vote et de consultation</div>
-                <div class="benefit-desc">Participez aux votes du bureau, aux consultations avant chaque prise de position. Votre voix compte dans chaque dossier.</div>
+                <div class="benefit-desc">Participez aux votes avant chaque prise de position. Votre voix compte dans chaque dossier porté.</div>
+              </div>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">👥</div>
+              <div>
+                <div class="benefit-title">Accès à la Communauté</div>
+                <div class="benefit-desc">Canaux par spécialité et région, petites annonces vérifiées (remplacements, cessions).</div>
               </div>
             </div>
             <div class="benefit">
               <div class="benefit-icon">🛠️</div>
               <div>
-                <div class="benefit-title">Accès à tous les outils</div>
-                <div class="benefit-desc">Simulateur de revenus, bibliothèque de courriers, calculateur URSSAF/CARMF, petites annonces.</div>
-              </div>
-            </div>
-            <div class="benefit">
-              <div class="benefit-icon">💳</div>
-              <div>
-                <div class="benefit-title">Carte d'adhérent digitale</div>
-                <div class="benefit-desc">Carte numérique via HelloAsso avec accès à des avantages partenaires.</div>
+                <div class="benefit-title">Tous les outils pratiques</div>
+                <div class="benefit-desc">Cotation, installation, types d'exercice, simulateur de revenus — centralisés et à jour.</div>
               </div>
             </div>
           </div>
-
           <div class="testimonial">
-            <p class="testimonial-text">"Enfin un mouvement qui répond à mes questions en 24h et qui me dit clairement ce qui change pour moi, pas ce qui change en général. La bibliothèque de courriers m'a déjà sauvé deux fois."</p>
+            <p class="testimonial-text">"Enfin un mouvement qui répond à mes questions en 24h et qui me dit clairement ce qui change pour moi. La bibliothèque de courriers m'a déjà sauvé deux fois."</p>
             <div class="testimonial-author">— Dr. M.T., Généraliste S1, Val-de-Marne</div>
           </div>
         </div>
 
-        <!-- Plan card -->
-        <div class="plan-card">
-          <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--green);margin-bottom:12px">Adhésion</div>
-          <div class="plan-price" style="color:var(--green)">Gratuit</div>
-          <p class="plan-desc">Adhésion gratuite, sans engagement financier.</p>
+        <!-- Formulaire d'inscription -->
+        <div class="signup-card">
+          <h2>Créer mon compte</h2>
+          <p class="subtitle">Adhésion gratuite · Accès immédiat · Données sécurisées</p>
 
-          <div class="perks">
-            <div class="perk">Décrypteurs avec veille personnalisée</div>
-            <div class="perk">SOS Juridique — délai garanti 48h</div>
-            <div class="perk">Accès à la Communauté</div>
-            <div class="perk">Droit de vote et de consultation</div>
-            <div class="perk">Bibliothèque de courriers complète</div>
-            <div class="perk">Simulateur de revenus avancé</div>
-            <div class="perk">Carte d'adhérent digitale</div>
+          <div id="alert-success" class="alert alert-success">
+            ✅ Inscription réussie ! Bienvenue dans Générations Médecins. Vous allez être redirigé vers votre espace membre…
           </div>
+          <div id="alert-error" class="alert alert-error"></div>
 
-          <a href="https://skezia.skezi.eu/cohorts/11e799a9-71bc-494a-9b61-398d9e1a33a5/cc0350b3-03af-485a-9eff-97074f163f36/public" class="btn btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:14px">
-            Adhérer maintenant →
-          </a>
+          <form id="signup-form" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="prenom">Prénom *</label>
+                <input type="text" id="prenom" name="prenom" placeholder="Marie" required>
+              </div>
+              <div class="form-group">
+                <label for="nom">Nom *</label>
+                <input type="text" id="nom" name="nom" placeholder="Dupont" required>
+              </div>
+            </div>
 
-          <p style="font-size:0.75rem;color:var(--muted);text-align:center;margin-top:14px">
-            Via Skezia · Prend 2 minutes
+            <div class="form-group">
+              <label for="email">Email professionnel *</label>
+              <input type="email" id="email" name="email" placeholder="m.dupont@cabinet.fr" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="password">Mot de passe *</label>
+                <input type="password" id="password" name="password" placeholder="8 caractères min." required minlength="8">
+              </div>
+              <div class="form-group">
+                <label for="password2">Confirmer *</label>
+                <input type="password" id="password2" name="password2" placeholder="Même mot de passe" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="rpps">Numéro RPPS *</label>
+              <input type="text" id="rpps" name="rpps" placeholder="11 chiffres" maxlength="11" pattern="[0-9]{11}" required>
+              <p class="form-hint">Votre identifiant unique à 11 chiffres (visible sur votre carte CPS)</p>
+              <p class="form-error" id="rpps-error">Le numéro RPPS doit contenir exactement 11 chiffres.</p>
+            </div>
+
+            <div class="form-group">
+              <label for="specialite">Spécialité *</label>
+              <select id="specialite" name="specialite" required>
+                <option value="">Sélectionner…</option>
+                <option>Médecine générale</option>
+                <option>Cardiologie</option>
+                <option>Dermatologie</option>
+                <option>Gastro-entérologie</option>
+                <option>Gynécologie médicale</option>
+                <option>Gynécologie-obstétrique</option>
+                <option>Médecine interne</option>
+                <option>Neurologie</option>
+                <option>Ophtalmologie</option>
+                <option>ORL</option>
+                <option>Pédiatrie</option>
+                <option>Psychiatrie</option>
+                <option>Rhumatologie</option>
+                <option>Urgentologie</option>
+                <option>Autre spécialité</option>
+                <option>Interne / Faisant fonction</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="mode_exercice">Mode d'exercice</label>
+                <select id="mode_exercice" name="mode_exercice">
+                  <option value="">Sélectionner…</option>
+                  <option value="liberal_seul">Libéral seul</option>
+                  <option value="liberal_groupe">Libéral groupe / MSP</option>
+                  <option value="salarie">Salarié</option>
+                  <option value="mixte">Mixte</option>
+                  <option value="remplacant">Remplaçant</option>
+                  <option value="interne">Interne</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="secteur">Secteur</label>
+                <select id="secteur" name="secteur">
+                  <option value="">Sélectionner…</option>
+                  <option value="S1">Secteur 1</option>
+                  <option value="S2">Secteur 2</option>
+                  <option value="S3">Secteur 3 / non conventionné</option>
+                  <option value="non_applicable">Non applicable</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="cgu-row">
+              <input type="checkbox" id="cgu" name="cgu" required>
+              <label for="cgu">J'accepte les <a href="#" style="color:var(--blue)">conditions d'utilisation</a> et la <a href="#" style="color:var(--blue)">politique de confidentialité</a> de Générations Médecins.</label>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submit-btn">
+              Créer mon compte →
+            </button>
+          </form>
+
+          <p class="already-member">
+            Déjà membre ? <a href="connexion.html">Se connecter →</a>
           </p>
         </div>
 
@@ -264,5 +362,92 @@
     </div>
   </footer>
 
+<script>
+(function () {
+  const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  const form    = document.getElementById('signup-form');
+  const btnSub  = document.getElementById('submit-btn');
+  const errBox  = document.getElementById('alert-error');
+  const okBox   = document.getElementById('alert-success');
+
+  function showError(msg) {
+    errBox.textContent = '⚠️ ' + msg;
+    errBox.classList.add('show');
+    okBox.classList.remove('show');
+    btnSub.disabled = false;
+    btnSub.textContent = 'Créer mon compte →';
+  }
+
+  function clearAlerts() {
+    errBox.classList.remove('show');
+    okBox.classList.remove('show');
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    clearAlerts();
+
+    const prenom       = form.prenom.value.trim();
+    const nom          = form.nom.value.trim();
+    const email        = form.email.value.trim();
+    const password     = form.password.value;
+    const password2    = form.password2.value;
+    const rpps         = form.rpps.value.trim();
+    const specialite   = form.specialite.value;
+    const mode         = form.mode_exercice.value || null;
+    const secteur      = form.secteur.value || null;
+    const cgu          = form.cgu.checked;
+
+    // Validations client
+    if (!prenom || !nom) return showError('Prénom et nom obligatoires.');
+    if (!email)          return showError('Email obligatoire.');
+    if (password.length < 8) return showError('Mot de passe : 8 caractères minimum.');
+    if (password !== password2) return showError('Les mots de passe ne correspondent pas.');
+    if (!/^\d{11}$/.test(rpps)) {
+      document.getElementById('rpps-error').classList.add('show');
+      return showError('Numéro RPPS invalide (11 chiffres).');
+    }
+    document.getElementById('rpps-error').classList.remove('show');
+    if (!specialite)     return showError('Veuillez sélectionner votre spécialité.');
+    if (!cgu)            return showError('Vous devez accepter les conditions d\'utilisation.');
+
+    btnSub.disabled = true;
+    btnSub.textContent = 'Inscription en cours…';
+
+    // 1. Créer le compte auth
+    const { data, error: authError } = await sb.auth.signUp({ email, password });
+    if (authError) return showError(authError.message);
+
+    const userId = data.user?.id;
+    if (!userId) return showError('Erreur lors de la création du compte. Réessayez.');
+
+    // 2. Créer le profil membre
+    const { error: memberError } = await sb.from('membres').insert({
+      user_id:       userId,
+      email,
+      prenom,
+      nom,
+      rpps,
+      specialite,
+      mode_exercice: mode,
+      secteur:       secteur,
+      statut:        'en_attente'
+    });
+
+    if (memberError) {
+      if (memberError.code === '23505') return showError('Un compte existe déjà avec cet email ou ce RPPS.');
+      return showError('Erreur profil : ' + memberError.message);
+    }
+
+    // 3. Succès
+    okBox.classList.add('show');
+    form.style.display = 'none';
+    setTimeout(() => { window.location.href = 'espace-membre.html'; }, 2500);
+  });
+})();
+</script>
 </body>
 </html>

@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #2a6db8; --blue-dark: #1a4a80; --teal: #38a8b5; --green: #62c040;
+      --ink: #1a2332; --muted: #6b7a8d; --line: #e8edf4; --surface: #f5f7fb;
+      --r: 14px;
+      --grad: linear-gradient(135deg, #17365f, #326aa2, #58aab3);
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--surface); color: var(--ink); min-height: 100vh; }
+
+    /* Top bar */
+    .topbar {
+      background: var(--blue-dark);
+      color: white;
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar-logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.9rem; }
+    .topbar-logo img { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; }
+    .admin-badge {
+      background: rgba(255,255,255,0.15); border-radius: 6px;
+      padding: 3px 10px; font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .topbar-user { font-size: 0.82rem; color: rgba(255,255,255,0.7); }
+    .btn-logout {
+      background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px; padding: 6px 14px; font-family: inherit;
+      font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-logout:hover { background: rgba(255,255,255,0.2); }
+
+    /* Layout */
+    .layout { display: flex; min-height: calc(100vh - 56px); }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px; flex-shrink: 0;
+      background: white; border-right: 1.5px solid var(--line);
+      padding: 24px 0;
+    }
+    .sidebar-section-label {
+      font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--muted); padding: 0 20px;
+      margin-bottom: 6px; margin-top: 20px;
+    }
+    .sidebar-section-label:first-child { margin-top: 0; }
+    .sidebar-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 20px; font-size: 0.85rem; font-weight: 600;
+      color: var(--ink); text-decoration: none; border-radius: 0;
+      transition: background 0.15s; cursor: pointer; border: none;
+      background: none; width: 100%; text-align: left; font-family: inherit;
+    }
+    .sidebar-link:hover { background: var(--surface); }
+    .sidebar-link.active { background: rgba(42,109,184,0.08); color: var(--blue); font-weight: 700; }
+    .sidebar-link .icon { font-size: 1rem; width: 20px; text-align: center;
+      font-family: 'Apple Color Emoji','Noto Color Emoji','Segoe UI Emoji',sans-serif; }
+
+    /* Main content */
+    .main { flex: 1; padding: 32px; overflow: auto; }
+    .main-header { margin-bottom: 28px; }
+    .main-title { font-size: 1.5rem; font-weight: 900; color: var(--blue-dark); }
+    .main-sub { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+    /* Stats row */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: white; border-radius: var(--r); border: 1.5px solid var(--line);
+      padding: 20px 22px;
+    }
+    .stat-label { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .stat-value { font-size: 1.9rem; font-weight: 900; color: var(--blue-dark); line-height: 1; }
+    .stat-sub { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+    .stat-card.highlight .stat-value { color: #b06c00; }
+
+    /* Filters */
+    .filters {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .filter-input {
+      flex: 1; min-width: 200px; max-width: 320px;
+      padding: 9px 14px; border: 1.5px solid var(--line); border-radius: 10px;
+      font-family: inherit; font-size: 0.85rem; color: var(--ink);
+    }
+    .filter-input:focus { outline: none; border-color: var(--blue); }
+    .filter-select {
+      padding: 9px 14px; border: 1.5px solid var(--line); border-radius: 10px;
+      font-family: inherit; font-size: 0.85rem; color: var(--ink); background: white;
+    }
+    .filter-select:focus { outline: none; border-color: var(--blue); }
+    .filter-count { font-size: 0.8rem; color: var(--muted); margin-left: auto; }
+
+    /* Table */
+    .table-wrap {
+      background: white; border-radius: var(--r); border: 1.5px solid var(--line);
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: var(--surface); padding: 11px 16px;
+      font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--muted); text-align: left;
+      border-bottom: 1.5px solid var(--line); white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--line); transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface); }
+    tbody td { padding: 12px 16px; font-size: 0.84rem; color: var(--ink); vertical-align: middle; }
+    .td-name { font-weight: 700; }
+    .td-email { color: var(--muted); font-size: 0.78rem; }
+    .td-rpps { font-family: monospace; font-size: 0.8rem; color: var(--muted); }
+
+    /* Status badges */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 0.7rem; font-weight: 700; white-space: nowrap;
+    }
+    .status-actif     { background: rgba(98,192,64,0.12);  color: #2d7a1a; }
+    .status-attente   { background: rgba(245,158,11,0.12); color: #b06c00; }
+    .status-suspendu  { background: rgba(220,38,38,0.1);   color: #b91c1c; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    /* Actions */
+    .actions { display: flex; gap: 6px; align-items: center; }
+    .btn-action {
+      padding: 5px 12px; border-radius: 7px; font-family: inherit;
+      font-size: 0.75rem; font-weight: 700; cursor: pointer; border: 1.5px solid;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .btn-valider  { background: rgba(98,192,64,0.1); color: #2d7a1a; border-color: rgba(98,192,64,0.3); }
+    .btn-valider:hover { background: rgba(98,192,64,0.2); }
+    .btn-suspendre { background: rgba(245,158,11,0.08); color: #b06c00; border-color: rgba(245,158,11,0.3); }
+    .btn-suspendre:hover { background: rgba(245,158,11,0.18); }
+    .btn-supprimer { background: rgba(220,38,38,0.07); color: #b91c1c; border-color: rgba(220,38,38,0.2); }
+    .btn-supprimer:hover { background: rgba(220,38,38,0.15); }
+
+    /* Empty / loading */
+    .table-empty { padding: 48px; text-align: center; color: var(--muted); font-size: 0.85rem; }
+    .table-loading { padding: 48px; text-align: center; color: var(--muted); font-size: 0.85rem; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 999;
+      background: var(--ink); color: white; border-radius: 10px;
+      padding: 12px 20px; font-size: 0.85rem; font-weight: 600;
+      opacity: 0; transform: translateY(8px); transition: all 0.25s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { background: #1d5c14; }
+    .toast.error   { background: #8b0000; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      display: none; align-items: center; justify-content: center; z-index: 200;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: white; border-radius: 16px; padding: 32px;
+      width: 100%; max-width: 480px; box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+    }
+    .modal h3 { font-size: 1.1rem; font-weight: 900; color: var(--blue-dark); margin-bottom: 8px; }
+    .modal p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-cancel {
+      padding: 10px 20px; background: var(--surface); border: 1.5px solid var(--line);
+      border-radius: 9px; font-family: inherit; font-size: 0.85rem; font-weight: 700;
+      cursor: pointer; color: var(--ink);
+    }
+    .btn-confirm-delete {
+      padding: 10px 20px; background: #dc2626; color: white;
+      border: none; border-radius: 9px; font-family: inherit;
+      font-size: 0.85rem; font-weight: 700; cursor: pointer;
+    }
+
+    /* Section hidden/shown via JS */
+    .section-panel { display: none; }
+    .section-panel.active { display: block; }
+
+    /* Decrypteurs admin */
+    .btn-primary-sm {
+      padding: 9px 18px; background: var(--grad); color: white;
+      border: none; border-radius: 9px; font-family: inherit;
+      font-size: 0.82rem; font-weight: 700; cursor: pointer;
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 0.75rem; font-weight: 700; color: var(--ink); }
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 9px 12px; border: 1.5px solid var(--line); border-radius: 9px;
+      font-family: inherit; font-size: 0.85rem; color: var(--ink);
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none; border-color: var(--blue);
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .card-form {
+      background: white; border-radius: var(--r); border: 1.5px solid var(--line);
+      padding: 24px; margin-bottom: 24px;
+    }
+    .card-form h3 { font-size: 0.95rem; font-weight: 800; color: var(--blue-dark); margin-bottom: 16px; }
+
+    @media (max-width: 900px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .sidebar { width: 60px; }
+      .sidebar-link span, .sidebar-section-label { display: none; }
+      .sidebar-link { justify-content: center; padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">
+        <img src="logoGM.jpeg" alt="GM">
+        Générations Médecins
+      </div>
+      <span class="admin-badge">Admin</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-user" id="admin-email">—</span>
+      <button class="btn-logout" id="btn-logout">Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section-label">Membres</div>
+      <button class="sidebar-link active" onclick="showSection('membres')" id="nav-membres">
+        <span class="icon">👥</span><span>Adhérents</span>
+      </button>
+      <button class="sidebar-link" onclick="showSection('en-attente')" id="nav-en-attente">
+        <span class="icon">⏳</span><span>En attente</span>
+      </button>
+
+      <div class="sidebar-section-label">Contenu</div>
+      <button class="sidebar-link" onclick="showSection('decrypteurs-admin')" id="nav-decrypteurs-admin">
+        <span class="icon">📰</span><span>Décrypteurs</span>
+      </button>
+      <button class="sidebar-link" onclick="showSection('plaidoyer-admin')" id="nav-plaidoyer-admin">
+        <span class="icon">⚖️</span><span>Plaidoyer</span>
+      </button>
+
+      <div class="sidebar-section-label">Navigation</div>
+      <a class="sidebar-link" href="espace-membre.html">
+        <span class="icon">👤</span><span>Mon espace</span>
+      </a>
+      <a class="sidebar-link" href="index.html">
+        <span class="icon">🏠</span><span>Site public</span>
+      </a>
+    </aside>
+
+    <main class="main">
+
+      <!-- Section: Tous les membres -->
+      <div id="section-membres" class="section-panel active">
+        <div class="main-header">
+          <div class="main-title">Adhérents</div>
+          <div class="main-sub">Liste complète des membres inscrits</div>
+        </div>
+
+        <div class="stats-row" id="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Total inscrits</div>
+            <div class="stat-value" id="stat-total">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Membres actifs</div>
+            <div class="stat-value" id="stat-actif" style="color:#2d7a1a">—</div>
+          </div>
+          <div class="stat-card highlight">
+            <div class="stat-label">En attente</div>
+            <div class="stat-value" id="stat-attente">—</div>
+            <div class="stat-sub">À valider</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Suspendus</div>
+            <div class="stat-value" id="stat-suspendu" style="color:#b91c1c">—</div>
+          </div>
+        </div>
+
+        <div class="filters">
+          <input type="search" class="filter-input" id="search-input" placeholder="Rechercher par nom, email, RPPS…">
+          <select class="filter-select" id="filter-statut">
+            <option value="">Tous les statuts</option>
+            <option value="actif">Actif</option>
+            <option value="en_attente">En attente</option>
+            <option value="suspendu">Suspendu</option>
+          </select>
+          <select class="filter-select" id="filter-specialite">
+            <option value="">Toutes spécialités</option>
+          </select>
+          <span class="filter-count" id="filter-count"></span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Membre</th>
+                <th>RPPS</th>
+                <th>Spécialité</th>
+                <th>Mode exercice</th>
+                <th>Secteur</th>
+                <th>Statut</th>
+                <th>Inscrit le</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="membres-tbody">
+              <tr><td colspan="8" class="table-loading">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section: En attente -->
+      <div id="section-en-attente" class="section-panel">
+        <div class="main-header">
+          <div class="main-title">Membres en attente</div>
+          <div class="main-sub">Validez les nouvelles inscriptions</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Membre</th>
+                <th>RPPS</th>
+                <th>Spécialité</th>
+                <th>Inscrit le</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="attente-tbody">
+              <tr><td colspan="5" class="table-loading">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section: Décrypteurs admin -->
+      <div id="section-decrypteurs-admin" class="section-panel">
+        <div class="main-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="main-title">Décrypteurs</div>
+            <div class="main-sub">Gérer les articles publiés</div>
+          </div>
+          <button class="btn-primary-sm" onclick="toggleNewDecrypteur()">+ Nouvel article</button>
+        </div>
+
+        <div id="new-decrypteur-form" style="display:none" class="card-form">
+          <h3>Nouvel article</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>Titre</label><input type="text" id="d-titre" placeholder="Avenant n°9…"></div>
+            <div class="form-group"><label>Slug (URL)</label><input type="text" id="d-slug" placeholder="avenant-9-analyse"></div>
+            <div class="form-group"><label>Catégorie</label>
+              <select id="d-categorie">
+                <option value="avenant">Avenant</option>
+                <option value="plfss">PLFSS</option>
+                <option value="decret">Décret</option>
+                <option value="jurisprudence">Jurisprudence</option>
+                <option value="urssaf">URSSAF</option>
+                <option value="numerique">Numérique</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Date de publication</label><input type="date" id="d-date"></div>
+            <div class="form-group full"><label>Résumé (chapô)</label><textarea id="d-resume" placeholder="En quelques phrases…"></textarea></div>
+            <div class="form-group full"><label>Contenu HTML</label><textarea id="d-contenu" style="min-height:160px" placeholder="<p>Corps de l'article…</p>"></textarea></div>
+            <div class="form-group"><label>Auteur</label><input type="text" id="d-auteur" placeholder="Rédaction GM"></div>
+            <div class="form-group"><label>Accès</label>
+              <select id="d-acces">
+                <option value="public">Public</option>
+                <option value="membres">Membres seulement</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:10px">
+            <button class="btn-primary-sm" onclick="saveDecrypteur()">Publier l'article</button>
+            <button class="btn-cancel" onclick="toggleNewDecrypteur()">Annuler</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Catégorie</th>
+                <th>Date</th>
+                <th>Accès</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="decrypteurs-tbody">
+              <tr><td colspan="5" class="table-loading">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section: Plaidoyer admin -->
+      <div id="section-plaidoyer-admin" class="section-panel">
+        <div class="main-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="main-title">Dossiers Plaidoyer</div>
+            <div class="main-sub">Mettre à jour l'avancement des dossiers</div>
+          </div>
+          <button class="btn-primary-sm" onclick="toggleNewDossier()">+ Nouveau dossier</button>
+        </div>
+
+        <div id="new-dossier-form" style="display:none" class="card-form">
+          <h3>Nouveau dossier</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>Titre</label><input type="text" id="p-titre" placeholder="Titre du dossier…"></div>
+            <div class="form-group"><label>Trimestre</label><input type="text" id="p-trimestre" placeholder="T1 2025"></div>
+            <div class="form-group full"><label>Description courte</label><input type="text" id="p-description" placeholder="Résumé en une phrase"></div>
+            <div class="form-group"><label>Statut</label>
+              <select id="p-statut">
+                <option value="en_cours">En cours</option>
+                <option value="victoire">Victoire</option>
+                <option value="en_attente">En attente</option>
+                <option value="abandonne">Abandonné</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Avancement (%)</label><input type="number" id="p-avancement" min="0" max="100" placeholder="60"></div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:10px">
+            <button class="btn-primary-sm" onclick="saveDossier()">Créer le dossier</button>
+            <button class="btn-cancel" onclick="toggleNewDossier()">Annuler</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Trimestre</th>
+                <th>Statut</th>
+                <th>Avancement</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="plaidoyer-tbody">
+              <tr><td colspan="5" class="table-loading">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Delete confirm modal -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <h3>Supprimer ce membre ?</h3>
+      <p>Cette action est irréversible. Le compte Supabase Auth et toutes les données associées seront supprimés.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+        <button class="btn-confirm-delete" id="btn-confirm-delete">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let allMembres = [];
+  let deleteTargetId = null;
+
+  // ── Auth guard ──────────────────────────────────────────────
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'connexion.html'; return; }
+
+    const { data: adminRow } = await sb.from('admins').select('id').eq('user_id', session.user.id).single();
+    if (!adminRow) { window.location.href = 'espace-membre.html'; return; }
+
+    document.getElementById('admin-email').textContent = session.user.email;
+    loadMembres();
+    loadDecrypteurs();
+    loadPlaidoyer();
+  }
+
+  // ── Toast ───────────────────────────────────────────────────
+  function toast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (type ? ' ' + type : '');
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+
+  // ── Navigation ──────────────────────────────────────────────
+  window.showSection = function(id) {
+    document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    document.getElementById('section-' + id).classList.add('active');
+    document.getElementById('nav-' + id).classList.add('active');
+  };
+
+  // ── Logout ──────────────────────────────────────────────────
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    window.location.href = 'index.html';
+  });
+
+  // ── Members ─────────────────────────────────────────────────
+  async function loadMembres() {
+    const { data, error } = await sb.from('membres')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) { toast('Erreur chargement membres', 'error'); return; }
+
+    allMembres = data || [];
+    updateStats();
+    populateSpecialiteFilter();
+    renderMembres(allMembres);
+    renderAttente(allMembres.filter(m => m.statut === 'en_attente'));
+  }
+
+  function updateStats() {
+    document.getElementById('stat-total').textContent    = allMembres.length;
+    document.getElementById('stat-actif').textContent    = allMembres.filter(m => m.statut === 'actif').length;
+    document.getElementById('stat-attente').textContent  = allMembres.filter(m => m.statut === 'en_attente').length;
+    document.getElementById('stat-suspendu').textContent = allMembres.filter(m => m.statut === 'suspendu').length;
+  }
+
+  function populateSpecialiteFilter() {
+    const specs = [...new Set(allMembres.map(m => m.specialite).filter(Boolean))].sort();
+    const sel = document.getElementById('filter-specialite');
+    specs.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s; opt.textContent = s;
+      sel.appendChild(opt);
+    });
+  }
+
+  function statusBadge(statut) {
+    const map = {
+      actif:      ['status-actif',    '● Actif'],
+      en_attente: ['status-attente',  '● En attente'],
+      suspendu:   ['status-suspendu', '● Suspendu'],
+    };
+    const [cls, label] = map[statut] || ['', statut];
+    return `<span class="status-badge ${cls}">${label}</span>`;
+  }
+
+  function renderMembres(list) {
+    const tbody = document.getElementById('membres-tbody');
+    document.getElementById('filter-count').textContent = `${list.length} membre${list.length > 1 ? 's' : ''}`;
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="table-empty">Aucun membre trouvé.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(m => `
+      <tr>
+        <td>
+          <div class="td-name">${esc(m.prenom)} ${esc(m.nom)}</div>
+          <div class="td-email">${esc(m.email)}</div>
+        </td>
+        <td class="td-rpps">${esc(m.rpps || '—')}</td>
+        <td>${esc(m.specialite || '—')}</td>
+        <td>${esc(m.mode_exercice || '—')}</td>
+        <td>${esc(m.secteur || '—')}</td>
+        <td>${statusBadge(m.statut)}</td>
+        <td style="color:var(--muted);font-size:0.78rem">${fmtDate(m.created_at)}</td>
+        <td>
+          <div class="actions">
+            ${m.statut !== 'actif'    ? `<button class="btn-action btn-valider"   onclick="setStatut('${m.id}','actif')">Valider</button>` : ''}
+            ${m.statut !== 'suspendu' ? `<button class="btn-action btn-suspendre" onclick="setStatut('${m.id}','suspendu')">Suspendre</button>` : ''}
+            <button class="btn-action btn-supprimer" onclick="openModal('${m.id}')">Supprimer</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function renderAttente(list) {
+    const tbody = document.getElementById('attente-tbody');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="table-empty">Aucune inscription en attente.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(m => `
+      <tr>
+        <td>
+          <div class="td-name">${esc(m.prenom)} ${esc(m.nom)}</div>
+          <div class="td-email">${esc(m.email)}</div>
+        </td>
+        <td class="td-rpps">${esc(m.rpps || '—')}</td>
+        <td>${esc(m.specialite || '—')}</td>
+        <td style="color:var(--muted);font-size:0.78rem">${fmtDate(m.created_at)}</td>
+        <td>
+          <div class="actions">
+            <button class="btn-action btn-valider"   onclick="setStatut('${m.id}','actif')">Valider ✓</button>
+            <button class="btn-action btn-supprimer" onclick="openModal('${m.id}')">Refuser</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Filters
+  function applyFilters() {
+    const q     = document.getElementById('search-input').value.trim().toLowerCase();
+    const st    = document.getElementById('filter-statut').value;
+    const spec  = document.getElementById('filter-specialite').value;
+    const list  = allMembres.filter(m => {
+      if (st   && m.statut    !== st)   return false;
+      if (spec && m.specialite !== spec) return false;
+      if (q) {
+        const hay = `${m.prenom} ${m.nom} ${m.email} ${m.rpps}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    renderMembres(list);
+  }
+  document.getElementById('search-input').addEventListener('input', applyFilters);
+  document.getElementById('filter-statut').addEventListener('change', applyFilters);
+  document.getElementById('filter-specialite').addEventListener('change', applyFilters);
+
+  // Update statut
+  window.setStatut = async function(id, statut) {
+    const { error } = await sb.from('membres').update({ statut }).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast(statut === 'actif' ? '✓ Membre validé' : '⚠ Membre suspendu', 'success');
+    await loadMembres();
+  };
+
+  // Delete modal
+  window.openModal = function(id) {
+    deleteTargetId = id;
+    document.getElementById('modal-overlay').classList.add('open');
+  };
+  window.closeModal = function() {
+    deleteTargetId = null;
+    document.getElementById('modal-overlay').classList.remove('open');
+  };
+  document.getElementById('btn-confirm-delete').addEventListener('click', async () => {
+    if (!deleteTargetId) return;
+    const { error } = await sb.from('membres').delete().eq('id', deleteTargetId);
+    if (error) { toast('Erreur suppression : ' + error.message, 'error'); closeModal(); return; }
+    toast('Membre supprimé', 'success');
+    closeModal();
+    await loadMembres();
+  });
+  document.getElementById('modal-overlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+
+  // ── Décrypteurs ─────────────────────────────────────────────
+  async function loadDecrypteurs() {
+    const { data } = await sb.from('decrypteurs').select('id,titre,categorie,publie_le,acces').order('publie_le', { ascending: false });
+    const tbody = document.getElementById('decrypteurs-tbody');
+    if (!data || !data.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="table-empty">Aucun article.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map(d => `
+      <tr>
+        <td style="font-weight:700">${esc(d.titre)}</td>
+        <td><span style="text-transform:capitalize">${esc(d.categorie)}</span></td>
+        <td style="color:var(--muted);font-size:0.78rem">${fmtDate(d.publie_le)}</td>
+        <td>${d.acces === 'public' ? '<span class="status-badge status-actif">Public</span>' : '<span class="status-badge status-attente">Membres</span>'}</td>
+        <td><button class="btn-action btn-supprimer" onclick="deleteDecrypteur('${d.id}')">Supprimer</button></td>
+      </tr>
+    `).join('');
+  }
+
+  window.toggleNewDecrypteur = function() {
+    const el = document.getElementById('new-decrypteur-form');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    if (el.style.display === 'block') {
+      document.getElementById('d-date').value = new Date().toISOString().slice(0,10);
+    }
+  };
+
+  window.saveDecrypteur = async function() {
+    const payload = {
+      titre:     document.getElementById('d-titre').value.trim(),
+      slug:      document.getElementById('d-slug').value.trim(),
+      categorie: document.getElementById('d-categorie').value,
+      publie_le: document.getElementById('d-date').value,
+      resume:    document.getElementById('d-resume').value.trim(),
+      contenu:   document.getElementById('d-contenu').value.trim(),
+      auteur:    document.getElementById('d-auteur').value.trim() || 'Rédaction GM',
+      acces:     document.getElementById('d-acces').value,
+    };
+    if (!payload.titre || !payload.slug) { toast('Titre et slug requis', 'error'); return; }
+    const { error } = await sb.from('decrypteurs').insert(payload);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Article publié ✓', 'success');
+    toggleNewDecrypteur();
+    loadDecrypteurs();
+  };
+
+  window.deleteDecrypteur = async function(id) {
+    if (!confirm('Supprimer cet article ?')) return;
+    const { error } = await sb.from('decrypteurs').delete().eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Article supprimé', 'success');
+    loadDecrypteurs();
+  };
+
+  // ── Plaidoyer ───────────────────────────────────────────────
+  async function loadPlaidoyer() {
+    const { data } = await sb.from('plaidoyer_dossiers').select('*').order('created_at', { ascending: false });
+    const tbody = document.getElementById('plaidoyer-tbody');
+    if (!data || !data.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="table-empty">Aucun dossier.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map(d => `
+      <tr>
+        <td style="font-weight:700">${esc(d.titre)}</td>
+        <td>${esc(d.trimestre || '—')}</td>
+        <td>${statusBadge(d.statut)}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:${d.avancement_pct || 0}%;background:var(--grad)"></div>
+            </div>
+            <span style="font-size:0.78rem;color:var(--muted);white-space:nowrap">${d.avancement_pct || 0}%</span>
+          </div>
+        </td>
+        <td>
+          <div class="actions">
+            <button class="btn-action btn-valider" onclick="setDossierStatut('${d.id}','victoire')">Victoire</button>
+            <button class="btn-action btn-suspendre" onclick="promptAvancement('${d.id}', ${d.avancement_pct || 0})">% avancement</button>
+            <button class="btn-action btn-supprimer" onclick="deleteDossier('${d.id}')">Supprimer</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  window.toggleNewDossier = function() {
+    const el = document.getElementById('new-dossier-form');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  };
+
+  window.saveDossier = async function() {
+    const payload = {
+      titre:          document.getElementById('p-titre').value.trim(),
+      trimestre:      document.getElementById('p-trimestre').value.trim(),
+      description_courte: document.getElementById('p-description').value.trim(),
+      statut:         document.getElementById('p-statut').value,
+      avancement_pct: parseInt(document.getElementById('p-avancement').value) || 0,
+    };
+    if (!payload.titre) { toast('Titre requis', 'error'); return; }
+    const { error } = await sb.from('plaidoyer_dossiers').insert(payload);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Dossier créé ✓', 'success');
+    toggleNewDossier();
+    loadPlaidoyer();
+  };
+
+  window.setDossierStatut = async function(id, statut) {
+    const { error } = await sb.from('plaidoyer_dossiers').update({ statut }).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Statut mis à jour ✓', 'success');
+    loadPlaidoyer();
+  };
+
+  window.promptAvancement = async function(id, current) {
+    const val = prompt(`Nouvel avancement (0-100) — actuellement ${current}%`, current);
+    if (val === null) return;
+    const pct = Math.min(100, Math.max(0, parseInt(val) || 0));
+    const { error } = await sb.from('plaidoyer_dossiers').update({ avancement_pct: pct }).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Avancement mis à jour ✓', 'success');
+    loadPlaidoyer();
+  };
+
+  window.deleteDossier = async function(id) {
+    if (!confirm('Supprimer ce dossier ?')) return;
+    const { error } = await sb.from('plaidoyer_dossiers').delete().eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Dossier supprimé', 'success');
+    loadPlaidoyer();
+  };
+
+  // ── Helpers ──────────────────────────────────────────────────
+  function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function fmtDate(s) {
+    if (!s) return '—';
+    return new Date(s).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
