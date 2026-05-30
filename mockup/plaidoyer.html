@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     .tracker-list { display: grid; gap: 16px; }
 
@@ -142,128 +143,8 @@
   <section class="section">
     <div class="section-inner">
 
-      <div class="quarter-title">
-        <span>T2 2025 — Dossiers en cours</span>
-        <span class="chip chip-blue">3 actifs · 1 veille</span>
-      </div>
-
-      <div class="tracker-list">
-        <div class="tracker-item">
-          <div>
-            <div class="tracker-top">
-              <div class="tracker-name">Revalorisation des gardes hospitalières</div>
-            </div>
-            <p class="tracker-desc">Courrier envoyé au Ministère le 12 mai. Réponse attendue avant le 15 juin. Pétition lancée : 1 240 signatures collectées à ce jour. Prochain point bureau : 5 juin.</p>
-            <div class="progress-wrap">
-              <div class="progress-bar bar-green" style="width:72%"></div>
-            </div>
-            <div class="progress-meta">
-              <span>Dossier déposé · En attente réponse</span>
-              <span style="font-weight:700;color:#3d8a1a">72%</span>
-            </div>
-          </div>
-          <div class="tracker-status">
-            <div class="t-status-pill s-active">● Actif</div>
-            <div class="tracker-date">Màj : 26 mai 2025</div>
-          </div>
-        </div>
-
-        <div class="tracker-item">
-          <div>
-            <div class="tracker-top">
-              <div class="tracker-name">Accès au DMP pour les médecins remplaçants</div>
-            </div>
-            <p class="tracker-desc">Rencontre planifiée avec la DSS le 3 juin. Préparation du dossier technique en cours avec le bureau juridique. Soutien de 4 autres organisations obtenu.</p>
-            <div class="progress-wrap">
-              <div class="progress-bar bar-blue" style="width:40%"></div>
-            </div>
-            <div class="progress-meta">
-              <span>Dossier en constitution</span>
-              <span style="font-weight:700;color:var(--blue)">40%</span>
-            </div>
-          </div>
-          <div class="tracker-status">
-            <div class="t-status-pill s-progress">↗ En cours</div>
-            <div class="tracker-date">Màj : 20 mai 2025</div>
-          </div>
-        </div>
-
-        <div class="tracker-item">
-          <div>
-            <div class="tracker-top">
-              <div class="tracker-name">Représentativité URPS — accès aux négociations conventionnelles</div>
-            </div>
-            <p class="tracker-desc">Contestation du seuil de 10% qui exclut les jeunes organisations des négociations CNAM. Dossier porté avec 3 autres collectifs. Audition Haut Conseil pour l'Avenir de l'Assurance Maladie prévue en juillet 2025.</p>
-            <div class="progress-wrap">
-              <div class="progress-bar bar-blue" style="width:45%"></div>
-            </div>
-            <div class="progress-meta">
-              <span>Constitution du dossier · Audition HCAAM juillet</span>
-              <span style="font-weight:700;color:var(--blue)">45%</span>
-            </div>
-          </div>
-          <div class="tracker-status">
-            <div class="t-status-pill s-progress">↗ En cours</div>
-            <div class="tracker-date">Màj : 20 mai 2025</div>
-          </div>
-        </div>
-
-        <div class="tracker-item">
-          <div>
-            <div class="tracker-top">
-              <div class="tracker-name">Simplification des obligations RGPD en cabinet libéral</div>
-            </div>
-            <p class="tracker-desc">Veille législative active. Proposition de simplification en cours de rédaction avec nos juristes partenaires. Consultation des adhérents prévue en juillet.</p>
-            <div class="progress-wrap">
-              <div class="progress-bar bar-orange" style="width:20%"></div>
-            </div>
-            <div class="progress-meta">
-              <span>Phase de veille et rédaction</span>
-              <span style="font-weight:700;color:#b06c00">20%</span>
-            </div>
-          </div>
-          <div class="tracker-status">
-            <div class="t-status-pill s-watch">👁 Veille</div>
-            <div class="tracker-date">Màj : 10 mai 2025</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="quarter-title" style="margin-top:60px">
-        <span>T1 2025 — Dossiers clôturés</span>
-        <span class="chip" style="background:rgba(88,170,179,0.1);color:#2a7a83">2 obtenus · 1 en suspens</span>
-      </div>
-
-      <div class="tracker-list">
-        <div class="tracker-item" style="opacity:0.75">
-          <div>
-            <div class="tracker-name">Forfait structure : revalorisation des cabinets de groupe</div>
-            <p class="tracker-desc">Revalorisation de 15% du forfait structure pour les MSP et cabinets de groupe de plus de 3 médecins. Obtenu dans l'avenant n°9.</p>
-            <div class="progress-wrap">
-              <div class="progress-bar bar-green" style="width:100%"></div>
-            </div>
-            <div class="progress-meta"><span>Obtenu — Avenant n°9</span><span style="font-weight:700;color:#3d8a1a">100%</span></div>
-          </div>
-          <div class="tracker-status">
-            <div class="t-status-pill s-done">✓ Obtenu</div>
-            <div class="tracker-date">Clôturé : mars 2025</div>
-          </div>
-        </div>
-
-        <div class="tracker-item" style="opacity:0.75">
-          <div>
-            <div class="tracker-name">Publication des données d'activité CPAM par département</div>
-            <p class="tracker-desc">Demande d'open data sur les données de remboursement agrégées pour alimenter l'Observatoire. Accord de principe obtenu de la CNAM.</p>
-            <div class="progress-wrap">
-              <div class="progress-bar bar-green" style="width:100%"></div>
-            </div>
-            <div class="progress-meta"><span>Accord CNAM obtenu</span><span style="font-weight:700;color:#3d8a1a">100%</span></div>
-          </div>
-          <div class="tracker-status">
-            <div class="t-status-pill s-done">✓ Obtenu</div>
-            <div class="tracker-date">Clôturé : fév. 2025</div>
-          </div>
-        </div>
+      <div id="plaidoyer-content">
+        <div style="text-align:center;padding:40px;color:var(--muted);font-size:0.9rem">Chargement…</div>
       </div>
 
     </div>
@@ -294,5 +175,107 @@
     </div>
   </footer>
 
+<script>
+(function () {
+  const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  const STATUT = {
+    actif:      { cls: 's-active',   label: '● Actif' },
+    en_cours:   { cls: 's-progress', label: '↗ En cours' },
+    veille:     { cls: 's-watch',    label: '👁 Veille' },
+    obtenu:     { cls: 's-done',     label: '✓ Obtenu' },
+    suspendu:   { cls: 's-watch',    label: '⏸ Suspendu' },
+    abandonne:  { cls: 's-watch',    label: '✕ Abandonné' },
+  };
+
+  function barClass(s) {
+    if (s === 'actif')   return 'bar-green';
+    if (s === 'obtenu')  return 'bar-green';
+    if (s === 'veille')  return 'bar-orange';
+    return 'bar-blue';
+  }
+
+  function pctColor(s) {
+    if (s === 'actif' || s === 'obtenu') return '#3d8a1a';
+    if (s === 'veille') return '#b06c00';
+    return 'var(--blue)';
+  }
+
+  function fmt(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function itemHTML(d) {
+    const st = STATUT[d.statut] || { cls: 's-progress', label: d.statut };
+    const opacity = d.statut === 'obtenu' || d.statut === 'abandonne' ? 'opacity:0.75;' : '';
+    return `
+      <div class="tracker-item" style="${opacity}">
+        <div>
+          <div class="tracker-top">
+            <div class="tracker-name">${d.titre}</div>
+          </div>
+          <p class="tracker-desc">${d.description || ''}</p>
+          <div class="progress-wrap">
+            <div class="progress-bar ${barClass(d.statut)}" style="width:${d.progression}%"></div>
+          </div>
+          <div class="progress-meta">
+            <span>${d.meta || ''}</span>
+            <span style="font-weight:700;color:${pctColor(d.statut)}">${d.progression}%</span>
+          </div>
+        </div>
+        <div class="tracker-status">
+          <div class="t-status-pill ${st.cls}">${st.label}</div>
+          <div class="tracker-date">Màj : ${fmt(d.updated_at)}</div>
+        </div>
+      </div>`;
+  }
+
+  async function load() {
+    const wrap = document.getElementById('plaidoyer-content');
+    const { data, error } = await sb
+      .from('plaidoyer_dossiers')
+      .select('*')
+      .order('ordre', { ascending: true });
+
+    if (error || !data || data.length === 0) {
+      wrap.innerHTML = '<p style="text-align:center;color:var(--muted);padding:40px">Aucun dossier pour le moment.</p>';
+      return;
+    }
+
+    // Grouper par trimestre
+    const groups = {};
+    data.forEach(d => {
+      const k = d.trimestre || 'Autres';
+      if (!groups[k]) groups[k] = [];
+      groups[k].push(d);
+    });
+
+    let html = '';
+    for (const [trimestre, dossiers] of Object.entries(groups)) {
+      const actifs = dossiers.filter(d => ['actif','en_cours','veille'].includes(d.statut)).length;
+      const obtenus = dossiers.filter(d => d.statut === 'obtenu').length;
+      const isClosed = dossiers.every(d => ['obtenu','abandonne','suspendu'].includes(d.statut));
+      const badge = isClosed
+        ? `<span class="chip" style="background:rgba(88,170,179,0.1);color:#2a7a83">${obtenus} obtenu${obtenus > 1 ? 's' : ''}</span>`
+        : `<span class="chip chip-blue">${actifs} actif${actifs > 1 ? 's' : ''}</span>`;
+
+      html += `
+        <div class="quarter-title" style="${isClosed ? 'margin-top:60px' : ''}">
+          <span>${trimestre}${isClosed ? ' — Dossiers clôturés' : ' — Dossiers en cours'}</span>
+          ${badge}
+        </div>
+        <div class="tracker-list">
+          ${dossiers.map(itemHTML).join('')}
+        </div>`;
+    }
+    wrap.innerHTML = html;
+  }
+
+  load();
+})();
+</script>
 </body>
 </html>

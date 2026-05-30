@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     .filter-bar {
       display: flex;
@@ -211,90 +212,9 @@
       </div>
 
       <!-- Articles -->
-      <div class="articles-grid">
-        <a href="#" class="article-card">
-          <div class="article-top" style="background:linear-gradient(135deg,#17365f,#326aa2)">
-            <span class="article-cat">Convention</span>
-          </div>
-          <div class="article-body">
-            <div class="article-title">Avenant n°9 : ce qui change concrètement selon votre profil</div>
-            <p class="article-excerpt">Généraliste S1, spécialiste S2, interne, remplaçant — impact réel pour chaque situation avec chiffres à l'appui.</p>
-            <div class="article-meta">
-              <span>26 mai 2025</span>
-              <span class="chip chip-green">✓ Vérifié</span>
-            </div>
-          </div>
-        </a>
-
-        <a href="#" class="article-card">
-          <div class="article-top" style="background:linear-gradient(135deg,#1a5c5c,#58aab3)">
-            <span class="article-cat">PLFSS 2026</span>
-          </div>
-          <div class="article-body">
-            <div class="article-title">PLFSS 2026 : les 3 mesures qui vont impacter votre cabinet</div>
-            <p class="article-excerpt">Analyse des impacts sur la T2A, la permanence de soins et les dépassements d'honoraires. En cours de validation.</p>
-            <div class="article-meta">
-              <span>18 mai 2025</span>
-              <span class="chip chip-orange">⏳ En analyse</span>
-            </div>
-          </div>
-        </a>
-
-        <a href="#" class="article-card">
-          <div class="article-top" style="background:linear-gradient(135deg,#3b1f6e,#6b42b3)">
-            <span class="article-cat">Décret</span>
-          </div>
-          <div class="article-body">
-            <div class="article-title">Téléconsultation : nouvelles obligations avant le 1er septembre</div>
-            <p class="article-excerpt">Ce que vous devez faire maintenant. Checklist complète et modèle de consentement patient à télécharger.</p>
-            <div class="article-meta">
-              <span>10 mai 2025</span>
-              <span class="chip chip-green">✓ Vérifié</span>
-            </div>
-          </div>
-        </a>
-
-        <a href="#" class="article-card">
-          <div class="article-top" style="background:linear-gradient(135deg,#1a4a2e,#2d7a4f)">
-            <span class="article-cat">Jurisprudence</span>
-          </div>
-          <div class="article-body">
-            <div class="article-title">Refus de tiers payant : vos droits après l'arrêt du Conseil d'État</div>
-            <p class="article-excerpt">Ce que vous pouvez refuser, dans quels cas, et comment vous protéger. Modèle de courrier inclus.</p>
-            <div class="article-meta">
-              <span>2 mai 2025</span>
-              <span class="chip chip-green">✓ Vérifié</span>
-            </div>
-          </div>
-        </a>
-
-        <a href="#" class="article-card">
-          <div class="article-top" style="background:linear-gradient(135deg,#5a2d00,#b06c00)">
-            <span class="article-cat">URSSAF</span>
-          </div>
-          <div class="article-body">
-            <div class="article-title">Cotisations URSSAF 2025 : nouveaux taux pour les libéraux</div>
-            <p class="article-excerpt">Tableau comparatif par tranche de revenus. Ce qui change réellement dans votre fiche de calcul annuelle.</p>
-            <div class="article-meta">
-              <span>28 avr. 2025</span>
-              <span class="chip chip-green">✓ Vérifié</span>
-            </div>
-          </div>
-        </a>
-
-        <a href="#" class="article-card">
-          <div class="article-top" style="background:linear-gradient(135deg,#2d1a5a,#5a3ea0)">
-            <span class="article-cat">Numérique en santé</span>
-          </div>
-          <div class="article-body">
-            <div class="article-title">Mon Espace Santé : ce qui est maintenant obligatoire pour votre cabinet</div>
-            <p class="article-excerpt">Nouvelles obligations de partage de documents, délais, et sanctions prévues en cas de non-conformité.</p>
-            <div class="article-meta">
-              <span>15 avr. 2025</span>
-              <span class="chip chip-orange">⏳ En analyse</span>
-            </div>
-          </div>
-        </a>
+      <div id="articles-grid" class="articles-grid">
+        <!-- chargement Supabase -->
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:0.9rem">Chargement…</div>
       </div>
 
     </div>
@@ -325,5 +245,68 @@
     </div>
   </footer>
 
+<script>
+(function () {
+  const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  const CAT = {
+    avenant:      { grad: 'linear-gradient(135deg,#17365f,#326aa2)', label: 'Convention' },
+    convention:   { grad: 'linear-gradient(135deg,#17365f,#326aa2)', label: 'Convention' },
+    plfss:        { grad: 'linear-gradient(135deg,#1a5c5c,#58aab3)', label: 'PLFSS' },
+    decret:       { grad: 'linear-gradient(135deg,#3b1f6e,#6b42b3)', label: 'Décret' },
+    jurisprudence:{ grad: 'linear-gradient(135deg,#1a4a2e,#2d7a4f)', label: 'Jurisprudence' },
+    urssaf:       { grad: 'linear-gradient(135deg,#5a2d00,#b06c00)', label: 'URSSAF' },
+    numerique:    { grad: 'linear-gradient(135deg,#2d1a5a,#5a3ea0)', label: 'Numérique en santé' },
+    observatoire: { grad: 'linear-gradient(135deg,#0d3b2e,#1a7a5e)', label: 'Observatoire' },
+    urgence:      { grad: 'linear-gradient(135deg,#7c1b1b,#dc2626)', label: 'Urgent' },
+  };
+  const DEFAULT_CAT = { grad: 'linear-gradient(135deg,#17365f,#326aa2)', label: 'Décrypteur' };
+
+  function fmt(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function card(a) {
+    const cat = CAT[a.categorie] || DEFAULT_CAT;
+    const chip = a.tags && a.tags.includes('en-analyse')
+      ? '<span class="chip chip-orange">⏳ En analyse</span>'
+      : '<span class="chip chip-green">✓ Vérifié</span>';
+    return `
+      <a href="decrypteur.html?slug=${a.slug}" class="article-card">
+        <div class="article-top" style="background:${cat.grad}">
+          <span class="article-cat">${cat.label}</span>
+        </div>
+        <div class="article-body">
+          <div class="article-title">${a.titre}</div>
+          <p class="article-excerpt">${a.extrait || ''}</p>
+          <div class="article-meta">
+            <span>${fmt(a.publie_le)}</span>
+            ${chip}
+          </div>
+        </div>
+      </a>`;
+  }
+
+  async function load() {
+    const grid = document.getElementById('articles-grid');
+    const { data, error } = await sb
+      .from('decrypteurs')
+      .select('id,titre,slug,extrait,categorie,tags,publie_le')
+      .eq('publie', true)
+      .order('publie_le', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+      grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px">Aucun article publié pour le moment.</p>';
+      return;
+    }
+    grid.innerHTML = data.map(card).join('');
+  }
+
+  load();
+})();
+</script>
 </body>
 </html>
