@@ -294,7 +294,7 @@
     }
   </style>
 </head>
-<body>
+<body style="visibility:hidden">
 
   <div class="topbar">
     <div class="topbar-left">
@@ -643,6 +643,7 @@
     const { data: adminRow } = await sb.from('admins').select('id').eq('user_id', session.user.id).single();
     if (!adminRow) { window.location.href = 'espace-membre.html'; return; }
 
+    document.body.style.visibility = 'visible';
     document.getElementById('admin-email').textContent = session.user.email;
     loadMembres();
     loadDecrypteurs();
