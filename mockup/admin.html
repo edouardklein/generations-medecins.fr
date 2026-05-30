@@ -222,6 +222,70 @@
     }
     .card-form h3 { font-size: 0.95rem; font-weight: 800; color: var(--blue-dark); margin-bottom: 16px; }
 
+    /* Articles à valider — counter badge */
+    .pending-counter {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(220,38,38,0.08); border: 1.5px solid rgba(220,38,38,0.2);
+      border-radius: 10px; padding: 10px 16px; font-size: 0.85rem; font-weight: 700;
+      color: #b91c1c;
+    }
+    .pending-counter .count-num {
+      font-size: 1.4rem; font-weight: 900; line-height: 1;
+    }
+    .pending-counter.zero {
+      background: rgba(98,192,64,0.08); border-color: rgba(98,192,64,0.2); color: #2d7a1a;
+    }
+
+    /* RPPS monospace copiable */
+    .rpps-copy {
+      font-family: monospace; font-size: 0.82rem; color: var(--ink);
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 5px; padding: 2px 7px; cursor: pointer;
+      user-select: all; white-space: nowrap;
+    }
+    .rpps-copy:hover { background: #e8edf4; }
+
+    /* Badge interne */
+    .badge-interne {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 0.7rem; font-weight: 700;
+      background: rgba(107,122,141,0.12); color: var(--muted);
+    }
+
+    /* Btn publier (vert plein) */
+    .btn-publier {
+      background: rgba(98,192,64,0.15); color: #2d7a1a; border-color: rgba(98,192,64,0.4);
+    }
+    .btn-publier:hover { background: rgba(98,192,64,0.28); }
+
+    /* Btn voir (bleu neutre) */
+    .btn-voir {
+      background: rgba(42,109,184,0.08); color: var(--blue); border-color: rgba(42,109,184,0.25);
+      text-decoration: none; padding: 5px 12px; border-radius: 7px;
+      font-family: inherit; font-size: 0.75rem; font-weight: 700;
+      display: inline-block; white-space: nowrap; border: 1.5px solid;
+    }
+    .btn-voir:hover { background: rgba(42,109,184,0.16); }
+
+    /* Btn RPPS OK */
+    .btn-rpps-ok {
+      background: rgba(98,192,64,0.12); color: #2d7a1a; border-color: rgba(98,192,64,0.3);
+    }
+    .btn-rpps-ok:hover { background: rgba(98,192,64,0.22); }
+
+    /* Btn lien externe */
+    .btn-ext {
+      background: rgba(56,168,181,0.08); color: #1a7a86; border-color: rgba(56,168,181,0.3);
+      text-decoration: none; padding: 5px 12px; border-radius: 7px;
+      font-family: inherit; font-size: 0.75rem; font-weight: 700;
+      display: inline-block; white-space: nowrap; border: 1.5px solid;
+    }
+    .btn-ext:hover { background: rgba(56,168,181,0.18); }
+
+    /* Résumé tronqué */
+    .resume-cell { max-width: 220px; font-size: 0.78rem; color: var(--muted); }
+
     @media (max-width: 900px) {
       .stats-row { grid-template-columns: 1fr 1fr; }
       .sidebar { width: 60px; }
@@ -255,8 +319,14 @@
       <button class="sidebar-link" onclick="showSection('en-attente')" id="nav-en-attente">
         <span class="icon">⏳</span><span>En attente</span>
       </button>
+      <button class="sidebar-link" onclick="showSection('rpps')" id="nav-rpps">
+        <span class="icon">🪪</span><span>RPPS</span>
+      </button>
 
       <div class="sidebar-section-label">Contenu</div>
+      <button class="sidebar-link" onclick="showSection('articles-valider')" id="nav-articles-valider">
+        <span class="icon">🔍</span><span>À valider</span>
+      </button>
       <button class="sidebar-link" onclick="showSection('decrypteurs-admin')" id="nav-decrypteurs-admin">
         <span class="icon">📰</span><span>Décrypteurs</span>
       </button>
@@ -361,14 +431,82 @@
         </div>
       </div>
 
+      <!-- Section: Articles à valider -->
+      <div id="section-articles-valider" class="section-panel">
+        <div class="main-header">
+          <div class="main-title">Articles à valider</div>
+          <div class="main-sub">Donnez le go avant publication</div>
+        </div>
+
+        <div id="articles-valider-counter" style="margin-bottom:16px"></div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Source</th>
+                <th>Catégorie</th>
+                <th>Tags</th>
+                <th>Résumé</th>
+                <th>Date pipeline</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="articles-valider-tbody">
+              <tr><td colspan="7" class="table-loading">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section: Validation RPPS -->
+      <div id="section-rpps" class="section-panel">
+        <div class="main-header">
+          <div class="main-title">Validation RPPS</div>
+          <div class="main-sub">Vérifiez les numéros RPPS des membres</div>
+        </div>
+
+        <div class="filters" style="margin-bottom:16px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;font-weight:600;cursor:pointer">
+            <input type="checkbox" id="rpps-show-verified" onchange="renderRppsTable()" style="width:16px;height:16px;cursor:pointer">
+            Afficher aussi les déjà vérifiés
+          </label>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>RPPS</th>
+                <th>Spécialité</th>
+                <th>Statut membre</th>
+                <th>RPPS vérifié</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rpps-tbody">
+              <tr><td colspan="7" class="table-loading">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- Section: Décrypteurs admin -->
       <div id="section-decrypteurs-admin" class="section-panel">
         <div class="main-header" style="display:flex;align-items:center;justify-content:space-between">
           <div>
-            <div class="main-title">Décrypteurs</div>
-            <div class="main-sub">Gérer les articles publiés</div>
+            <div class="main-title">Gérer les articles</div>
+            <div class="main-sub">Créer et gérer les articles manuels</div>
           </div>
           <button class="btn-primary-sm" onclick="toggleNewDecrypteur()">+ Nouvel article</button>
+        </div>
+
+        <div class="banner-info" style="background:rgba(42,109,184,0.07);border:1.5px solid rgba(42,109,184,0.2);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:0.83rem;color:var(--blue-dark);display:flex;align-items:center;gap:10px">
+          <span style="font-size:1.1rem">ℹ️</span>
+          <span>Les articles du pipeline arrivent dans <strong>«&nbsp;À valider&nbsp;»</strong>. Ce formulaire permet d'écrire un article manuellement.</span>
         </div>
 
         <div id="new-decrypteur-form" style="display:none" class="card-form">
@@ -509,6 +647,8 @@
     loadMembres();
     loadDecrypteurs();
     loadPlaidoyer();
+    loadArticlesAValider();
+    loadRpps();
   }
 
   // ── Toast ───────────────────────────────────────────────────
@@ -809,6 +949,151 @@
     if (error) { toast('Erreur : ' + error.message, 'error'); return; }
     toast('Dossier supprimé', 'success');
     loadPlaidoyer();
+  };
+
+  // ── Articles à valider ──────────────────────────────────────
+  async function loadArticlesAValider() {
+    const { data, error } = await sb.from('decrypteurs')
+      .select('*')
+      .eq('publie', false)
+      .order('created_at', { ascending: false });
+
+    const tbody = document.getElementById('articles-valider-tbody');
+    const counterEl = document.getElementById('articles-valider-counter');
+
+    if (error) {
+      tbody.innerHTML = '<tr><td colspan="7" class="table-empty">Erreur de chargement.</td></tr>';
+      return;
+    }
+
+    const list = data || [];
+
+    // Compteur
+    if (list.length === 0) {
+      counterEl.innerHTML = `
+        <div class="pending-counter zero">
+          <span style="font-size:1.1rem">✅</span>
+          <span>Aucun article en attente. La veille publie automatiquement ici chaque lundi.</span>
+        </div>`;
+      tbody.innerHTML = '<tr><td colspan="7" class="table-empty">Aucun article en attente. La veille publie automatiquement ici chaque lundi.</td></tr>';
+      return;
+    }
+
+    counterEl.innerHTML = `
+      <div class="pending-counter">
+        <span class="count-num">${list.length}</span>
+        <span>article${list.length > 1 ? 's' : ''} en attente de validation</span>
+      </div>`;
+
+    tbody.innerHTML = list.map(a => {
+      const resume = a.resume ? (a.resume.length > 120 ? esc(a.resume.slice(0, 120)) + '…' : esc(a.resume)) : '—';
+      const tags = Array.isArray(a.tags) ? a.tags.join(', ') : (a.tags || '—');
+      return `
+        <tr>
+          <td style="font-weight:700;max-width:200px">${esc(a.titre || '—')}</td>
+          <td style="font-size:0.78rem;color:var(--muted)">${esc(a.source || '—')}</td>
+          <td><span style="text-transform:capitalize">${esc(a.categorie || '—')}</span></td>
+          <td style="font-size:0.78rem;color:var(--muted);max-width:140px">${esc(tags)}</td>
+          <td class="resume-cell">${resume}</td>
+          <td style="color:var(--muted);font-size:0.78rem;white-space:nowrap">${fmtDate(a.created_at)}</td>
+          <td>
+            <div class="actions">
+              <button class="btn-action btn-publier" onclick="publierArticle('${a.id}')">Publier ✓</button>
+              <a class="btn-voir" href="decrypteur.html?slug=${encodeURIComponent(a.slug || '')}" target="_blank">Voir →</a>
+              <button class="btn-action btn-supprimer" onclick="supprimerArticleAValider('${a.id}')">Supprimer</button>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  window.publierArticle = async function(id) {
+    const { error } = await sb.from('decrypteurs').update({ publie: true }).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Article publié ✓', 'success');
+    await loadArticlesAValider();
+  };
+
+  window.supprimerArticleAValider = async function(id) {
+    if (!confirm('Supprimer cet article définitivement ?')) return;
+    const { error } = await sb.from('decrypteurs').delete().eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Article supprimé', 'success');
+    await loadArticlesAValider();
+  };
+
+  // ── RPPS ────────────────────────────────────────────────────
+  let allRppsData = [];
+
+  async function loadRpps() {
+    const { data, error } = await sb.from('membres')
+      .select('id,prenom,nom,email,rpps,specialite,statut,rpps_verifie,est_interne')
+      .order('rpps_verifie', { ascending: true });
+
+    if (error) {
+      document.getElementById('rpps-tbody').innerHTML =
+        '<tr><td colspan="7" class="table-empty">Erreur de chargement.</td></tr>';
+      return;
+    }
+    allRppsData = data || [];
+    renderRppsTable();
+  }
+
+  window.renderRppsTable = function() {
+    const showVerified = document.getElementById('rpps-show-verified').checked;
+    const tbody = document.getElementById('rpps-tbody');
+
+    let list = allRppsData;
+    if (!showVerified) {
+      list = list.filter(m => !m.rpps_verifie && !m.est_interne);
+    }
+
+    if (!list.length) {
+      tbody.innerHTML = `<tr><td colspan="7" class="table-empty">${showVerified ? 'Aucun membre.' : 'Aucun RPPS à vérifier.'}</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map(m => {
+      const rppsCell = m.rpps
+        ? `<span class="rpps-copy" title="Cliquer pour sélectionner">${esc(m.rpps)}</span>`
+        : '<span style="color:var(--muted)">—</span>';
+
+      const rppsVerifBadge = m.rpps_verifie
+        ? '<span class="status-badge status-actif">● Vérifié</span>'
+        : '<span class="status-badge status-attente">● En attente</span>';
+
+      let actions = '';
+      if (m.est_interne) {
+        actions = '<span class="badge-interne">Interne</span>';
+      } else {
+        const rppsUrl = `https://annuaire.sante.fr/web/site-pro/recherche-professionnelle?name=&firstName=&rpps=${encodeURIComponent(m.rpps || '')}`;
+        actions = `
+          <div class="actions">
+            ${!m.rpps_verifie ? `<button class="btn-action btn-rpps-ok" onclick="validerRpps('${m.id}')">RPPS OK ✓</button>` : ''}
+            ${m.rpps ? `<a class="btn-ext" href="${rppsUrl}" target="_blank">Vérifier sur RPPS ↗</a>` : ''}
+          </div>`;
+      }
+
+      return `
+        <tr>
+          <td>
+            <div class="td-name">${esc(m.prenom)} ${esc(m.nom)}</div>
+          </td>
+          <td class="td-email">${esc(m.email)}</td>
+          <td>${rppsCell}</td>
+          <td>${esc(m.specialite || '—')}</td>
+          <td>${statusBadge(m.statut)}</td>
+          <td>${rppsVerifBadge}</td>
+          <td>${actions}</td>
+        </tr>`;
+    }).join('');
+  };
+
+  window.validerRpps = async function(id) {
+    const { error } = await sb.from('membres').update({ rpps_verifie: true }).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('RPPS validé ✓', 'success');
+    await loadRpps();
   };
 
   // ── Helpers ──────────────────────────────────────────────────

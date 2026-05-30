@@ -46,6 +46,19 @@
       background-position: right 10px center;
     }
     .filter-select:focus { outline: none; border-color: var(--blue); }
+    .filter-reset {
+      margin-left: auto;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: color 0.15s;
+    }
+    .filter-reset:hover { color: var(--blue); }
 
     .articles-grid {
       display: grid;
@@ -61,7 +74,8 @@
       transition: all 0.2s;
       text-decoration: none;
       color: inherit;
-      display: block;
+      display: flex;
+      flex-direction: column;
     }
     .article-card:hover {
       box-shadow: 0 8px 32px rgba(50,106,162,0.1);
@@ -84,7 +98,12 @@
       letter-spacing: 0.06em;
       backdrop-filter: blur(4px);
     }
-    .article-body { padding: 20px; }
+    .article-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
     .article-title {
       font-size: 0.95rem;
       font-weight: 700;
@@ -96,12 +115,39 @@
       font-size: 0.82rem;
       color: var(--muted);
       line-height: 1.55;
+      margin-bottom: 12px;
+    }
+    .article-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
       margin-bottom: 14px;
+    }
+    .tag-pill {
+      background: rgba(42,109,184,0.08);
+      color: var(--blue);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .tag-pill-more {
+      background: rgba(100,116,139,0.08);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
     }
     .article-meta {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: auto;
+    }
+    .article-source-date {
       font-size: 0.72rem;
       color: var(--muted);
     }
@@ -128,6 +174,14 @@
     .veille-icon { font-size: 1.8rem; flex-shrink: 0; }
     .veille-title { font-size: 0.92rem; font-weight: 700; color: var(--blue-dark); margin-bottom: 3px; }
     .veille-desc { font-size: 0.8rem; color: var(--muted); }
+
+    .no-results {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
 
     @media (max-width: 760px) {
       .articles-grid { grid-template-columns: 1fr 1fr; }
@@ -181,39 +235,21 @@
 
       <!-- Filtres -->
       <div class="filter-bar">
-        <span class="filter-label">Je suis</span>
-        <select class="filter-select">
-          <option>Toutes spécialités</option>
-          <option>Médecin généraliste</option>
-          <option>Psychiatre</option>
-          <option>Cardiologue</option>
-          <option>Interne</option>
-          <option>Remplaçant</option>
+        <span class="filter-label">Filtrer par</span>
+        <select id="filter-theme" class="filter-select">
+          <option value="">Tous les thèmes</option>
         </select>
-        <select class="filter-select">
-          <option>Tous secteurs</option>
-          <option>Secteur 1</option>
-          <option>Secteur 2</option>
-          <option>Secteur 3 / non conventionné</option>
+        <select id="filter-specialite" class="filter-select">
+          <option value="">Toutes les spécialités</option>
         </select>
-        <select class="filter-select">
-          <option>Tous modes d'exercice</option>
-          <option>Libéral</option>
-          <option>Salarié</option>
-          <option>Mixte</option>
+        <select id="filter-region" class="filter-select">
+          <option value="">Toutes les régions</option>
         </select>
-        <select class="filter-select">
-          <option>Toutes catégories</option>
-          <option>Convention</option>
-          <option>PLFSS</option>
-          <option>Décret</option>
-          <option>Jurisprudence</option>
-        </select>
+        <button id="filter-reset" class="filter-reset">Réinitialiser</button>
       </div>
 
       <!-- Articles -->
       <div id="articles-grid" class="articles-grid">
-        <!-- chargement Supabase -->
         <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:0.9rem">Chargement…</div>
       </div>
 
@@ -264,9 +300,26 @@
   };
   const DEFAULT_CAT = { grad: 'linear-gradient(135deg,#17365f,#326aa2)', label: 'Décrypteur' };
 
+  // State
+  let allArticles = [];
+  let tagsMap = {}; // slug -> label
+  let activeFilters = { theme: '', specialite: '', region: '' };
+
   function fmt(iso) {
     if (!iso) return '';
     return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function renderTagPills(tags) {
+    if (!tags || tags.length === 0) return '';
+    const visible = tags.slice(0, 4);
+    const rest = tags.length - 4;
+    let html = visible.map(slug => {
+      const label = tagsMap[slug] || slug;
+      return `<span class="tag-pill">${label}</span>`;
+    }).join('');
+    if (rest > 0) html += `<span class="tag-pill-more">+${rest}</span>`;
+    return `<div class="article-tags">${html}</div>`;
   }
 
   function card(a) {
@@ -274,6 +327,11 @@
     const chip = a.tags && a.tags.includes('en-analyse')
       ? '<span class="chip chip-orange">⏳ En analyse</span>'
       : '<span class="chip chip-green">✓ Vérifié</span>';
+    const sourcePart = a.source ? `${a.source} · ` : '';
+    const datePart = fmt(a.publie_le);
+    const sourceDate = (sourcePart || datePart)
+      ? `<span class="article-source-date">${sourcePart}${datePart}</span>`
+      : '';
     return `
       <a href="decrypteur.html?slug=${a.slug}" class="article-card">
         <div class="article-top" style="background:${cat.grad}">
@@ -282,29 +340,99 @@
         <div class="article-body">
           <div class="article-title">${a.titre}</div>
           <p class="article-excerpt">${a.extrait || ''}</p>
+          ${renderTagPills(a.tags)}
           <div class="article-meta">
-            <span>${fmt(a.publie_le)}</span>
+            ${sourceDate}
             ${chip}
           </div>
         </div>
       </a>`;
   }
 
+  function applyFilters() {
+    const grid = document.getElementById('articles-grid');
+    const { theme, specialite, region } = activeFilters;
+
+    const filtered = allArticles.filter(a => {
+      const tags = a.tags || [];
+      if (theme && !tags.includes(theme)) return false;
+      if (specialite && !tags.includes(specialite)) return false;
+      if (region && !tags.includes(region)) return false;
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div class="no-results">Aucun article ne correspond à ces filtres.</div>';
+    } else {
+      grid.innerHTML = filtered.map(card).join('');
+    }
+  }
+
+  function populateSelects(tagsRef) {
+    const themes = tagsRef.filter(t => t.type === 'theme');
+    const specialites = tagsRef.filter(t => t.type === 'specialite');
+    const regions = tagsRef.filter(t => t.type === 'region');
+
+    function fill(selectId, items) {
+      const sel = document.getElementById(selectId);
+      items.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.slug;
+        opt.textContent = t.label;
+        sel.appendChild(opt);
+      });
+    }
+
+    fill('filter-theme', themes);
+    fill('filter-specialite', specialites);
+    fill('filter-region', regions);
+  }
+
+  function bindFilters() {
+    ['filter-theme', 'filter-specialite', 'filter-region'].forEach(id => {
+      document.getElementById(id).addEventListener('change', function () {
+        const key = id.replace('filter-', '');
+        activeFilters[key] = this.value;
+        applyFilters();
+      });
+    });
+    document.getElementById('filter-reset').addEventListener('click', function () {
+      activeFilters = { theme: '', specialite: '', region: '' };
+      document.getElementById('filter-theme').value = '';
+      document.getElementById('filter-specialite').value = '';
+      document.getElementById('filter-region').value = '';
+      applyFilters();
+    });
+  }
+
   async function load() {
     const grid = document.getElementById('articles-grid');
-    const { data, error } = await sb
-      .from('decrypteurs')
-      .select('id,titre,slug,extrait,categorie,tags,publie_le')
-      .eq('publie', true)
-      .order('publie_le', { ascending: false });
 
-    if (error || !data || data.length === 0) {
+    // Load tags_ref and articles in parallel
+    const [tagsRes, articlesRes] = await Promise.all([
+      sb.from('tags_ref').select('slug,label,type'),
+      sb.from('decrypteurs')
+        .select('id,titre,slug,extrait,categorie,tags,auteur,source,publie_le')
+        .eq('publie', true)
+        .order('publie_le', { ascending: false })
+    ]);
+
+    // Build tags map
+    if (tagsRes.data) {
+      tagsRes.data.forEach(t => { tagsMap[t.slug] = t.label; });
+      populateSelects(tagsRes.data);
+    }
+
+    if (articlesRes.error || !articlesRes.data || articlesRes.data.length === 0) {
       grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px">Aucun article publié pour le moment.</p>';
       return;
     }
-    grid.innerHTML = data.map(card).join('');
+
+    allArticles = articlesRes.data;
+    applyFilters();
   }
 
+  bindFilters();
   load();
 })();
 </script>

@@ -151,5 +151,5 @@ def process(article: dict, texte_complet: str) -> dict | None:
         "publie_le": article["publie_le"],
         "auteur":    "Veille GM",
         "acces":     "public",
-        "publie":    True,
+        "publie":    False,  # requiert validation admin avant publication
     }
