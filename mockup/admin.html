@@ -292,6 +292,19 @@
       .sidebar-link span, .sidebar-section-label { display: none; }
       .sidebar-link { justify-content: center; padding: 12px; }
     }
+    /* Actions : icône seule sur petit écran */
+    .btn-action .btn-label { display:inline; }
+    @media (max-width: 1100px) {
+      .btn-action .btn-label { display:none; }
+      .btn-action { padding:6px 8px; min-width:32px; justify-content:center; }
+    }
+    /* Modal membre édition */
+    #membre-edit-overlay { position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;display:none;align-items:center;justify-content:center; }
+    #membre-edit-overlay.open { display:flex; }
+    #membre-edit-modal { background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.2);padding:28px 32px;width:min(640px,95vw);max-height:90vh;overflow-y:auto; }
+    #membre-edit-modal h3 { margin:0 0 20px;font-size:1rem;font-weight:800;color:var(--blue-dark); }
+    /* Inline select catégorie */
+    .cat-select { font-size:.78rem;font-weight:700;border:1.5px solid var(--line);border-radius:6px;padding:3px 6px;font-family:inherit;background:#fff;cursor:pointer; }
   </style>
 </head>
 <body style="visibility:hidden">
@@ -503,7 +516,7 @@
             <div class="main-title">Gérer les articles</div>
             <div class="main-sub">Créer et gérer les articles manuels</div>
           </div>
-          <button class="btn-primary-sm" onclick="toggleNewDecrypteur()">+ Nouvel article</button>
+          <button id="btn-toggle-new-article" class="btn-primary-sm" onclick="toggleNewDecrypteur()">+ Nouvel article</button>
         </div>
 
         <div class="banner-info" style="background:rgba(42,109,184,0.07);border:1.5px solid rgba(42,109,184,0.2);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:0.83rem;color:var(--blue-dark);display:flex;align-items:center;gap:10px">
@@ -539,7 +552,6 @@
           </div>
           <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
             <button class="btn-primary-sm" onclick="saveDecrypteur()">Soumettre pour validation</button>
-            <button class="btn-cancel" onclick="toggleNewDecrypteur()">← Retour à la liste</button>
           </div>
         </div>
 
@@ -645,6 +657,51 @@
 
       <div class="modal-actions" style="margin-top:20px">
         <button class="btn-cancel" onclick="closeDossierModal()">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Membre edit modal -->
+  <div id="membre-edit-overlay" onclick="if(event.target===this)closeMemberModal()">
+    <div id="membre-edit-modal">
+      <h3 id="membre-edit-title">Modifier le profil</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>Prénom</label><input id="me-prenom" type="text"></div>
+        <div class="form-group"><label>Nom</label><input id="me-nom" type="text"></div>
+        <div class="form-group"><label>Téléphone</label><input id="me-telephone" type="tel"></div>
+        <div class="form-group"><label>Code postal</label><input id="me-cp" type="text" maxlength="5"></div>
+        <div class="form-group"><label>RPPS</label><input id="me-rpps" type="text" maxlength="11"></div>
+        <div class="form-group"><label>Spécialité</label><input id="me-specialite" type="text"></div>
+        <div class="form-group"><label>Secteur</label>
+          <select id="me-secteur">
+            <option value="">—</option>
+            <option value="S1">Secteur 1</option>
+            <option value="S2">Secteur 2</option>
+            <option value="S3">Secteur 3 / OPTAM</option>
+            <option value="non_conventionné">Non conventionné</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Mode d'exercice</label>
+          <select id="me-mode">
+            <option value="">—</option>
+            <option value="liberal_seul">Libéral seul</option>
+            <option value="liberal_groupe">Libéral en groupe</option>
+            <option value="salarie">Salarié</option>
+            <option value="mixte">Mixte</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Statut</label>
+          <select id="me-statut">
+            <option value="en_attente">En attente</option>
+            <option value="actif">Actif</option>
+            <option value="suspendu">Suspendu</option>
+          </select>
+        </div>
+      </div>
+      <input type="hidden" id="me-id">
+      <div class="modal-actions" style="margin-top:20px">
+        <button class="btn-cancel" onclick="closeMemberModal()">Annuler</button>
+        <button class="btn-primary-sm" onclick="saveMember()">Enregistrer</button>
       </div>
     </div>
   </div>
@@ -763,7 +820,7 @@
     tbody.innerHTML = list.map(m => `
       <tr>
         <td>
-          <div class="td-name">${esc(m.prenom)} ${esc(m.nom)}</div>
+          <div class="td-name" style="cursor:pointer;color:var(--blue);text-decoration:underline;text-underline-offset:3px" onclick="openMemberModal(${JSON.stringify(m)})">${esc(m.prenom)} ${esc(m.nom)}</div>
           <div class="td-email">${esc(m.email)}</div>
         </td>
         <td style="font-size:0.82rem">${esc(m.telephone || '—')}</td>
@@ -776,9 +833,9 @@
         <td style="color:var(--muted);font-size:0.78rem">${fmtDate(m.created_at)}</td>
         <td>
           <div class="actions">
-            ${m.statut !== 'actif'    ? `<button class="btn-action btn-valider"   onclick="setStatut('${m.id}','actif')">Valider</button>` : ''}
-            ${m.statut !== 'suspendu' ? `<button class="btn-action btn-suspendre" onclick="setStatut('${m.id}','suspendu')">Suspendre</button>` : ''}
-            <button class="btn-action btn-supprimer" onclick="openModal('${m.id}')">Supprimer</button>
+            ${m.statut !== 'actif'    ? `<button class="btn-action btn-valider"   onclick="setStatut('${m.id}','actif')" title="Valider">✓ <span class="btn-label">Valider</span></button>` : ''}
+            ${m.statut !== 'suspendu' ? `<button class="btn-action btn-suspendre" onclick="confirmSuspendre('${m.id}')" title="Suspendre">⏸ <span class="btn-label">Suspendre</span></button>` : ''}
+            <button class="btn-action btn-supprimer" onclick="openModal('${m.id}')" title="Supprimer">🗑 <span class="btn-label">Supprimer</span></button>
           </div>
         </td>
       </tr>
@@ -881,9 +938,11 @@
   window.toggleNewDecrypteur = function() {
     const form  = document.getElementById('new-decrypteur-form');
     const table = document.getElementById('decrypteurs-table-wrap');
+    const btn   = document.getElementById('btn-toggle-new-article');
     const showing = form.style.display !== 'none';
     form.style.display  = showing ? 'none'  : 'block';
     table.style.display = showing ? 'block' : 'none';
+    btn.textContent = showing ? '+ Nouvel article' : '← Retour à la liste';
     if (!showing) document.getElementById('d-date').value = new Date().toISOString().slice(0,10);
   };
 
@@ -1095,6 +1154,10 @@
         <span>article${list.length > 1 ? 's' : ''} en attente de validation</span>
       </div>`;
 
+    const CATS = ['avenant','plfss','decret','jurisprudence','urssaf','numerique','greve-mobilisation','reforme-etudes-medicales','urssaf'];
+    const catOpts = (current) => CATS.map(c =>
+      `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`).join('');
+
     tbody.innerHTML = list.map(a => {
       const resume = a.resume ? (a.resume.length > 120 ? esc(a.resume.slice(0, 120)) + '…' : esc(a.resume)) : '—';
       const tags = Array.isArray(a.tags) ? a.tags.join(', ') : (a.tags || '—');
@@ -1102,20 +1165,30 @@
         <tr>
           <td style="font-weight:700;max-width:200px">${esc(a.titre || '—')}</td>
           <td style="font-size:0.78rem;color:var(--muted)">${esc(a.source || '—')}</td>
-          <td><span style="text-transform:capitalize">${esc(a.categorie || '—')}</span></td>
+          <td>
+            <select class="cat-select" onchange="updateCategorie('${a.id}', this.value)">
+              ${catOpts(a.categorie)}
+            </select>
+          </td>
           <td style="font-size:0.78rem;color:var(--muted);max-width:140px">${esc(tags)}</td>
           <td class="resume-cell">${resume}</td>
           <td style="color:var(--muted);font-size:0.78rem;white-space:nowrap">${fmtDate(a.created_at)}</td>
           <td>
             <div class="actions">
-              <button class="btn-action btn-publier" onclick="publierArticle('${a.id}')">Publier ✓</button>
-              <a class="btn-voir" href="decrypteur.html?slug=${encodeURIComponent(a.slug || '')}" target="_blank">Voir →</a>
-              <button class="btn-action btn-supprimer" onclick="supprimerArticleAValider('${a.id}')">Supprimer</button>
+              <button class="btn-action btn-publier" onclick="publierArticle('${a.id}')" title="Publier"><span class="btn-label">Publier ✓</span></button>
+              <a class="btn-voir" href="decrypteur.html?slug=${encodeURIComponent(a.slug || '')}" target="_blank" title="Voir">Voir →</a>
+              <button class="btn-action btn-supprimer" onclick="supprimerArticleAValider('${a.id}')" title="Supprimer">🗑</button>
             </div>
           </td>
         </tr>`;
     }).join('');
   }
+
+  window.updateCategorie = async function(id, categorie) {
+    const { error } = await sb.from('decrypteurs').update({ categorie }).eq('id', id);
+    if (error) toast('Erreur : ' + error.message, 'error');
+    else toast('Catégorie mise à jour ✓', 'success');
+  };
 
   window.publierArticle = async function(id) {
     const { error } = await sb.from('decrypteurs').update({ publie: true }).eq('id', id);
@@ -1215,6 +1288,51 @@
     if (!s) return '—';
     return new Date(s).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
   }
+
+  // ── Modal édition membre ─────────────────────────────────────
+  window.openMemberModal = function(m) {
+    document.getElementById('me-id').value        = m.id;
+    document.getElementById('me-prenom').value    = m.prenom || '';
+    document.getElementById('me-nom').value       = m.nom || '';
+    document.getElementById('me-telephone').value = m.telephone || '';
+    document.getElementById('me-cp').value        = m.code_postal || '';
+    document.getElementById('me-rpps').value      = m.rpps || '';
+    document.getElementById('me-specialite').value= m.specialite || '';
+    document.getElementById('me-secteur').value   = m.secteur || '';
+    document.getElementById('me-mode').value      = m.mode_exercice || '';
+    document.getElementById('me-statut').value    = m.statut || 'en_attente';
+    document.getElementById('membre-edit-title').textContent = `${m.prenom} ${m.nom}`;
+    document.getElementById('membre-edit-overlay').classList.add('open');
+  };
+
+  window.closeMemberModal = function() {
+    document.getElementById('membre-edit-overlay').classList.remove('open');
+  };
+
+  window.saveMember = async function() {
+    const id = document.getElementById('me-id').value;
+    const payload = {
+      prenom:        document.getElementById('me-prenom').value.trim(),
+      nom:           document.getElementById('me-nom').value.trim(),
+      telephone:     document.getElementById('me-telephone').value.trim() || null,
+      code_postal:   document.getElementById('me-cp').value.trim() || null,
+      rpps:          document.getElementById('me-rpps').value.trim() || null,
+      specialite:    document.getElementById('me-specialite').value.trim() || null,
+      secteur:       document.getElementById('me-secteur').value || null,
+      mode_exercice: document.getElementById('me-mode').value || null,
+      statut:        document.getElementById('me-statut').value,
+    };
+    const { error } = await sb.from('membres').update(payload).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Profil mis à jour ✓', 'success');
+    closeMemberModal();
+    await loadMembres();
+  };
+
+  window.confirmSuspendre = function(id) {
+    if (!confirm('Suspendre ce membre ? Il ne pourra plus accéder à l\'espace membre.')) return;
+    setStatut(id, 'suspendu');
+  };
 
   init();
 })();
