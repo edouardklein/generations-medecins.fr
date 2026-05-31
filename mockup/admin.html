@@ -154,6 +154,13 @@
     .btn-supprimer { background: rgba(220,38,38,0.07); color: #b91c1c; border-color: rgba(220,38,38,0.2); }
     .btn-supprimer:hover { background: rgba(220,38,38,0.15); }
 
+    /* Icon-only action buttons */
+    .btn-icon {
+      width: 32px; height: 32px; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+
     /* Empty / loading */
     .table-empty { padding: 48px; text-align: center; color: var(--muted); font-size: 0.85rem; }
     .table-loading { padding: 48px; text-align: center; color: var(--muted); font-size: 0.85rem; }
@@ -286,17 +293,19 @@
     /* Résumé tronqué */
     .resume-cell { max-width: 220px; font-size: 0.78rem; color: var(--muted); }
 
+    /* CSV export button */
+    .btn-csv {
+      padding: 8px 14px; background: rgba(42,109,184,0.08); color: var(--blue);
+      border: 1.5px solid rgba(42,109,184,0.25); border-radius: 9px;
+      font-family: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+    }
+    .btn-csv:hover { background: rgba(42,109,184,0.16); }
+
     @media (max-width: 900px) {
       .stats-row { grid-template-columns: 1fr 1fr; }
       .sidebar { width: 60px; }
       .sidebar-link span, .sidebar-section-label { display: none; }
       .sidebar-link { justify-content: center; padding: 12px; }
-    }
-    /* Actions : icône seule sur petit écran */
-    .btn-action .btn-label { display:inline; }
-    @media (max-width: 1100px) {
-      .btn-action .btn-label { display:none; }
-      .btn-action { padding:6px 8px; min-width:32px; justify-content:center; }
     }
     /* Modal membre édition */
     #membre-edit-overlay { position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;display:none;align-items:center;justify-content:center; }
@@ -305,6 +314,18 @@
     #membre-edit-modal h3 { margin:0 0 20px;font-size:1rem;font-weight:800;color:var(--blue-dark); }
     /* Inline select catégorie */
     .cat-select { font-size:.78rem;font-weight:700;border:1.5px solid var(--line);border-radius:6px;padding:3px 6px;font-family:inherit;background:#fff;cursor:pointer; }
+    /* Email readonly display */
+    .email-display {
+      padding: 9px 12px; border: 1.5px solid var(--line); border-radius: 9px;
+      font-family: inherit; font-size: 0.85rem; color: var(--muted);
+      background: var(--surface); word-break: break-all;
+    }
+    /* Region display */
+    .region-display {
+      padding: 9px 12px; border: 1.5px solid var(--line); border-radius: 9px;
+      font-family: inherit; font-size: 0.85rem; color: var(--muted);
+      background: var(--surface);
+    }
   </style>
 </head>
 <body style="visibility:hidden">
@@ -360,9 +381,12 @@
 
       <!-- Section: Tous les membres -->
       <div id="section-membres" class="section-panel active">
-        <div class="main-header">
-          <div class="main-title">Adhérents</div>
-          <div class="main-sub">Liste complète des membres inscrits</div>
+        <div class="main-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="main-title">Adhérents</div>
+            <div class="main-sub">Liste complète des membres inscrits</div>
+          </div>
+          <button id="btn-csv-export" class="btn-csv" style="display:none" onclick="exportCSV()">⬇ CSV</button>
         </div>
 
         <div class="stats-row" id="stats-row">
@@ -386,7 +410,7 @@
         </div>
 
         <div class="filters">
-          <input type="search" class="filter-input" id="search-input" placeholder="Rechercher par nom, email, RPPS…">
+          <input type="search" class="filter-input" id="search-input" placeholder="Rechercher par nom, email…">
           <select class="filter-select" id="filter-statut">
             <option value="">Tous les statuts</option>
             <option value="actif">Actif</option>
@@ -406,7 +430,7 @@
                 <th>Membre</th>
                 <th>Téléphone</th>
                 <th>CP</th>
-                <th>RPPS</th>
+                <th>Région</th>
                 <th>Spécialité</th>
                 <th>Mode exercice</th>
                 <th>Secteur</th>
@@ -668,8 +692,19 @@
       <div class="form-grid">
         <div class="form-group"><label>Prénom</label><input id="me-prenom" type="text"></div>
         <div class="form-group"><label>Nom</label><input id="me-nom" type="text"></div>
+        <div class="form-group full">
+          <label>Email</label>
+          <div class="email-display" id="me-email-display">—</div>
+        </div>
         <div class="form-group"><label>Téléphone</label><input id="me-telephone" type="tel"></div>
-        <div class="form-group"><label>Code postal</label><input id="me-cp" type="text" maxlength="5"></div>
+        <div class="form-group">
+          <label>Code postal</label>
+          <input id="me-cp" type="text" maxlength="5" oninput="updateRegionDisplay()">
+        </div>
+        <div class="form-group">
+          <label>Région (calculée)</label>
+          <div class="region-display" id="me-region-display">—</div>
+        </div>
         <div class="form-group"><label>RPPS</label><input id="me-rpps" type="text" maxlength="11"></div>
         <div class="form-group"><label>Spécialité</label><input id="me-specialite" type="text"></div>
         <div class="form-group"><label>Secteur</label>
@@ -690,15 +725,29 @@
             <option value="mixte">Mixte</option>
           </select>
         </div>
-        <div class="form-group"><label>Statut</label>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input id="me-est-interne" type="checkbox" style="width:16px;height:16px">
+            Est interne
+          </label>
+        </div>
+        <div class="form-group" id="me-statut-group">
+          <label>Statut</label>
           <select id="me-statut">
             <option value="en_attente">En attente</option>
             <option value="actif">Actif</option>
             <option value="suspendu">Suspendu</option>
           </select>
         </div>
+        <div class="form-group full" id="me-subadmin-group" style="display:none">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input id="me-subadmin" type="checkbox" style="width:16px;height:16px">
+            Sous-administrateur (accès panneau admin)
+          </label>
+        </div>
       </div>
       <input type="hidden" id="me-id">
+      <input type="hidden" id="me-user-id">
       <div class="modal-actions" style="margin-top:20px">
         <button class="btn-cancel" onclick="closeMemberModal()">Annuler</button>
         <button class="btn-primary-sm" onclick="saveMember()">Enregistrer</button>
@@ -728,14 +777,62 @@
 
   let allMembres = [];
   let deleteTargetId = null;
+  let isSuperAdmin = false;
+  let adminSet = new Set(); // set of user_ids that are admins
+
+  // Member map keyed by id for safe modal opening
+  const memberMap = {};
+
+  // ── Dept → Région map ────────────────────────────────────────
+  const DEPT_REGION = {
+    '01':'Auvergne-Rhône-Alpes','02':'Hauts-de-France','03':'Auvergne-Rhône-Alpes',
+    '04':'Provence-Alpes-Côte d\'Azur','05':'Provence-Alpes-Côte d\'Azur','06':'Provence-Alpes-Côte d\'Azur',
+    '07':'Auvergne-Rhône-Alpes','08':'Grand Est','09':'Occitanie','10':'Grand Est',
+    '11':'Occitanie','12':'Occitanie','13':'Provence-Alpes-Côte d\'Azur','14':'Normandie',
+    '15':'Auvergne-Rhône-Alpes','16':'Nouvelle-Aquitaine','17':'Nouvelle-Aquitaine','18':'Centre-Val de Loire',
+    '19':'Nouvelle-Aquitaine','21':'Bourgogne-Franche-Comté','22':'Bretagne','23':'Nouvelle-Aquitaine',
+    '24':'Nouvelle-Aquitaine','25':'Bourgogne-Franche-Comté','26':'Auvergne-Rhône-Alpes','27':'Normandie',
+    '28':'Centre-Val de Loire','29':'Bretagne','2A':'Corse','2B':'Corse',
+    '30':'Occitanie','31':'Occitanie','32':'Occitanie','33':'Nouvelle-Aquitaine','34':'Occitanie',
+    '35':'Bretagne','36':'Centre-Val de Loire','37':'Centre-Val de Loire','38':'Auvergne-Rhône-Alpes',
+    '39':'Bourgogne-Franche-Comté','40':'Nouvelle-Aquitaine','41':'Centre-Val de Loire',
+    '42':'Auvergne-Rhône-Alpes','43':'Auvergne-Rhône-Alpes','44':'Pays de la Loire','45':'Centre-Val de Loire',
+    '46':'Occitanie','47':'Nouvelle-Aquitaine','48':'Occitanie','49':'Pays de la Loire','50':'Normandie',
+    '51':'Grand Est','52':'Grand Est','53':'Pays de la Loire','54':'Grand Est','55':'Grand Est',
+    '56':'Bretagne','57':'Grand Est','58':'Bourgogne-Franche-Comté','59':'Hauts-de-France',
+    '60':'Hauts-de-France','61':'Normandie','62':'Hauts-de-France','63':'Auvergne-Rhône-Alpes',
+    '64':'Nouvelle-Aquitaine','65':'Occitanie','66':'Occitanie','67':'Grand Est','68':'Grand Est',
+    '69':'Auvergne-Rhône-Alpes','70':'Bourgogne-Franche-Comté','71':'Bourgogne-Franche-Comté',
+    '72':'Pays de la Loire','73':'Auvergne-Rhône-Alpes','74':'Auvergne-Rhône-Alpes',
+    '75':'Île-de-France','76':'Normandie','77':'Île-de-France','78':'Île-de-France',
+    '79':'Nouvelle-Aquitaine','80':'Hauts-de-France','81':'Occitanie','82':'Occitanie',
+    '83':'Provence-Alpes-Côte d\'Azur','84':'Provence-Alpes-Côte d\'Azur','85':'Pays de la Loire',
+    '86':'Nouvelle-Aquitaine','87':'Nouvelle-Aquitaine','88':'Grand Est','89':'Bourgogne-Franche-Comté',
+    '90':'Bourgogne-Franche-Comté','91':'Île-de-France','92':'Île-de-France','93':'Île-de-France',
+    '94':'Île-de-France','95':'Île-de-France',
+    '971':'Guadeloupe','972':'Martinique','973':'Guyane','974':'La Réunion','976':'Mayotte'
+  };
+
+  function cpToRegion(cp) {
+    if (!cp) return '—';
+    const dept = cp.startsWith('97') ? cp.slice(0,3) : cp.slice(0,2);
+    return DEPT_REGION[dept] || '—';
+  }
 
   // ── Auth guard ──────────────────────────────────────────────
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'connexion.html'; return; }
 
-    const { data: adminRow } = await sb.from('admins').select('user_id').eq('user_id', session.user.id).single();
+    const { data: adminRow } = await sb.from('admins').select('user_id, role').eq('user_id', session.user.id).single();
     if (!adminRow) { window.location.href = 'espace-membre.html'; return; }
+
+    isSuperAdmin = adminRow?.role === 'super_admin';
+
+    // Show/hide super-admin only UI
+    if (isSuperAdmin) {
+      document.getElementById('btn-csv-export').style.display = 'inline-flex';
+    }
 
     document.body.style.visibility = 'visible';
     document.getElementById('admin-email').textContent = session.user.email;
@@ -770,6 +867,10 @@
 
   // ── Members ─────────────────────────────────────────────────
   async function loadMembres() {
+    // Also fetch the admins set
+    const { data: adminsData } = await sb.from('admins').select('user_id');
+    adminSet = new Set((adminsData || []).map(a => a.user_id));
+
     const { data, error } = await sb.from('membres')
       .select('*')
       .order('created_at', { ascending: false });
@@ -777,6 +878,10 @@
     if (error) { toast('Erreur chargement membres', 'error'); return; }
 
     allMembres = data || [];
+
+    // Populate memberMap
+    allMembres.forEach(m => { memberMap[m.id] = m; });
+
     updateStats();
     populateSpecialiteFilter();
     renderMembres(allMembres);
@@ -793,6 +898,8 @@
   function populateSpecialiteFilter() {
     const specs = [...new Set(allMembres.map(m => m.specialite).filter(Boolean))].sort();
     const sel = document.getElementById('filter-specialite');
+    // Remove existing options except the first
+    while (sel.options.length > 1) sel.remove(1);
     specs.forEach(s => {
       const opt = document.createElement('option');
       opt.value = s; opt.textContent = s;
@@ -814,32 +921,44 @@
     const tbody = document.getElementById('membres-tbody');
     document.getElementById('filter-count').textContent = `${list.length} membre${list.length > 1 ? 's' : ''}`;
     if (!list.length) {
-      tbody.innerHTML = '<tr><td colspan="8" class="table-empty">Aucun membre trouvé.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="table-empty">Aucun membre trouvé.</td></tr>';
       return;
     }
-    tbody.innerHTML = list.map(m => `
-      <tr>
-        <td>
-          <div class="td-name" style="cursor:pointer;color:var(--blue);text-decoration:underline;text-underline-offset:3px" onclick="openMemberModal(${JSON.stringify(m)})">${esc(m.prenom)} ${esc(m.nom)}</div>
-          <div class="td-email">${esc(m.email)}</div>
-        </td>
-        <td style="font-size:0.82rem">${esc(m.telephone || '—')}</td>
-        <td style="font-size:0.82rem">${esc(m.code_postal || '—')}</td>
-        <td class="td-rpps">${esc(m.rpps || '—')}</td>
-        <td>${esc(m.specialite || '—')}</td>
-        <td>${esc(m.mode_exercice || '—')}</td>
-        <td>${esc(m.secteur || '—')}</td>
-        <td>${statusBadge(m.statut)}</td>
-        <td style="color:var(--muted);font-size:0.78rem">${fmtDate(m.created_at)}</td>
-        <td>
-          <div class="actions">
-            ${m.statut !== 'actif'    ? `<button class="btn-action btn-valider"   onclick="setStatut('${m.id}','actif')" title="Valider">✓ <span class="btn-label">Valider</span></button>` : ''}
-            ${m.statut !== 'suspendu' ? `<button class="btn-action btn-suspendre" onclick="confirmSuspendre('${m.id}')" title="Suspendre">⏸ <span class="btn-label">Suspendre</span></button>` : ''}
-            <button class="btn-action btn-supprimer" onclick="openModal('${m.id}')" title="Supprimer">🗑 <span class="btn-label">Supprimer</span></button>
-          </div>
-        </td>
-      </tr>
-    `).join('');
+    tbody.innerHTML = list.map(m => {
+      const region = cpToRegion(m.code_postal);
+      const validerBtn = m.statut !== 'actif'
+        ? `<button class="btn-action btn-valider btn-icon" onclick="setStatut('${m.id}','actif')" title="Valider">✓</button>`
+        : '';
+      const suspendreBtnHtml = m.statut !== 'suspendu' && isSuperAdmin
+        ? `<button class="btn-action btn-suspendre btn-icon" onclick="confirmSuspendre('${m.id}')" title="Suspendre">⏸</button>`
+        : '';
+      const supprimerBtnHtml = isSuperAdmin
+        ? `<button class="btn-action btn-supprimer btn-icon" onclick="openModal('${m.id}')" title="Supprimer">🗑</button>`
+        : '';
+      return `
+        <tr>
+          <td>
+            <div class="td-name" style="cursor:pointer;color:var(--blue);text-decoration:underline;text-underline-offset:3px" onclick="openMemberModal('${m.id}')">${esc(m.prenom)} ${esc(m.nom)}</div>
+            <div class="td-email">${esc(m.email)}</div>
+          </td>
+          <td style="font-size:0.82rem">${esc(m.telephone || '—')}</td>
+          <td style="font-size:0.82rem">${esc(m.code_postal || '—')}</td>
+          <td style="font-size:0.78rem;color:var(--muted)">${esc(region)}</td>
+          <td>${esc(m.specialite || '—')}</td>
+          <td>${esc(m.mode_exercice || '—')}</td>
+          <td>${esc(m.secteur || '—')}</td>
+          <td>${statusBadge(m.statut)}</td>
+          <td style="color:var(--muted);font-size:0.78rem">${fmtDate(m.created_at)}</td>
+          <td>
+            <div class="actions">
+              ${validerBtn}
+              ${suspendreBtnHtml}
+              ${supprimerBtnHtml}
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
   }
 
   function renderAttente(list) {
@@ -859,8 +978,8 @@
         <td style="color:var(--muted);font-size:0.78rem">${fmtDate(m.created_at)}</td>
         <td>
           <div class="actions">
-            <button class="btn-action btn-valider"   onclick="setStatut('${m.id}','actif')">Valider ✓</button>
-            <button class="btn-action btn-supprimer" onclick="openModal('${m.id}')">Refuser</button>
+            <button class="btn-action btn-valider btn-icon" onclick="setStatut('${m.id}','actif')" title="Valider">✓</button>
+            <button class="btn-action btn-supprimer btn-icon" onclick="openModal('${m.id}')" title="Refuser">🗑</button>
           </div>
         </td>
       </tr>
@@ -876,7 +995,7 @@
       if (st   && m.statut    !== st)   return false;
       if (spec && m.specialite !== spec) return false;
       if (q) {
-        const hay = `${m.prenom} ${m.nom} ${m.email} ${m.rpps}`.toLowerCase();
+        const hay = `${m.prenom} ${m.nom} ${m.email}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -915,6 +1034,38 @@
   document.getElementById('modal-overlay').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeModal();
   });
+
+  // ── CSV Export (super-admin only) ────────────────────────────
+  window.exportCSV = async function() {
+    const { data, error } = await sb.from('membres').select('*').order('created_at', { ascending: false });
+    if (error) { toast('Erreur export : ' + error.message, 'error'); return; }
+    const cols = ['prenom','nom','email','telephone','code_postal','region','specialite','secteur','mode_exercice','rpps','statut','created_at'];
+    const header = cols.join(',');
+    const rows = (data || []).map(m => {
+      const region = cpToRegion(m.code_postal);
+      return [
+        m.prenom, m.nom, m.email, m.telephone, m.code_postal, region,
+        m.specialite, m.secteur, m.mode_exercice, m.rpps, m.statut, m.created_at
+      ].map(v => {
+        if (v == null) return '';
+        const s = String(v);
+        if (s.includes(',') || s.includes('"') || s.includes('\n')) return '"' + s.replace(/"/g, '""') + '"';
+        return s;
+      }).join(',');
+    });
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const today = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `adherents_${today}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Export CSV téléchargé ✓', 'success');
+  };
 
   // ── Décrypteurs ─────────────────────────────────────────────
   async function loadDecrypteurs() {
@@ -957,7 +1108,6 @@
       auteur:    document.getElementById('d-auteur').value.trim() || 'Rédaction GM',
       acces:     document.getElementById('d-acces').value,
       publie:    false,
-      auteur:    document.getElementById('d-auteur').value.trim() || 'Rédaction GM',
     };
     if (!payload.titre || !payload.slug) { toast('Titre et slug requis', 'error'); return; }
     const { error } = await sb.from('decrypteurs').insert(payload);
@@ -1289,19 +1439,43 @@
     return new Date(s).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
   }
 
+  // ── Region display update (called from CP input) ─────────────
+  window.updateRegionDisplay = function() {
+    const cp = document.getElementById('me-cp').value.trim();
+    document.getElementById('me-region-display').textContent = cpToRegion(cp);
+  };
+
   // ── Modal édition membre ─────────────────────────────────────
-  window.openMemberModal = function(m) {
-    document.getElementById('me-id').value        = m.id;
-    document.getElementById('me-prenom').value    = m.prenom || '';
-    document.getElementById('me-nom').value       = m.nom || '';
-    document.getElementById('me-telephone').value = m.telephone || '';
-    document.getElementById('me-cp').value        = m.code_postal || '';
-    document.getElementById('me-rpps').value      = m.rpps || '';
-    document.getElementById('me-specialite').value= m.specialite || '';
-    document.getElementById('me-secteur').value   = m.secteur || '';
-    document.getElementById('me-mode').value      = m.mode_exercice || '';
-    document.getElementById('me-statut').value    = m.statut || 'en_attente';
+  window.openMemberModal = function(m_id) {
+    const m = memberMap[m_id];
+    if (!m) return;
+    document.getElementById('me-id').value             = m.id;
+    document.getElementById('me-user-id').value        = m.user_id || '';
+    document.getElementById('me-prenom').value         = m.prenom || '';
+    document.getElementById('me-nom').value            = m.nom || '';
+    document.getElementById('me-email-display').textContent = m.email || '—';
+    document.getElementById('me-telephone').value      = m.telephone || '';
+    document.getElementById('me-cp').value             = m.code_postal || '';
+    document.getElementById('me-region-display').textContent = cpToRegion(m.code_postal);
+    document.getElementById('me-rpps').value           = m.rpps || '';
+    document.getElementById('me-specialite').value     = m.specialite || '';
+    document.getElementById('me-secteur').value        = m.secteur || '';
+    document.getElementById('me-mode').value           = m.mode_exercice || '';
+    document.getElementById('me-est-interne').checked  = !!m.est_interne;
+    document.getElementById('me-statut').value         = m.statut || 'en_attente';
     document.getElementById('membre-edit-title').textContent = `${m.prenom} ${m.nom}`;
+
+    // Super-admin only fields
+    const subAdminGroup = document.getElementById('me-subadmin-group');
+    if (isSuperAdmin) {
+      subAdminGroup.style.display = 'block';
+      // Check if user is in adminSet
+      const isAdmin = m.user_id && adminSet.has(m.user_id);
+      document.getElementById('me-subadmin').checked = isAdmin;
+    } else {
+      subAdminGroup.style.display = 'none';
+    }
+
     document.getElementById('membre-edit-overlay').classList.add('open');
   };
 
@@ -1310,7 +1484,8 @@
   };
 
   window.saveMember = async function() {
-    const id = document.getElementById('me-id').value;
+    const id     = document.getElementById('me-id').value;
+    const userId = document.getElementById('me-user-id').value;
     const payload = {
       prenom:        document.getElementById('me-prenom').value.trim(),
       nom:           document.getElementById('me-nom').value.trim(),
@@ -1320,10 +1495,36 @@
       specialite:    document.getElementById('me-specialite').value.trim() || null,
       secteur:       document.getElementById('me-secteur').value || null,
       mode_exercice: document.getElementById('me-mode').value || null,
-      statut:        document.getElementById('me-statut').value,
+      est_interne:   document.getElementById('me-est-interne').checked,
     };
+
+    // Super-admin can edit statut
+    if (isSuperAdmin) {
+      payload.statut = document.getElementById('me-statut').value;
+    }
+
     const { error } = await sb.from('membres').update(payload).eq('id', id);
     if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+
+    // Handle sub-admin checkbox (super-admin only)
+    if (isSuperAdmin && userId) {
+      const isSubAdmin = document.getElementById('me-subadmin').checked;
+      // Don't remove super-admin's own admin record
+      const { data: { session } } = await sb.auth.getSession();
+      const isSelf = session && session.user.id === userId;
+      if (isSubAdmin) {
+        // Upsert with role='admin' (won't override super_admin due to DB logic, but safe)
+        const { error: uErr } = await sb.from('admins').upsert({ user_id: userId, role: 'admin' }, { onConflict: 'user_id', ignoreDuplicates: false });
+        if (uErr) toast('Erreur admin upsert : ' + uErr.message, 'error');
+      } else if (!isSelf) {
+        const { error: dErr } = await sb.from('admins').delete().eq('user_id', userId);
+        if (dErr) toast('Erreur admin delete : ' + dErr.message, 'error');
+      }
+      // Refresh adminSet
+      const { data: adminsData } = await sb.from('admins').select('user_id');
+      adminSet = new Set((adminsData || []).map(a => a.user_id));
+    }
+
     toast('Profil mis à jour ✓', 'success');
     closeMemberModal();
     await loadMembres();
