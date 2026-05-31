@@ -537,13 +537,13 @@
               </select>
             </div>
           </div>
-          <div style="margin-top:16px;display:flex;gap:10px">
-            <button class="btn-primary-sm" onclick="saveDecrypteur()">Publier l'article</button>
-            <button class="btn-cancel" onclick="toggleNewDecrypteur()">Annuler</button>
+          <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
+            <button class="btn-primary-sm" onclick="saveDecrypteur()">Soumettre pour validation</button>
+            <button class="btn-cancel" onclick="toggleNewDecrypteur()">← Retour à la liste</button>
           </div>
         </div>
 
-        <div class="table-wrap">
+        <div id="decrypteurs-table-wrap" class="table-wrap">
           <table>
             <thead>
               <tr>
@@ -879,11 +879,12 @@
   }
 
   window.toggleNewDecrypteur = function() {
-    const el = document.getElementById('new-decrypteur-form');
-    el.style.display = el.style.display === 'none' ? 'block' : 'none';
-    if (el.style.display === 'block') {
-      document.getElementById('d-date').value = new Date().toISOString().slice(0,10);
-    }
+    const form  = document.getElementById('new-decrypteur-form');
+    const table = document.getElementById('decrypteurs-table-wrap');
+    const showing = form.style.display !== 'none';
+    form.style.display  = showing ? 'none'  : 'block';
+    table.style.display = showing ? 'block' : 'none';
+    if (!showing) document.getElementById('d-date').value = new Date().toISOString().slice(0,10);
   };
 
   window.saveDecrypteur = async function() {
@@ -896,11 +897,13 @@
       contenu:   document.getElementById('d-contenu').value.trim(),
       auteur:    document.getElementById('d-auteur').value.trim() || 'Rédaction GM',
       acces:     document.getElementById('d-acces').value,
+      publie:    false,
+      auteur:    document.getElementById('d-auteur').value.trim() || 'Rédaction GM',
     };
     if (!payload.titre || !payload.slug) { toast('Titre et slug requis', 'error'); return; }
     const { error } = await sb.from('decrypteurs').insert(payload);
     if (error) { toast('Erreur : ' + error.message, 'error'); return; }
-    toast('Article publié ✓', 'success');
+    toast('Article soumis — en attente de validation ✓', 'success');
     toggleNewDecrypteur();
     loadDecrypteurs();
   };
@@ -915,7 +918,9 @@
 
   // ── Plaidoyer ───────────────────────────────────────────────
   async function loadPlaidoyer() {
-    const { data } = await sb.from('plaidoyer_dossiers').select('*').order('created_at', { ascending: false });
+    const { data } = await sb.from('plaidoyer_dossiers')
+      .select('*, plaidoyer_etapes(id)')
+      .order('created_at', { ascending: false });
     const tbody = document.getElementById('plaidoyer-tbody');
     if (!data || !data.length) {
       tbody.innerHTML = '<tr><td colspan="5" class="table-empty">Aucun dossier.</td></tr>';
@@ -924,9 +929,14 @@
     tbody.innerHTML = data.map(d => `
       <tr>
         <td>
-          <span style="font-weight:700;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="openDossierModal('${d.id}','${esc(d.titre).replace(/'/g,"\\'")}')">
-            ${esc(d.titre)}
-          </span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-weight:700;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="openDossierModal('${d.id}','${esc(d.titre).replace(/'/g,"\\'")}')">
+              ${esc(d.titre)}
+            </span>
+            ${d.plaidoyer_etapes && d.plaidoyer_etapes.length > 0
+              ? `<span style="min-width:20px;height:20px;padding:0 6px;background:var(--blue);color:#fff;border-radius:999px;font-size:.7rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center">${d.plaidoyer_etapes.length}</span>`
+              : ''}
+          </div>
         </td>
         <td>${esc(d.trimestre || '—')}</td>
         <td>${statusBadge(d.statut)}</td>
