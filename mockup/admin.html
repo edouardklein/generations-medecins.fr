@@ -1685,7 +1685,10 @@
       toast('Impossible de charger les listes Brevo : ' + e.message, 'error');
       return;
     }
-    const opts = lists.map(l => `<option value="${l.id}">${l.name} (${l.totalSubscribers ?? '?'} contacts)</option>`).join('');
+    const opts = lists.map(l => {
+      const count = l.uniqueSubscribers ?? l.totalSubscribers ?? '?';
+      return `<option value="${l.id}">${l.name} (${count} contacts)</option>`;
+    }).join('');
     ['nl-list-id','cp-list-id'].forEach(id => {
       document.getElementById(id).innerHTML = '<option value="">— Choisir une liste —</option>' + opts;
     });
