@@ -233,11 +233,14 @@
             <div class="tracker-name">${d.titre}</div>
           </div>
           <p class="tracker-desc">${d.description_courte || d.description || ''}</p>
-          <div class="progress-wrap">
+          <div class="progress-wrap" style="position:relative">
             <div class="progress-bar ${barClass(d.statut)}" style="width:${pct}%"></div>
+            ${(d.plaidoyer_etapes||[]).map(e => `
+              <div title="${e.texte} (${e.pourcentage}%)" style="position:absolute;top:50%;left:${e.pourcentage}%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--blue);box-shadow:0 0 0 1px rgba(42,109,184,.3)"></div>
+            `).join('')}
           </div>
           <div class="progress-meta">
-            <span>${d.plaidoyer_etapes && d.plaidoyer_etapes.length ? d.plaidoyer_etapes.length + ' étape' + (d.plaidoyer_etapes.length > 1 ? 's' : '') : ''}</span>
+            <span style="color:var(--muted);font-size:.78rem">${d.plaidoyer_etapes && d.plaidoyer_etapes.length ? d.plaidoyer_etapes.length + ' jalon' + (d.plaidoyer_etapes.length > 1 ? 's' : '') : ''}</span>
             <span style="font-weight:700;color:${pctColor(d.statut)}">${pct}%</span>
           </div>
           ${etapesHTML(d.plaidoyer_etapes)}

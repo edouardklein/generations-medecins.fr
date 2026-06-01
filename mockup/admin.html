@@ -663,6 +663,15 @@
         </div>
       </div>
 
+      <div style="margin-bottom:18px">
+        <label style="font-size:.8rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">AVANCEMENT GLOBAL (%)</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="dossier-avancement-input" type="number" min="0" max="100" style="width:90px;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:.9rem;font-family:inherit" placeholder="0">
+          <button class="btn-primary-sm" onclick="saveDossierAvancement()">Sauvegarder</button>
+          <span style="font-size:.78rem;color:var(--muted)">(indépendant des étapes)</span>
+        </div>
+      </div>
+
       <div style="margin-bottom:14px">
         <label style="font-size:.8rem;font-weight:700;color:var(--muted);display:block;margin-bottom:8px">ÉTAPES</label>
         <div id="etapes-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px"></div>
@@ -1146,7 +1155,7 @@
       <tr>
         <td>
           <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-weight:700;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="openDossierModal('${d.id}','${esc(d.titre).replace(/'/g,"\\'")}')">
+            <span style="font-weight:700;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="openDossierModal('${d.id}','${esc(d.titre).replace(/'/g,"\\'")}',${d.avancement_pct||0})">
               ${esc(d.titre)}
             </span>
             ${d.plaidoyer_etapes && d.plaidoyer_etapes.length > 0
@@ -1198,9 +1207,10 @@
   // ── Dossier modal (titre + étapes) ─────────────────────────
   let currentDossierId = null;
 
-  window.openDossierModal = async function(id, titre) {
+  window.openDossierModal = async function(id, titre, avancement) {
     currentDossierId = id;
     document.getElementById('dossier-titre-input').value = titre;
+    document.getElementById('dossier-avancement-input').value = avancement || 0;
     document.getElementById('etape-texte').value = '';
     document.getElementById('etape-pct').value = '';
     document.getElementById('dossier-modal-overlay').classList.add('open');
@@ -1259,6 +1269,15 @@
     const { error } = await sb.from('plaidoyer_dossiers').update({ titre }).eq('id', currentDossierId);
     if (error) { toast('Erreur : ' + error.message, 'error'); return; }
     toast('Titre mis à jour ✓', 'success');
+    loadPlaidoyer();
+  };
+
+  window.saveDossierAvancement = async function() {
+    const pct = Math.min(100, Math.max(0, parseInt(document.getElementById('dossier-avancement-input').value) || 0));
+    if (!currentDossierId) return;
+    const { error } = await sb.from('plaidoyer_dossiers').update({ avancement_pct: pct }).eq('id', currentDossierId);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Avancement mis à jour ✓', 'success');
     loadPlaidoyer();
   };
 
@@ -1453,9 +1472,9 @@
   };
 
   // ── Modal édition membre ─────────────────────────────────────
-  window.openMemberModal = function(m_id) {
-    const m = memberMap[m_id];
-    if (!m) return;
+  window.openMemberModal = async function(m_id) {
+    const { data: m, error } = await sb.from('membres').select('*').eq('id', m_id).single();
+    if (error || !m) { toast('Impossible de charger ce membre', 'error'); return; }
     document.getElementById('me-id').value             = m.id;
     document.getElementById('me-user-id').value        = m.user_id || '';
     document.getElementById('me-prenom').value         = m.prenom || '';
