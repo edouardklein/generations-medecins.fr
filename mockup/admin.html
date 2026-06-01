@@ -1677,10 +1677,10 @@
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       lists = await res.json();
-      if (!Array.isArray(lists)) throw new Error(lists.error || 'Réponse inattendue');
+      if (!Array.isArray(lists)) throw new Error(`[${res.status}] ${lists.error || JSON.stringify(lists)}`);
     } catch (e) {
       ['nl-list-id','cp-list-id'].forEach(id => {
-        document.getElementById(id).innerHTML = '<option value="">Erreur chargement listes</option>';
+        document.getElementById(id).innerHTML = `<option value="">⚠ ${e.message}</option>`;
       });
       toast('Impossible de charger les listes Brevo : ' + e.message, 'error');
       return;
