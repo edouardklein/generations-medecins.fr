@@ -679,9 +679,10 @@
             </p>
             <div class="form-grid">
               <div class="form-group">
-                <label>ID liste Brevo adhérents</label>
-                <input type="number" id="nl-list-id" placeholder="ex: 3" style="max-width:120px">
-                <span style="font-size:.72rem;color:var(--muted);display:block;margin-top:4px">Laisser vide pour utiliser NEWSLETTER_LIST_ID (env)</span>
+                <label>Liste Brevo adhérents</label>
+                <select id="nl-list-id" style="max-width:280px">
+                  <option value="">Chargement…</option>
+                </select>
               </div>
               <div class="form-group full">
                 <label>Sujet</label>
@@ -713,9 +714,10 @@
             </p>
             <div class="form-grid">
               <div class="form-group">
-                <label>ID liste Brevo presse</label>
-                <input type="number" id="cp-list-id" placeholder="ex: 4" style="max-width:120px">
-                <span style="font-size:.72rem;color:var(--muted);display:block;margin-top:4px">Laisser vide pour PRESS_LIST_ID (env)</span>
+                <label>Liste Brevo presse</label>
+                <select id="cp-list-id" style="max-width:280px">
+                  <option value="">Chargement…</option>
+                </select>
               </div>
               <div class="form-group full">
                 <label>Sujet</label>
@@ -962,6 +964,7 @@
     document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
     document.getElementById('section-' + id).classList.add('active');
     document.getElementById('nav-' + id).classList.add('active');
+    if (id === 'communication') loadBrevoLists();
   };
 
   // ── Logout ──────────────────────────────────────────────────
@@ -1662,6 +1665,32 @@
 
   // ── Communication ────────────────────────────────────────────
 
+  let brevoListsLoaded = false;
+
+  async function loadBrevoLists() {
+    if (brevoListsLoaded) return;
+    brevoListsLoaded = true;
+    const { data: { session } } = await sb.auth.getSession();
+    let lists = [];
+    try {
+      const res = await fetch('/.netlify/functions/get-brevo-lists', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      lists = await res.json();
+      if (!Array.isArray(lists)) throw new Error(lists.error || 'Réponse inattendue');
+    } catch (e) {
+      ['nl-list-id','cp-list-id'].forEach(id => {
+        document.getElementById(id).innerHTML = '<option value="">Erreur chargement listes</option>';
+      });
+      toast('Impossible de charger les listes Brevo : ' + e.message, 'error');
+      return;
+    }
+    const opts = lists.map(l => `<option value="${l.id}">${l.name} (${l.totalSubscribers ?? '?'} contacts)</option>`).join('');
+    ['nl-list-id','cp-list-id'].forEach(id => {
+      document.getElementById(id).innerHTML = '<option value="">— Choisir une liste —</option>' + opts;
+    });
+  }
+
   window.showCommTab = function(tab) {
     ['newsletter','communique'].forEach(t => {
       document.getElementById('cpanel-' + t).style.display = t === tab ? '' : 'none';
@@ -1669,6 +1698,7 @@
       btn.style.borderBottomColor = t === tab ? 'var(--blue)' : 'transparent';
       btn.style.color = t === tab ? 'var(--blue)' : 'var(--muted)';
     });
+    loadBrevoLists();
   };
 
   window.toggleNlPreview = function() {
@@ -1719,19 +1749,21 @@
   window.sendNewsletter = function() {
     const subject = document.getElementById('nl-subject').value.trim();
     const htmlContent = document.getElementById('nl-body').value.trim();
-    const listId = document.getElementById('nl-list-id').value.trim();
+    const listId = document.getElementById('nl-list-id').value;
     if (!subject || !htmlContent) { toast('Sujet et contenu requis', 'error'); return; }
+    if (!listId) { toast('Choisissez une liste Brevo', 'error'); return; }
     if (!confirm(`Envoyer cette newsletter à tous les abonnés Brevo ?\n\nSujet : ${subject}`)) return;
-    callCommFunction('/.netlify/functions/send-newsletter', { subject, htmlContent, listId: listId || undefined }, 'btn-send-nl', 'nl-status');
+    callCommFunction('/.netlify/functions/send-newsletter', { subject, htmlContent, listId }, 'btn-send-nl', 'nl-status');
   };
 
   window.sendCommunique = function() {
     const subject = document.getElementById('cp-subject').value.trim();
     const textContent = document.getElementById('cp-body').value.trim();
-    const listId = document.getElementById('cp-list-id').value.trim();
+    const listId = document.getElementById('cp-list-id').value;
     if (!subject || !textContent) { toast('Sujet et contenu requis', 'error'); return; }
+    if (!listId) { toast('Choisissez une liste Brevo presse', 'error'); return; }
     if (!confirm(`Envoyer ce communiqué aux contacts presse Brevo ?\n\nSujet : ${subject}`)) return;
-    callCommFunction('/.netlify/functions/send-communique', { subject, textContent, listId: listId || undefined }, 'btn-send-cp', 'cp-status');
+    callCommFunction('/.netlify/functions/send-communique', { subject, textContent, listId }, 'btn-send-cp', 'cp-status');
   };
 
 })();
