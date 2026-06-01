@@ -745,6 +745,11 @@
             Sous-administrateur (accès panneau admin)
           </label>
         </div>
+        <div class="form-group full" id="me-superadmin-badge" style="display:none">
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(42,109,184,0.08);border:1.5px solid rgba(42,109,184,0.25);border-radius:9px;font-size:.83rem;font-weight:700;color:var(--blue-dark)">
+            ⭐ Super Administrateur — vous êtes le seul à pouvoir supprimer des comptes et exporter la base adhérent.
+          </div>
+        </div>
       </div>
       <input type="hidden" id="me-id">
       <input type="hidden" id="me-user-id">
@@ -778,6 +783,7 @@
   let allMembres = [];
   let deleteTargetId = null;
   let isSuperAdmin = false;
+  let currentUserId = null;
   let adminSet = new Set(); // set of user_ids that are admins
 
   // Member map keyed by id for safe modal opening
@@ -828,6 +834,7 @@
     if (!adminRow) { window.location.href = 'espace-membre.html'; return; }
 
     isSuperAdmin = adminRow?.role === 'super_admin';
+    currentUserId = session.user.id;
 
     // Show/hide super-admin only UI
     if (isSuperAdmin) {
@@ -1467,13 +1474,21 @@
 
     // Super-admin only fields
     const subAdminGroup = document.getElementById('me-subadmin-group');
-    if (isSuperAdmin) {
+    const superBadge    = document.getElementById('me-superadmin-badge');
+    const isSelf = m.user_id && m.user_id === currentUserId;
+    if (isSuperAdmin && isSelf) {
+      // Own super-admin account: show badge, hide sub-admin checkbox
+      subAdminGroup.style.display = 'none';
+      superBadge.style.display    = 'block';
+    } else if (isSuperAdmin && !isSelf) {
+      // Another member: show sub-admin checkbox
       subAdminGroup.style.display = 'block';
-      // Check if user is in adminSet
+      superBadge.style.display    = 'none';
       const isAdmin = m.user_id && adminSet.has(m.user_id);
       document.getElementById('me-subadmin').checked = isAdmin;
     } else {
       subAdminGroup.style.display = 'none';
+      superBadge.style.display    = 'none';
     }
 
     document.getElementById('membre-edit-overlay').classList.add('open');
