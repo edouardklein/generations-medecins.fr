@@ -695,6 +695,16 @@
                 <label>Corps du message</label>
                 <textarea id="nl-corps" rows="7" placeholder="Développez ici le contenu principal de votre newsletter…" oninput="updateNlPreview()" style="resize:vertical"></textarea>
               </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label style="display:flex;align-items:center;justify-content:space-between">
+                  <span>Images <span style="font-weight:400;color:var(--muted)">(optionnel)</span></span>
+                  <button type="button" onclick="addNlImage()"
+                    style="font-family:inherit;font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:6px;border:1.5px solid var(--blue);background:rgba(42,109,184,.07);color:var(--blue);cursor:pointer">
+                    + Ajouter une image
+                  </button>
+                </label>
+                <div id="nl-images" style="display:flex;flex-direction:column;gap:10px;margin-top:6px"></div>
+              </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
                 <div class="form-group" style="margin:0">
                   <label>Texte du bouton <span style="font-weight:400;color:var(--muted)">(optionnel)</span></label>
@@ -724,31 +734,56 @@
 
         <!-- Communiqué panel -->
         <div id="cpanel-communique" style="display:none">
-          <div class="card-form">
-            <p style="font-size:.82rem;color:var(--muted);margin-bottom:20px;line-height:1.6">
-              Envoie un communiqué de presse aux contacts de la liste presse Brevo, via Gmail (BCC — les destinataires ne se voient pas).
-            </p>
-            <div class="form-grid">
-              <div class="form-group">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+
+            <!-- Colonne gauche : champs -->
+            <div class="card-form" style="margin:0">
+              <div class="form-group" style="margin-bottom:16px">
                 <label>Liste Brevo presse</label>
-                <select id="cp-list-id" style="max-width:280px">
+                <select id="cp-list-id" style="max-width:100%">
                   <option value="">Chargement…</option>
                 </select>
               </div>
-              <div class="form-group full">
-                <label>Sujet</label>
-                <input type="text" id="cp-subject" placeholder="ex: Communiqué — Générations Médecins réagit à…">
+              <div class="form-group" style="margin-bottom:16px">
+                <label>Sujet de l'email</label>
+                <input type="text" id="cp-subject" placeholder="ex: Communiqué de presse — Générations Médecins réagit à…" oninput="updateCpPreview()">
               </div>
-              <div class="form-group full">
-                <label>Corps (texte brut)</label>
-                <textarea id="cp-body" rows="14" placeholder="Madame, Monsieur,&#10;&#10;Générations Médecins…"></textarea>
+              <div class="form-group" style="margin-bottom:16px">
+                <label>Titre du communiqué</label>
+                <input type="text" id="cp-titre" placeholder="ex: Générations Médecins appelle à une réforme urgente du numerus clausus" oninput="updateCpPreview()">
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label>Corps</label>
+                <textarea id="cp-corps" rows="9" placeholder="Rédigez ici le contenu du communiqué…" oninput="updateCpPreview()" style="resize:vertical"></textarea>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+                <div class="form-group" style="margin:0">
+                  <label>Contact presse — nom</label>
+                  <input type="text" id="cp-contact-nom" placeholder="Dr Alexis Bourla" oninput="updateCpPreview()">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label>Téléphone</label>
+                  <input type="tel" id="cp-contact-tel" placeholder="+33 6 …" oninput="updateCpPreview()">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:20px">
+                <label>Email contact presse</label>
+                <input type="email" id="cp-contact-email" placeholder="cdp@generations-medecins.fr" oninput="updateCpPreview()">
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <button class="btn-primary-sm" id="btn-send-cp" onclick="sendCommunique()" style="background:#1a5c3e">📣 Envoyer aux médias</button>
+                <span id="cp-status" style="font-size:.8rem;color:var(--muted)"></span>
               </div>
             </div>
-            <div style="display:flex;gap:12px;margin-top:4px;align-items:center;flex-wrap:wrap">
-              <button class="btn-primary-sm" id="btn-send-cp" onclick="sendCommunique()"
-                style="background:#7c3aed">📣 Envoyer aux médias</button>
-              <span id="cp-status" style="font-size:.8rem;color:var(--muted)"></span>
+
+            <!-- Aperçu live -->
+            <div style="position:sticky;top:80px">
+              <div style="font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Aperçu en direct</div>
+              <div style="border:1.5px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+                <iframe id="cp-preview" style="width:100%;height:600px;border:none"></iframe>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -1720,6 +1755,47 @@
     loadBrevoLists();
   };
 
+  // ── Newsletter builder ───────────────────────────────────────
+  let nlImageCount = 0;
+
+  window.addNlImage = function() {
+    nlImageCount++;
+    const idx = nlImageCount;
+    const div = document.createElement('div');
+    div.id = `nl-img-block-${idx}`;
+    div.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;background:var(--surface);padding:10px 12px;border-radius:8px;border:1px solid var(--line)';
+    div.innerHTML = `
+      <div><label style="font-size:.72rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">URL de l'image</label>
+        <input type="url" id="nl-img-url-${idx}" placeholder="https://…" oninput="updateNlPreview()" style="width:100%"></div>
+      <div><label style="font-size:.72rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">Légende (optionnel)</label>
+        <input type="text" id="nl-img-cap-${idx}" placeholder="Description de l'image" oninput="updateNlPreview()" style="width:100%"></div>
+      <button type="button" onclick="removeNlImage(${idx})"
+        style="padding:6px 10px;border-radius:6px;border:1px solid #f0c0c0;background:#fff5f5;color:#c0392b;font-size:.8rem;cursor:pointer;font-family:inherit;font-weight:700;white-space:nowrap">✕</button>`;
+    document.getElementById('nl-images').appendChild(div);
+    updateNlPreview();
+  };
+
+  window.removeNlImage = function(idx) {
+    document.getElementById(`nl-img-block-${idx}`)?.remove();
+    updateNlPreview();
+  };
+
+  function getNlImagesHtml() {
+    const blocks = document.querySelectorAll('[id^="nl-img-block-"]');
+    let html = '';
+    blocks.forEach(b => {
+      const idx = b.id.split('-').pop();
+      const url = document.getElementById(`nl-img-url-${idx}`)?.value.trim();
+      const cap = document.getElementById(`nl-img-cap-${idx}`)?.value.trim();
+      if (!url) return;
+      html += `<tr><td style="padding:0 0 20px">
+        <img src="${url}" alt="${cap || ''}" style="width:100%;border-radius:8px;display:block;max-height:400px;object-fit:cover">
+        ${cap ? `<p style="margin:6px 0 0;font-size:12px;color:#6b7a8d;text-align:center;font-style:italic">${cap}</p>` : ''}
+      </td></tr>`;
+    });
+    return html;
+  }
+
   function buildNlHtml() {
     const subj     = document.getElementById('nl-subject').value.trim();
     const accroche = document.getElementById('nl-accroche').value.trim();
@@ -1728,22 +1804,21 @@
     const ctaUrl   = document.getElementById('nl-cta-url').value.trim();
 
     const accrocheHtml = accroche
-      ? `<p style="margin:0 0 18px;font-size:16px;color:#1a2332;line-height:1.75;font-weight:500">${accroche.replace(/\n/g,'<br>')}</p>`
+      ? `<tr><td style="padding:0 0 18px"><p style="margin:0;font-size:16px;color:#1a2332;line-height:1.75;font-weight:500">${accroche.replace(/\n/g,'<br>')}</p></td></tr>`
       : '';
-
+    const imagesHtml = getNlImagesHtml();
     const corpsHtml = corps
       ? corps.split(/\n\n+/).map(p =>
-          `<p style="margin:0 0 18px;font-size:15px;color:#2a3445;line-height:1.75">${p.replace(/\n/g,'<br>')}</p>`
+          `<tr><td style="padding:0 0 18px"><p style="margin:0;font-size:15px;color:#2a3445;line-height:1.75">${p.replace(/\n/g,'<br>')}</p></td></tr>`
         ).join('')
-      : '<p style="margin:0 0 18px;font-size:15px;color:#aab0bb;line-height:1.75;font-style:italic">Contenu à rédiger…</p>';
-
+      : '<tr><td><p style="margin:0 0 18px;font-size:15px;color:#aab0bb;line-height:1.75;font-style:italic">Contenu à rédiger…</p></td></tr>';
     const ctaHtml = (ctaText && ctaUrl)
-      ? `<table cellpadding="0" cellspacing="0" style="margin:28px 0">
-          <tr><td style="background:linear-gradient(135deg,#1a5c3e,#27956a,#38a8b5);border-radius:8px">
-            <a href="${ctaUrl}" style="display:inline-block;padding:13px 28px;color:white;font-weight:700;font-size:14px;text-decoration:none">${ctaText}</a>
-          </td></tr>
-        </table>`
-      : '';
+      ? `<tr><td style="padding:10px 0 28px">
+          <table cellpadding="0" cellspacing="0"><tr>
+            <td style="background:linear-gradient(135deg,#1a5c3e,#27956a,#38a8b5);border-radius:8px">
+              <a href="${ctaUrl}" style="display:inline-block;padding:13px 28px;color:white;font-weight:700;font-size:14px;text-decoration:none">${ctaText}</a>
+            </td></tr></table>
+         </td></tr>` : '';
 
     return `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -1756,13 +1831,14 @@
     <div style="font-size:22px;font-weight:800;color:white;line-height:1.3">${subj || 'Titre de la newsletter'}</div>
   </td></tr>
   <tr><td style="background:white;padding:36px 40px">
-    <p style="margin:0 0 20px;font-size:15px;color:#1a2332;line-height:1.75">Bonjour,</p>
-    ${accrocheHtml}
-    ${corpsHtml}
-    ${ctaHtml}
-    <p style="margin:24px 0 0;font-size:15px;color:#1a2332;line-height:1.75">
-      Bien cordialement,<br><strong>L'équipe Générations Médecins IDF</strong>
-    </p>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr><td style="padding:0 0 20px"><p style="margin:0;font-size:15px;color:#1a2332;line-height:1.75">Bonjour,</p></td></tr>
+      ${accrocheHtml}
+      ${imagesHtml}
+      ${corpsHtml}
+      ${ctaHtml}
+      <tr><td><p style="margin:0;font-size:15px;color:#1a2332;line-height:1.75">Bien cordialement,<br><strong>L'équipe Générations Médecins IDF</strong></p></td></tr>
+    </table>
   </td></tr>
   <tr><td style="background:#f0f4f9;border-top:1px solid #e8edf4;border-radius:0 0 14px 14px;padding:20px 40px;text-align:center">
     <p style="margin:0 0 5px;font-size:11px;color:#6b7a8d">Générations Médecins Île-de-France · Mouvement médical indépendant</p>
@@ -1778,9 +1854,83 @@
     document.getElementById('nl-preview').srcdoc = buildNlHtml();
   };
 
-  // Initialise l'aperçu dès l'affichage de la section
+  // ── Communiqué builder ───────────────────────────────────────
+  function buildCpHtml() {
+    const titre      = document.getElementById('cp-titre').value.trim();
+    const corps      = document.getElementById('cp-corps').value.trim();
+    const cNom       = document.getElementById('cp-contact-nom').value.trim();
+    const cTel       = document.getElementById('cp-contact-tel').value.trim();
+    const cEmail     = document.getElementById('cp-contact-email').value.trim();
+    const dateStr    = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const corpsHtml = corps
+      ? corps.split(/\n\n+/).map(p =>
+          `<p style="margin:0 0 16px;font-size:14px;color:#2a3445;line-height:1.8">${p.replace(/\n/g,'<br>')}</p>`
+        ).join('')
+      : '<p style="color:#aab0bb;font-size:14px;font-style:italic">Corps du communiqué…</p>';
+
+    const contactHtml = (cNom || cTel || cEmail) ? `
+      <tr><td style="border-top:1px solid #e8edf4;padding:20px 0 0;margin-top:20px">
+        <p style="margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6b7a8d">Contact presse</p>
+        ${cNom   ? `<p style="margin:0;font-size:13px;color:#1a2332;font-weight:700">${cNom}</p>` : ''}
+        ${cTel   ? `<p style="margin:2px 0 0;font-size:13px;color:#2a6db8">${cTel}</p>` : ''}
+        ${cEmail ? `<p style="margin:2px 0 0;font-size:13px;color:#2a6db8">${cEmail}</p>` : ''}
+      </td></tr>` : '';
+
+    return `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f0;font-family:Georgia,'Times New Roman',serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f0;padding:32px 0">
+<tr><td align="center">
+<table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%">
+
+  <!-- En-tête institution -->
+  <tr><td style="background:white;border-bottom:3px solid #1a5c3e;border-radius:12px 12px 0 0;padding:24px 40px">
+    <table width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td>
+        <div style="font-size:13px;font-weight:700;color:#1a5c3e;letter-spacing:.04em">GÉNÉRATIONS MÉDECINS ÎLE-DE-FRANCE</div>
+        <div style="font-size:11px;color:#6b7a8d;margin-top:2px">Mouvement médical indépendant</div>
+      </td>
+      <td align="right" style="font-size:11px;color:#6b7a8d">Paris, le ${dateStr}</td>
+    </tr></table>
+  </td></tr>
+
+  <!-- Bandeau COMMUNIQUÉ DE PRESSE -->
+  <tr><td style="background:#1a5c3e;padding:14px 40px;text-align:center">
+    <span style="font-size:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:white">— COMMUNIQUÉ DE PRESSE —</span>
+  </td></tr>
+
+  <!-- Corps -->
+  <tr><td style="background:white;padding:36px 40px">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr><td style="padding:0 0 24px">
+        <p style="margin:0;font-size:19px;font-weight:700;color:#1a2332;line-height:1.4;font-family:'Helvetica Neue',Arial,sans-serif">${titre || 'Titre du communiqué'}</p>
+      </td></tr>
+      <tr><td>${corpsHtml}</td></tr>
+      ${contactHtml}
+    </table>
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style="background:#f5f5f0;border-top:2px solid #e8edf4;border-radius:0 0 12px 12px;padding:16px 40px;text-align:center">
+    <p style="margin:0;font-size:11px;color:#6b7a8d;font-family:'Helvetica Neue',Arial,sans-serif">
+      Générations Médecins Île-de-France · <a href="{{unsubscribe}}" style="color:#6b7a8d">Se désabonner</a>
+    </p>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body></html>`;
+  }
+
+  window.updateCpPreview = function() {
+    document.getElementById('cp-preview').srcdoc = buildCpHtml();
+  };
+
   function initNlPreview() {
     updateNlPreview();
+    updateCpPreview();
   }
 
   async function callCommFunction(path, payload, btnId, statusId) {
@@ -1828,12 +1978,12 @@
 
   window.sendCommunique = function() {
     const subject = document.getElementById('cp-subject').value.trim();
-    const textContent = document.getElementById('cp-body').value.trim();
-    const listId = document.getElementById('cp-list-id').value;
-    if (!subject || !textContent) { toast('Sujet et contenu requis', 'error'); return; }
-    if (!listId) { toast('Choisissez une liste Brevo presse', 'error'); return; }
+    const listId  = document.getElementById('cp-list-id').value;
+    if (!subject) { toast('Remplissez le sujet', 'error'); return; }
+    if (!listId)  { toast('Choisissez une liste Brevo presse', 'error'); return; }
+    const htmlContent = buildCpHtml();
     if (!confirm(`Envoyer ce communiqué aux contacts presse Brevo ?\n\nSujet : ${subject}`)) return;
-    callCommFunction('/.netlify/functions/send-communique', { subject, textContent, listId }, 'btn-send-cp', 'cp-status');
+    callCommFunction('/.netlify/functions/send-communique', { subject, htmlContent, listId, senderEmailCdp: true }, 'btn-send-cp', 'cp-status');
   };
 
 })();
