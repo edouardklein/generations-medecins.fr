@@ -924,6 +924,36 @@
 
   <div class="toast" id="toast"></div>
 
+<!-- Galerie d'images newsletter -->
+<div id="gallery-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:white;border-radius:16px;width:860px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="padding:20px 24px;border-bottom:1.5px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div>
+        <div style="font-size:1rem;font-weight:800;color:var(--blue-dark)">Galerie d'images</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:2px">Téléversez ou réutilisez une image existante</div>
+      </div>
+      <button onclick="closeGallery()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);line-height:1">✕</button>
+    </div>
+    <div style="padding:16px 24px;border-bottom:1px solid var(--line);flex-shrink:0">
+      <label id="gallery-upload-label" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px dashed var(--line);border-radius:10px;cursor:pointer;transition:border-color .2s;background:var(--surface)"
+        onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--line)'">
+        <span style="font-size:1.4rem">⬆</span>
+        <div>
+          <div style="font-size:.85rem;font-weight:700;color:var(--ink)">Téléverser une nouvelle image</div>
+          <div style="font-size:.72rem;color:var(--muted)">JPG, PNG, WebP — max 5 Mo</div>
+        </div>
+        <input type="file" id="gallery-file-input" accept="image/*" style="display:none" onchange="uploadGalleryImage(this)">
+        <span id="gallery-upload-status" style="margin-left:auto;font-size:.78rem;color:var(--muted)"></span>
+      </label>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1">
+      <div id="gallery-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+        <div style="text-align:center;padding:40px;color:var(--muted);font-size:.85rem;grid-column:1/-1">Chargement…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
@@ -2076,40 +2106,6 @@
 
 })();
 </script>
-
-<!-- Galerie d'images newsletter -->
-<div id="gallery-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center">
-  <div style="background:white;border-radius:16px;width:860px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)">
-    <div style="padding:20px 24px;border-bottom:1.5px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <div>
-        <div style="font-size:1rem;font-weight:800;color:var(--blue-dark)">Galerie d'images</div>
-        <div style="font-size:.75rem;color:var(--muted);margin-top:2px">Téléversez ou réutilisez une image existante</div>
-      </div>
-      <button onclick="closeGallery()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);line-height:1">✕</button>
-    </div>
-
-    <!-- Zone d'upload -->
-    <div style="padding:16px 24px;border-bottom:1px solid var(--line);flex-shrink:0">
-      <label id="gallery-upload-label" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px dashed var(--line);border-radius:10px;cursor:pointer;transition:border-color .2s;background:var(--surface)"
-        onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--line)'">
-        <span style="font-size:1.4rem">⬆</span>
-        <div>
-          <div style="font-size:.85rem;font-weight:700;color:var(--ink)">Téléverser une nouvelle image</div>
-          <div style="font-size:.72rem;color:var(--muted)">JPG, PNG, WebP — max 5 Mo</div>
-        </div>
-        <input type="file" id="gallery-file-input" accept="image/*" style="display:none" onchange="uploadGalleryImage(this)">
-        <span id="gallery-upload-status" style="margin-left:auto;font-size:.78rem;color:var(--muted)"></span>
-      </label>
-    </div>
-
-    <!-- Grille des images -->
-    <div style="padding:16px 24px;overflow-y:auto;flex:1">
-      <div id="gallery-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
-        <div style="text-align:center;padding:40px;color:var(--muted);font-size:.85rem;grid-column:1/-1">Chargement…</div>
-      </div>
-    </div>
-  </div>
-</div>
 
 </body>
 </html>
