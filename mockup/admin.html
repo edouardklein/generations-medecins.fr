@@ -688,7 +688,7 @@
                 <input type="text" id="nl-subject" placeholder="ex: Résultats de notre plaidoyer — Mai 2025" oninput="updateNlPreview()">
               </div>
               <div class="form-group" style="margin-bottom:16px">
-                <label>Accroche <span style="font-weight:400;color:var(--muted)">(1–2 phrases d'intro)</span></label>
+                <label>Accroche <span style="font-weight:400;color:var(--muted)">— s'affiche en tête, en italique, avant la salutation</span></label>
                 <textarea id="nl-accroche" rows="2" placeholder="Ce mois-ci, voici ce que nous avons accompli ensemble…" oninput="updateNlPreview()" style="resize:vertical"></textarea>
               </div>
               <div class="form-group" style="margin-bottom:16px">
@@ -700,7 +700,7 @@
                   <span>Images <span style="font-weight:400;color:var(--muted)">(optionnel)</span></span>
                   <button type="button" onclick="addNlImage()"
                     style="font-family:inherit;font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:6px;border:1.5px solid var(--blue);background:rgba(42,109,184,.07);color:var(--blue);cursor:pointer">
-                    + Ajouter une image
+                    + Ajouter un bloc image
                   </button>
                 </label>
                 <div id="nl-images" style="display:flex;flex-direction:column;gap:10px;margin-top:6px"></div>
@@ -1755,6 +1755,76 @@
     loadBrevoLists();
   };
 
+  // ── Galerie d'images (Supabase Storage) ─────────────────────
+  const BUCKET = 'newsletter-images';
+  let galleryTargetIdx = null;
+
+  window.openGallery = async function(idx) {
+    galleryTargetIdx = idx;
+    document.getElementById('gallery-overlay').style.display = 'flex';
+    await refreshGalleryGrid();
+  };
+
+  window.closeGallery = function() {
+    document.getElementById('gallery-overlay').style.display = 'none';
+    galleryTargetIdx = null;
+  };
+
+  // Fermer en cliquant en dehors
+  document.getElementById('gallery-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeGallery();
+  });
+
+  async function refreshGalleryGrid() {
+    const grid = document.getElementById('gallery-grid');
+    grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:.85rem;grid-column:1/-1">Chargement…</div>';
+    const { data, error } = await sb.storage.from(BUCKET).list('', { limit: 200, sortBy: { column: 'created_at', order: 'desc' } });
+    if (error || !data || data.length === 0) {
+      grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:.85rem;grid-column:1/-1">Aucune image — téléversez-en une ci-dessus.</div>';
+      return;
+    }
+    grid.innerHTML = data.filter(f => f.name !== '.emptyFolderPlaceholder').map(f => {
+      const url = sb.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl;
+      return `<div style="border:1.5px solid var(--line);border-radius:10px;overflow:hidden;background:white;position:relative;cursor:pointer" onclick="selectGalleryImage('${url}')">
+        <div style="width:100%;aspect-ratio:4/3;overflow:hidden;background:#f0f4f9">
+          <img src="${url}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy">
+        </div>
+        <div style="padding:8px 10px;font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${f.name}">${f.name}</div>
+        <button onclick="event.stopPropagation();deleteGalleryImage('${f.name}')"
+          style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:white;border:none;border-radius:5px;padding:2px 7px;font-size:.7rem;cursor:pointer;font-family:inherit">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  window.selectGalleryImage = function(url) {
+    if (galleryTargetIdx !== null) {
+      document.getElementById(`nl-img-url-${galleryTargetIdx}`).value = url;
+      updateNlPreview();
+    }
+    closeGallery();
+  };
+
+  window.deleteGalleryImage = async function(name) {
+    if (!confirm(`Supprimer "${name}" de la galerie ?`)) return;
+    await sb.storage.from(BUCKET).remove([name]);
+    await refreshGalleryGrid();
+  };
+
+  window.uploadGalleryImage = async function(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const status = document.getElementById('gallery-upload-status');
+    status.textContent = '⏳ Envoi…';
+    const ext = file.name.split('.').pop();
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await sb.storage.from(BUCKET).upload(path, file, { contentType: file.type, upsert: false });
+    if (error) { status.textContent = '✗ ' + error.message; return; }
+    status.textContent = '✓ Image ajoutée';
+    input.value = '';
+    setTimeout(() => { status.textContent = ''; }, 2500);
+    await refreshGalleryGrid();
+  };
+
   // ── Newsletter builder ───────────────────────────────────────
   let nlImageCount = 0;
 
@@ -1763,15 +1833,33 @@
     const idx = nlImageCount;
     const div = document.createElement('div');
     div.id = `nl-img-block-${idx}`;
-    div.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;background:var(--surface);padding:10px 12px;border-radius:8px;border:1px solid var(--line)';
+    div.style.cssText = 'background:var(--surface);padding:12px 14px;border-radius:10px;border:1px solid var(--line)';
     div.innerHTML = `
-      <div><label style="font-size:.72rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">URL de l'image</label>
-        <input type="url" id="nl-img-url-${idx}" placeholder="https://…" oninput="updateNlPreview()" style="width:100%"></div>
-      <div><label style="font-size:.72rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">Légende (optionnel)</label>
-        <input type="text" id="nl-img-cap-${idx}" placeholder="Description de l'image" oninput="updateNlPreview()" style="width:100%"></div>
-      <button type="button" onclick="removeNlImage(${idx})"
-        style="padding:6px 10px;border-radius:6px;border:1px solid #f0c0c0;background:#fff5f5;color:#c0392b;font-size:.8rem;cursor:pointer;font-family:inherit;font-weight:700;white-space:nowrap">✕</button>`;
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+        <div id="nl-img-thumb-${idx}" style="width:52px;height:52px;border-radius:7px;background:#e8edf4;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.7rem">🖼</div>
+        <div style="flex:1;min-width:0">
+          <input type="url" id="nl-img-url-${idx}" placeholder="URL de l'image…" oninput="onNlImgUrl(${idx})" style="width:100%;font-size:.82rem;margin-bottom:4px">
+          <input type="text" id="nl-img-cap-${idx}" placeholder="Légende (optionnel)" oninput="updateNlPreview()" style="width:100%;font-size:.82rem">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          <button type="button" onclick="openGallery(${idx})"
+            style="padding:5px 10px;border-radius:6px;border:1.5px solid var(--blue);background:rgba(42,109,184,.07);color:var(--blue);font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">🖼 Galerie</button>
+          <button type="button" onclick="removeNlImage(${idx})"
+            style="padding:5px 10px;border-radius:6px;border:1px solid #f0c0c0;background:#fff5f5;color:#c0392b;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit">✕ Retirer</button>
+        </div>
+      </div>`;
     document.getElementById('nl-images').appendChild(div);
+    updateNlPreview();
+  };
+
+  window.onNlImgUrl = function(idx) {
+    const url = document.getElementById(`nl-img-url-${idx}`).value.trim();
+    const thumb = document.getElementById(`nl-img-thumb-${idx}`);
+    if (url) {
+      thumb.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
+    } else {
+      thumb.innerHTML = '🖼';
+    }
     updateNlPreview();
   };
 
@@ -1789,7 +1877,7 @@
       const cap = document.getElementById(`nl-img-cap-${idx}`)?.value.trim();
       if (!url) return;
       html += `<tr><td style="padding:0 0 20px">
-        <img src="${url}" alt="${cap || ''}" style="width:100%;border-radius:8px;display:block;max-height:400px;object-fit:cover">
+        <img src="${url}" alt="${cap || ''}" style="width:100%;border-radius:8px;display:block">
         ${cap ? `<p style="margin:6px 0 0;font-size:12px;color:#6b7a8d;text-align:center;font-style:italic">${cap}</p>` : ''}
       </td></tr>`;
     });
@@ -1804,12 +1892,12 @@
     const ctaUrl   = document.getElementById('nl-cta-url').value.trim();
 
     const accrocheHtml = accroche
-      ? `<tr><td style="padding:0 0 18px"><p style="margin:0;font-size:16px;color:#1a2332;line-height:1.75;font-weight:500">${accroche.replace(/\n/g,'<br>')}</p></td></tr>`
+      ? `<tr><td style="padding:0 0 22px"><p style="margin:0;font-size:17px;color:#2a3a50;line-height:1.8;font-style:italic">${accroche.replace(/\n/g,'<br>')}</p></td></tr>`
       : '';
     const imagesHtml = getNlImagesHtml();
     const corpsHtml = corps
       ? corps.split(/\n\n+/).map(p =>
-          `<tr><td style="padding:0 0 18px"><p style="margin:0;font-size:15px;color:#2a3445;line-height:1.75">${p.replace(/\n/g,'<br>')}</p></td></tr>`
+          `<tr><td style="padding:0 0 16px"><p style="margin:0;font-size:15px;color:#2a3445;line-height:1.75">${p.replace(/\n/g,'<br>')}</p></td></tr>`
         ).join('')
       : '<tr><td><p style="margin:0 0 18px;font-size:15px;color:#aab0bb;line-height:1.75;font-style:italic">Contenu à rédiger…</p></td></tr>';
     const ctaHtml = (ctaText && ctaUrl)
@@ -1832,8 +1920,8 @@
   </td></tr>
   <tr><td style="background:white;padding:36px 40px">
     <table width="100%" cellpadding="0" cellspacing="0">
-      <tr><td style="padding:0 0 20px"><p style="margin:0;font-size:15px;color:#1a2332;line-height:1.75">Bonjour,</p></td></tr>
       ${accrocheHtml}
+      <tr><td style="padding:0 0 18px"><p style="margin:0;font-size:15px;color:#1a2332;line-height:1.75">Chères adhérentes, chers adhérents,</p></td></tr>
       ${imagesHtml}
       ${corpsHtml}
       ${ctaHtml}
@@ -1952,7 +2040,7 @@
         body: JSON.stringify(payload),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Erreur serveur');
+      if (!res.ok) throw new Error(json.error + (json.detail ? ' — ' + (json.detail.message || JSON.stringify(json.detail)) : '') || 'Erreur serveur');
       status.textContent = '✓ Envoyé avec succès !';
       status.style.color = '#3d8a1a';
       toast('Envoi réussi !');
@@ -1988,5 +2076,40 @@
 
 })();
 </script>
+
+<!-- Galerie d'images newsletter -->
+<div id="gallery-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:white;border-radius:16px;width:860px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="padding:20px 24px;border-bottom:1.5px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div>
+        <div style="font-size:1rem;font-weight:800;color:var(--blue-dark)">Galerie d'images</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:2px">Téléversez ou réutilisez une image existante</div>
+      </div>
+      <button onclick="closeGallery()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);line-height:1">✕</button>
+    </div>
+
+    <!-- Zone d'upload -->
+    <div style="padding:16px 24px;border-bottom:1px solid var(--line);flex-shrink:0">
+      <label id="gallery-upload-label" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px dashed var(--line);border-radius:10px;cursor:pointer;transition:border-color .2s;background:var(--surface)"
+        onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--line)'">
+        <span style="font-size:1.4rem">⬆</span>
+        <div>
+          <div style="font-size:.85rem;font-weight:700;color:var(--ink)">Téléverser une nouvelle image</div>
+          <div style="font-size:.72rem;color:var(--muted)">JPG, PNG, WebP — max 5 Mo</div>
+        </div>
+        <input type="file" id="gallery-file-input" accept="image/*" style="display:none" onchange="uploadGalleryImage(this)">
+        <span id="gallery-upload-status" style="margin-left:auto;font-size:.78rem;color:var(--muted)"></span>
+      </label>
+    </div>
+
+    <!-- Grille des images -->
+    <div style="padding:16px 24px;overflow-y:auto;flex:1">
+      <div id="gallery-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+        <div style="text-align:center;padding:40px;color:var(--muted);font-size:.85rem;grid-column:1/-1">Chargement…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
