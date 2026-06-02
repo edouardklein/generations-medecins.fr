@@ -13,25 +13,18 @@ export default function Features(props: FeaturesProps) {
       <div className="gold-bar mt-3" />
       {props.subtitle && <p className="mt-3 text-[17px] text-navy-200 max-w-[1000px]">{props.subtitle}</p>}
 
-      {/* 3 cards side-by-side, each FULLY VISIBLE. The static tilt/lift lives
-          on an outer wrapper so Framer Motion's animate transforms don't
-          clobber it the way they did in the previous "stack" attempt. */}
+      {/* 3 cards side-by-side, aligned and pushed down so they sit between
+          the title and the bottom pills with breathing room above and below. */}
       <motion.div
         initial="hidden"
         whileInView="show"
         viewport={VIEWPORT_ONCE}
         variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } } }}
-        className="mt-7 grid grid-cols-3 gap-6"
+        className="my-auto pt-2 grid grid-cols-3 gap-6"
       >
-        {top.map((f, i) => {
-          const tilt = i === 0 ? -2.5 : i === 2 ? 2.5 : 0
-          const lift = i === 1 ? -10 : 0
+        {top.map((f) => {
           return (
-            <div
-              key={f.title}
-              style={{ transform: `translateY(${lift}px) rotate(${tilt}deg)` }}
-              className="will-change-transform"
-            >
+            <div key={f.title} className="will-change-transform">
               <motion.div
                 variants={{
                   hidden: { opacity: 0, y: 30 },

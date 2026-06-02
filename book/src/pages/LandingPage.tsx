@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import LogoGrid from '../components/LogoGrid'
 import PasswordGate from '../components/PasswordGate'
+import AdminVault from '../components/AdminVault'
 import { listPartners, unlockBook } from '../lib/api'
 import type { BookEnvelope, PublicPartner } from '../lib/types'
 
@@ -13,6 +14,7 @@ export default function LandingPage() {
   const [active, setActive] = useState<PublicPartner | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [adminOpen, setAdminOpen] = useState(false)
 
   useEffect(() => {
     let alive = true
@@ -83,8 +85,19 @@ export default function LandingPage() {
 
       <footer className="px-8 md:px-16 py-6 text-navy-300 text-xs flex items-center justify-between border-t border-white/5">
         <div>© Générations Médecins IDF — Espace partenaires</div>
-        <div className="opacity-70">Accès réservé aux partenaires invités</div>
+        <div className="flex items-center gap-3">
+          <span className="opacity-70">Accès réservé aux partenaires invités</span>
+          {/* Hidden admin trigger — discreet dot in the corner */}
+          <button
+            onClick={() => setAdminOpen(true)}
+            aria-label="Console admin"
+            title="Console admin"
+            className="w-2 h-2 rounded-full bg-navy-300/30 hover:bg-gold-500/80 transition focus:outline-none focus:ring-1 focus:ring-gold-500"
+          />
+        </div>
       </footer>
+
+      {adminOpen && <AdminVault onClose={() => setAdminOpen(false)} />}
 
       {active && (
         <PasswordGate
