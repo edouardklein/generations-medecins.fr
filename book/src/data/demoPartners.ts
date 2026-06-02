@@ -15,4 +15,5 @@ export const demoPartners: PublicPartner[] = [
   { id: '8',  slug: 'club-prive-des-medecins', name: 'Club Privé des Médecins',  logo_url: '/logos/CPM.png', display_order: 8 },
   { id: '9',  slug: 'clariane',                name: 'Clariane',                 logo_url: '/logos/CLA.png', display_order: 9 },
   { id: '10', slug: 'nebimage',                name: 'Nebimage',                 logo_url: '/logos/NEB.png', display_order: 10 },
+  { id: '11', slug: 'novo-nordisk',            name: 'Novo Nordisk',             logo_url: '/logos/NOV.png', display_order: 11 },
 ]

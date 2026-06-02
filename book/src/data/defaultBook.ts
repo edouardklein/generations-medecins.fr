@@ -14,6 +14,7 @@ const knownPartners = [
   { name: 'Club Privé des Médecins', logo: partnerLogoBySlug('CPM.png') },
   { name: 'Clariane', logo: partnerLogoBySlug('CLA.png') },
   { name: 'Nebimage', logo: partnerLogoBySlug('NEB.png') },
+  { name: 'Novo Nordisk', logo: partnerLogoBySlug('NOV.png') },
 ]
 
 export const defaultBook: Book = {

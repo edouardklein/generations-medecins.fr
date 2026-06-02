@@ -1,10 +1,6 @@
 -- ============================================================================
 -- Default book template — applies the full GM IDF book to a partner
 -- ============================================================================
--- Run once to install the function. Then:
---   select public.apply_default_book('la-medicale');
--- ============================================================================
-
 create or replace function public.apply_default_book(p_slug text)
 returns int
 language plpgsql
@@ -557,6 +553,10 @@ declare
         {
           "name": "Nebimage",
           "logo": "/logos/NEB.png"
+        },
+        {
+          "name": "Novo Nordisk",
+          "logo": "/logos/NOV.png"
         }
       ]
     }
@@ -655,19 +655,10 @@ begin
   if v_partner_id is null then
     raise exception 'No partner with slug %', p_slug;
   end if;
-
-  update public.partner_books
-     set slides = v_slides, updated_at = now()
-   where partner_id = v_partner_id;
-
-  if not found then
-    insert into public.partner_books (partner_id, slides)
-    values (v_partner_id, v_slides);
-  end if;
-
+  update public.partner_books set slides = v_slides, updated_at = now() where partner_id = v_partner_id;
+  if not found then insert into public.partner_books (partner_id, slides) values (v_partner_id, v_slides); end if;
   v_count := jsonb_array_length(v_slides);
   return v_count;
 end;
 $fn$;
-
 revoke all on function public.apply_default_book(text) from public;

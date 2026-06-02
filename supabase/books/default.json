@@ -542,6 +542,10 @@
         {
           "name": "Nebimage",
           "logo": "/logos/NEB.png"
+        },
+        {
+          "name": "Novo Nordisk",
+          "logo": "/logos/NOV.png"
         }
       ]
     }
