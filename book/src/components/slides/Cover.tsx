@@ -68,19 +68,26 @@ export default function Cover({ ctx, ...props }: CoverProps & { ctx: SlideContex
         className="col-span-5 relative flex items-center justify-center"
       >
         <div className="relative w-[460px] h-[460px]">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-accent/40 to-accent/0 blur-2xl" />
-          <div className="absolute inset-6 rounded-full ring-1 ring-white/10 bg-navy-800/40 backdrop-blur" />
+          {/* Outer gold halo glow */}
+          <div className="absolute -inset-4 rounded-full bg-gradient-to-br from-gold-500/30 via-accent/20 to-transparent blur-3xl" />
+          {/* Gold ring */}
+          <div className="absolute inset-0 rounded-full ring-2 ring-gold-500/40" />
+          {/* WHITE inner disc — readable for both light and dark partner logos */}
+          <div
+            className="absolute inset-6 rounded-full bg-white"
+            style={{ boxShadow: '0 30px 80px -20px rgba(2,8,20,0.55), inset 0 0 0 1px rgba(196,149,61,0.25)' }}
+          />
           <div className="absolute inset-0 flex items-center justify-center">
             {ctx.partnerLogoUrl ? (
               <img
                 src={ctx.partnerLogoUrl}
                 alt={ctx.partnerName ?? ''}
-                className="max-w-[60%] max-h-[60%] object-contain drop-shadow-2xl"
+                className="max-w-[58%] max-h-[58%] object-contain"
               />
             ) : (
               <div className="text-center">
-                <div className="h-display text-[56px] text-white">GM</div>
-                <div className="mt-2 text-[12px] tracking-[0.3em] text-gold-400">IDF</div>
+                <div className="h-display text-[56px] text-navy-900">GM</div>
+                <div className="mt-2 text-[12px] tracking-[0.3em] text-gold-600">IDF</div>
               </div>
             )}
           </div>
