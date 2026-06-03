@@ -13,15 +13,25 @@
  *   SUPABASE_SERVICE_ROLE_KEY
  */
 
+const GOOGLE_NEWS_BASE = 'https://news.google.com/rss/search?q={q}&hl=fr&gl=FR&ceid=FR:fr';
+const GOOGLE_NEWS_QUERIES = [
+  'convention médicale médecins',
+  'syndicat médecin négociation CNAM',
+  'déserts médicaux installation médecin',
+  'honoraires médecins secteur',
+  'médecin libéral retraite CARMF',
+  'PLFSS médecins libéraux',
+];
+
 const RSS_FEEDS = [
   { nom: 'Egora',                url: 'https://www.egora.fr/rss.xml' },
   { nom: 'Quotidien du Médecin', url: 'https://www.lequotidiendumedecin.fr/feed' },
-  { nom: 'Medscape France',      url: 'https://francais.medscape.com/rss' },
-  { nom: 'PourquoiDocteur',      url: 'https://www.pourquoidocteur.fr/rss.xml' },
-  {
-    nom: 'Google News Médecins',
-    url: 'https://news.google.com/rss/search?q=m%C3%A9decins+g%C3%A9n%C3%A9ralistes+France&hl=fr&gl=FR&ceid=FR:fr',
-  },
+  { nom: 'JIM',                  url: 'https://www.jim.fr/rss/actualites.xml' },
+  { nom: 'Medscape France',      url: 'https://francais.medscape.com/rss/actualites' },
+  ...GOOGLE_NEWS_QUERIES.map(q => ({
+    nom: 'Google News',
+    url: GOOGLE_NEWS_BASE.replace('{q}', encodeURIComponent(q)),
+  })),
 ];
 
 const TAGS_ALLOWED = [
@@ -121,8 +131,11 @@ Si l'article n'est pas pertinent, renvoie pertinent:false et laisse les autres c
 // ── Supabase helpers ─────────────────────────────────────────────────────────
 
 async function urlAlreadyExists(url) {
+  // Déduplique uniquement parmi les imports auto des 7 derniers jours
+  // (ignore les articles de l'ancienne pipeline qui ont auto_import=false)
+  const since = new Date(Date.now() - 7 * 24 * 36e5).toISOString();
   const res = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/decrypteurs?url=eq.${encodeURIComponent(url)}&select=id&limit=1`,
+    `${process.env.SUPABASE_URL}/rest/v1/decrypteurs?url=eq.${encodeURIComponent(url)}&auto_import=eq.true&created_at=gte.${since}&select=id&limit=1`,
     {
       headers: {
         apikey:        process.env.SUPABASE_SERVICE_ROLE_KEY,

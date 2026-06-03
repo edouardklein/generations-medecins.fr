@@ -2407,8 +2407,14 @@
         status.style.color = 'var(--red)';
       } else {
         const n = json.imported?.length || 0;
-        status.textContent = `✓ ${n} article${n > 1 ? 's' : ''} importé${n > 1 ? 's' : ''}${json.skipped ? ` · ${json.skipped} ignorés` : ''}${json.errors?.length ? ` · ${json.errors.length} erreur(s)` : ''}`;
-        status.style.color = 'var(--green)';
+        let msg = `✓ ${n} article${n > 1 ? 's' : ''} importé${n > 1 ? 's' : ''}`;
+        if (json.skipped) msg += ` · ${json.skipped} ignorés`;
+        if (json.errors?.length) msg += ` · ${json.errors.length} erreur(s)`;
+        status.innerHTML = msg;
+        if (json.errors?.length) {
+          status.innerHTML += '<br><small style="color:var(--red)">' + json.errors.join('<br>') + '</small>';
+        }
+        status.style.color = n > 0 ? 'var(--green)' : 'var(--muted)';
         if (n > 0) loadVeille();
       }
     } catch (e) {
