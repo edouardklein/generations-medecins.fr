@@ -372,6 +372,9 @@
       <button class="sidebar-link super-admin-only" onclick="showSection('communication')" id="nav-communication" style="display:none">
         <span class="icon">📨</span><span>Communication</span>
       </button>
+      <button class="sidebar-link super-admin-only" onclick="showSection('veille')" id="nav-veille" style="display:none">
+        <span class="icon">🔍</span><span>Veille</span>
+      </button>
 
       <div class="sidebar-section-label">Navigation</div>
       <a class="sidebar-link" href="espace-membre.html">
@@ -821,6 +824,32 @@
 
       </div>
 
+      <!-- Section: Veille automatisée (super-admin) -->
+      <div id="section-veille" class="section-panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+          <div>
+            <div class="main-title">Veille automatisée</div>
+            <div class="main-sub">Articles importés automatiquement ce matin — rejeter pour dépublier</div>
+          </div>
+          <button class="btn" onclick="triggerVeille()" id="btn-trigger-veille" style="background:var(--teal);color:#fff;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">
+            ▶ Lancer la veille maintenant
+          </button>
+        </div>
+        <div id="veille-status" style="margin-bottom:16px;font-size:14px;color:var(--muted)"></div>
+
+        <!-- Filtre date -->
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap">
+          <label style="font-size:14px;color:var(--muted)">Date :</label>
+          <input type="date" id="veille-date-filter" style="border:1.5px solid var(--line);border-radius:8px;padding:6px 10px;font-size:14px;color:var(--text)">
+          <button class="btn-outline" onclick="loadVeille()" style="padding:6px 14px;font-size:13px">Filtrer</button>
+        </div>
+
+        <div id="veille-grid" style="display:grid;gap:16px"></div>
+        <div id="veille-empty" style="display:none;text-align:center;padding:48px;color:var(--muted)">
+          Aucun article importé automatiquement pour cette date.
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -1090,6 +1119,7 @@
     document.getElementById('section-' + id).classList.add('active');
     document.getElementById('nav-' + id).classList.add('active');
     if (id === 'communication') { loadBrevoLists(); initNlPreview(); }
+    if (id === 'veille') { loadVeille(); }
   };
 
   // ── Logout ──────────────────────────────────────────────────
@@ -2258,6 +2288,137 @@
     if (!confirm(`Envoyer ce communiqué aux contacts presse Brevo ?\n\nSujet : ${subject}`)) return;
     callCommFunction('/.netlify/functions/send-communique', { subject, htmlContent, listId, senderEmailCdp: true }, 'btn-send-cp', 'cp-status',
       (json) => saveCommToDb('communique', subject, htmlContent, null, listId, json.campaignId));
+  };
+
+  // ── Veille automatisée ──────────────────────────────────────────
+
+  const VEILLE_TAGS_COLORS = {
+    'CCAM/Cotation':       '#2a6db8',
+    'Convention médicale': '#1a4a80',
+    'Accès aux soins':     '#38a8b5',
+    'Télémédecine':        '#62c040',
+    'Formation/DPC':       '#e67e22',
+    'Fiscalité/Retraite':  '#8e44ad',
+    'Installation/Libéral':'#16a085',
+    'Politique de santé':  '#c0392b',
+    'Syndicat':            '#7f8c8d',
+  };
+
+  async function loadVeille() {
+    const grid  = document.getElementById('veille-grid');
+    const empty = document.getElementById('veille-empty');
+    const dateInput = document.getElementById('veille-date-filter');
+
+    // Set today's date as default if not set
+    if (!dateInput.value) {
+      dateInput.value = new Date().toISOString().slice(0, 10);
+    }
+    const filterDate = dateInput.value;
+
+    grid.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:24px">Chargement…</div>';
+    empty.style.display = 'none';
+
+    const { data, error } = await sb
+      .from('decrypteurs')
+      .select('id, titre, source_nom, source, url, publie_le, resume, tags, veille_statut, publie')
+      .eq('auto_import', true)
+      .eq('publie_le', filterDate)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      grid.innerHTML = `<div style="color:var(--red);font-size:14px;padding:24px">Erreur : ${error.message}</div>`;
+      return;
+    }
+
+    if (!data || !data.length) {
+      grid.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+
+    grid.innerHTML = data.map(a => {
+      const tags = (a.tags || []).map(t => {
+        const color = VEILLE_TAGS_COLORS[t] || '#888';
+        return `<span style="background:${color}15;color:${color};border:1px solid ${color}40;border-radius:12px;padding:2px 8px;font-size:11px;font-weight:600">${t}</span>`;
+      }).join(' ');
+
+      const isRejected = a.veille_statut === 'rejete' || !a.publie;
+      const statusBadge = isRejected
+        ? `<span style="background:#ffeaea;color:#c0392b;border-radius:12px;padding:2px 10px;font-size:12px;font-weight:600">Rejeté</span>`
+        : `<span style="background:#eafaf1;color:#27ae60;border-radius:12px;padding:2px 10px;font-size:12px;font-weight:600">Publié</span>`;
+
+      const sourceNom = a.source_nom || a.source || '';
+
+      return `
+        <div id="veille-card-${a.id}" style="background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:20px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start${isRejected ? ';opacity:.55' : ''}">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+              ${statusBadge}
+              ${sourceNom ? `<span style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px">${sourceNom}</span>` : ''}
+              <span style="font-size:12px;color:var(--muted)">${a.publie_le || ''}</span>
+            </div>
+            <div style="font-weight:700;font-size:15px;margin-bottom:8px;line-height:1.4">${a.titre || ''}</div>
+            ${a.resume ? `<div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:10px">${a.resume}</div>` : ''}
+            <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+              ${tags}
+              ${a.url ? `<a href="${a.url}" target="_blank" rel="noopener" style="font-size:12px;color:var(--blue);text-decoration:none;margin-left:4px">↗ Source</a>` : ''}
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+            ${isRejected
+              ? `<button onclick="veilleRestore('${a.id}')" style="border:1.5px solid var(--green);color:var(--green);background:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap">✓ Republier</button>`
+              : `<button onclick="veilleReject('${a.id}')" style="border:1.5px solid #e74c3c;color:#e74c3c;background:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap">✕ Rejeter</button>`
+            }
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  window.veilleReject = async function(id) {
+    const { error } = await sb.from('decrypteurs').update({ publie: false, veille_statut: 'rejete' }).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Article rejeté');
+    const card = document.getElementById('veille-card-' + id);
+    if (card) card.style.opacity = '.4';
+    loadVeille();
+  };
+
+  window.veilleRestore = async function(id) {
+    const { error } = await sb.from('decrypteurs').update({ publie: true, veille_statut: 'publie' }).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Article republié');
+    loadVeille();
+  };
+
+  window.triggerVeille = async function() {
+    const btn    = document.getElementById('btn-trigger-veille');
+    const status = document.getElementById('veille-status');
+    btn.disabled = true;
+    btn.textContent = '⏳ Veille en cours…';
+    status.textContent = '';
+    try {
+      const token = session?.access_token;
+      const res = await fetch('/.netlify/functions/veille-matinale', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        status.textContent = 'Erreur : ' + (json.error || res.status);
+        status.style.color = 'var(--red)';
+      } else {
+        const n = json.imported?.length || 0;
+        status.textContent = `✓ ${n} article${n > 1 ? 's' : ''} importé${n > 1 ? 's' : ''}${json.skipped ? ` · ${json.skipped} ignorés` : ''}${json.errors?.length ? ` · ${json.errors.length} erreur(s)` : ''}`;
+        status.style.color = 'var(--green)';
+        if (n > 0) loadVeille();
+      }
+    } catch (e) {
+      status.textContent = 'Erreur réseau : ' + e.message;
+      status.style.color = 'var(--red)';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '▶ Lancer la veille maintenant';
+    }
   };
 
 })();

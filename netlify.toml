@@ -5,6 +5,9 @@
 [functions]
   node_bundler = "esbuild"
 
+[functions."veille-matinale"]
+  schedule = "0 5 * * *"
+
 [[headers]]
   for = "/*"
   [headers.values]
