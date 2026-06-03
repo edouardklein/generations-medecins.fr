@@ -358,9 +358,7 @@
       </button>
 
       <div class="sidebar-section-label">Contenu</div>
-      <button class="sidebar-link" onclick="showSection('articles-valider')" id="nav-articles-valider">
-        <span class="icon">🔍</span><span>À valider</span>
-      </button>
+
       <button class="sidebar-link" onclick="showSection('decrypteurs-admin')" id="nav-decrypteurs-admin">
         <span class="icon">📰</span><span>Décrypteurs</span>
       </button>
@@ -2397,7 +2395,8 @@
     btn.textContent = '⏳ Veille en cours…';
     status.textContent = '';
     try {
-      const token = session?.access_token;
+      const { data: { session: s } } = await sb.auth.getSession();
+      const token = s?.access_token;
       const res = await fetch('/.netlify/functions/veille-matinale', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
