@@ -4,7 +4,7 @@
  * schedule = "0 5 * * *"  (dans netlify.toml)
  *
  * Env vars requis :
- *   ANTHROPIC_API_KEY
+ *   OPENAI_API_KEY
  *   BREVO_API_KEY
  *   ADMIN_EMAIL          ex: alexis.bourla@gmail.com
  *   SENDER_EMAIL         ex: contact@generations-medecins.fr
@@ -93,15 +93,14 @@ Réponds en JSON strict avec ces champs :
 
 Si l'article n'est pas pertinent, renvoie pertinent:false et laisse les autres champs vides.`;
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'x-api-key':         process.env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-      'content-type':      'application/json',
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      'Content-Type':  'application/json',
     },
     body: JSON.stringify({
-      model:      'claude-haiku-4-5-20251001',
+      model:      'gpt-4o-mini',
       max_tokens: 300,
       messages:   [{ role: 'user', content: prompt }],
     }),
@@ -109,7 +108,7 @@ Si l'article n'est pas pertinent, renvoie pertinent:false et laisse les autres c
 
   if (!res.ok) return null;
   const data = await res.json();
-  const text = data.content?.[0]?.text || '';
+  const text = data.choices?.[0]?.message?.content || '';
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) return null;
   try {
