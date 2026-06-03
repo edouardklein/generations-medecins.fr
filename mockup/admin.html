@@ -154,6 +154,13 @@
     .btn-supprimer { background: rgba(220,38,38,0.07); color: #b91c1c; border-color: rgba(220,38,38,0.2); }
     .btn-supprimer:hover { background: rgba(220,38,38,0.15); }
 
+    /* Icon-only action buttons */
+    .btn-icon {
+      width: 32px; height: 32px; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+
     /* Empty / loading */
     .table-empty { padding: 48px; text-align: center; color: var(--muted); font-size: 0.85rem; }
     .table-loading { padding: 48px; text-align: center; color: var(--muted); font-size: 0.85rem; }
@@ -222,15 +229,106 @@
     }
     .card-form h3 { font-size: 0.95rem; font-weight: 800; color: var(--blue-dark); margin-bottom: 16px; }
 
+    /* Articles à valider — counter badge */
+    .pending-counter {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(220,38,38,0.08); border: 1.5px solid rgba(220,38,38,0.2);
+      border-radius: 10px; padding: 10px 16px; font-size: 0.85rem; font-weight: 700;
+      color: #b91c1c;
+    }
+    .pending-counter .count-num {
+      font-size: 1.4rem; font-weight: 900; line-height: 1;
+    }
+    .pending-counter.zero {
+      background: rgba(98,192,64,0.08); border-color: rgba(98,192,64,0.2); color: #2d7a1a;
+    }
+
+    /* RPPS monospace copiable */
+    .rpps-copy {
+      font-family: monospace; font-size: 0.82rem; color: var(--ink);
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 5px; padding: 2px 7px; cursor: pointer;
+      user-select: all; white-space: nowrap;
+    }
+    .rpps-copy:hover { background: #e8edf4; }
+
+    /* Badge interne */
+    .badge-interne {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 0.7rem; font-weight: 700;
+      background: rgba(107,122,141,0.12); color: var(--muted);
+    }
+
+    /* Btn publier (vert plein) */
+    .btn-publier {
+      background: rgba(98,192,64,0.15); color: #2d7a1a; border-color: rgba(98,192,64,0.4);
+    }
+    .btn-publier:hover { background: rgba(98,192,64,0.28); }
+
+    /* Btn voir (bleu neutre) */
+    .btn-voir {
+      background: rgba(42,109,184,0.08); color: var(--blue); border-color: rgba(42,109,184,0.25);
+      text-decoration: none; padding: 5px 12px; border-radius: 7px;
+      font-family: inherit; font-size: 0.75rem; font-weight: 700;
+      display: inline-block; white-space: nowrap; border: 1.5px solid;
+    }
+    .btn-voir:hover { background: rgba(42,109,184,0.16); }
+
+    /* Btn RPPS OK */
+    .btn-rpps-ok {
+      background: rgba(98,192,64,0.12); color: #2d7a1a; border-color: rgba(98,192,64,0.3);
+    }
+    .btn-rpps-ok:hover { background: rgba(98,192,64,0.22); }
+
+    /* Btn lien externe */
+    .btn-ext {
+      background: rgba(56,168,181,0.08); color: #1a7a86; border-color: rgba(56,168,181,0.3);
+      text-decoration: none; padding: 5px 12px; border-radius: 7px;
+      font-family: inherit; font-size: 0.75rem; font-weight: 700;
+      display: inline-block; white-space: nowrap; border: 1.5px solid;
+    }
+    .btn-ext:hover { background: rgba(56,168,181,0.18); }
+
+    /* Résumé tronqué */
+    .resume-cell { max-width: 220px; font-size: 0.78rem; color: var(--muted); }
+
+    /* CSV export button */
+    .btn-csv {
+      padding: 8px 14px; background: rgba(42,109,184,0.08); color: var(--blue);
+      border: 1.5px solid rgba(42,109,184,0.25); border-radius: 9px;
+      font-family: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+    }
+    .btn-csv:hover { background: rgba(42,109,184,0.16); }
+
     @media (max-width: 900px) {
       .stats-row { grid-template-columns: 1fr 1fr; }
       .sidebar { width: 60px; }
       .sidebar-link span, .sidebar-section-label { display: none; }
       .sidebar-link { justify-content: center; padding: 12px; }
     }
+    /* Modal membre édition */
+    #membre-edit-overlay { position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;display:none;align-items:center;justify-content:center; }
+    #membre-edit-overlay.open { display:flex; }
+    #membre-edit-modal { background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.2);padding:28px 32px;width:min(640px,95vw);max-height:90vh;overflow-y:auto; }
+    #membre-edit-modal h3 { margin:0 0 20px;font-size:1rem;font-weight:800;color:var(--blue-dark); }
+    /* Inline select catégorie */
+    .cat-select { font-size:.78rem;font-weight:700;border:1.5px solid var(--line);border-radius:6px;padding:3px 6px;font-family:inherit;background:#fff;cursor:pointer; }
+    /* Email readonly display */
+    .email-display {
+      padding: 9px 12px; border: 1.5px solid var(--line); border-radius: 9px;
+      font-family: inherit; font-size: 0.85rem; color: var(--muted);
+      background: var(--surface); word-break: break-all;
+    }
+    /* Region display */
+    .region-display {
+      padding: 9px 12px; border: 1.5px solid var(--line); border-radius: 9px;
+      font-family: inherit; font-size: 0.85rem; color: var(--muted);
+      background: var(--surface);
+    }
   </style>
 </head>
-<body>
+<body style="visibility:hidden">
 
   <div class="topbar">
     <div class="topbar-left">
@@ -255,13 +353,24 @@
       <button class="sidebar-link" onclick="showSection('en-attente')" id="nav-en-attente">
         <span class="icon">⏳</span><span>En attente</span>
       </button>
+      <button class="sidebar-link" onclick="showSection('rpps')" id="nav-rpps">
+        <span class="icon">🪪</span><span>RPPS</span>
+      </button>
 
       <div class="sidebar-section-label">Contenu</div>
+      <button class="sidebar-link" onclick="showSection('articles-valider')" id="nav-articles-valider">
+        <span class="icon">🔍</span><span>À valider</span>
+      </button>
       <button class="sidebar-link" onclick="showSection('decrypteurs-admin')" id="nav-decrypteurs-admin">
         <span class="icon">📰</span><span>Décrypteurs</span>
       </button>
       <button class="sidebar-link" onclick="showSection('plaidoyer-admin')" id="nav-plaidoyer-admin">
         <span class="icon">⚖️</span><span>Plaidoyer</span>
+      </button>
+
+      <div class="sidebar-section-label super-admin-only" style="display:none">Communication</div>
+      <button class="sidebar-link super-admin-only" onclick="showSection('communication')" id="nav-communication" style="display:none">
+        <span class="icon">📨</span><span>Communication</span>
       </button>
 
       <div class="sidebar-section-label">Navigation</div>
@@ -277,9 +386,12 @@
 
       <!-- Section: Tous les membres -->
       <div id="section-membres" class="section-panel active">
-        <div class="main-header">
-          <div class="main-title">Adhérents</div>
-          <div class="main-sub">Liste complète des membres inscrits</div>
+        <div class="main-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="main-title">Adhérents</div>
+            <div class="main-sub">Liste complète des membres inscrits</div>
+          </div>
+          <button id="btn-csv-export" class="btn-csv" style="display:none" onclick="exportCSV()">⬇ CSV</button>
         </div>
 
         <div class="stats-row" id="stats-row">
@@ -303,7 +415,7 @@
         </div>
 
         <div class="filters">
-          <input type="search" class="filter-input" id="search-input" placeholder="Rechercher par nom, email, RPPS…">
+          <input type="search" class="filter-input" id="search-input" placeholder="Rechercher par nom, email…">
           <select class="filter-select" id="filter-statut">
             <option value="">Tous les statuts</option>
             <option value="actif">Actif</option>
@@ -321,7 +433,9 @@
             <thead>
               <tr>
                 <th>Membre</th>
-                <th>RPPS</th>
+                <th>Téléphone</th>
+                <th>CP</th>
+                <th>Région</th>
                 <th>Spécialité</th>
                 <th>Mode exercice</th>
                 <th>Secteur</th>
@@ -331,7 +445,7 @@
               </tr>
             </thead>
             <tbody id="membres-tbody">
-              <tr><td colspan="8" class="table-loading">Chargement…</td></tr>
+              <tr><td colspan="10" class="table-loading">Chargement…</td></tr>
             </tbody>
           </table>
         </div>
@@ -361,14 +475,82 @@
         </div>
       </div>
 
+      <!-- Section: Articles à valider -->
+      <div id="section-articles-valider" class="section-panel">
+        <div class="main-header">
+          <div class="main-title">Articles à valider</div>
+          <div class="main-sub">Donnez le go avant publication</div>
+        </div>
+
+        <div id="articles-valider-counter" style="margin-bottom:16px"></div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Source</th>
+                <th>Catégorie</th>
+                <th>Tags</th>
+                <th>Résumé</th>
+                <th>Date pipeline</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="articles-valider-tbody">
+              <tr><td colspan="7" class="table-loading">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section: Validation RPPS -->
+      <div id="section-rpps" class="section-panel">
+        <div class="main-header">
+          <div class="main-title">Validation RPPS</div>
+          <div class="main-sub">Vérifiez les numéros RPPS des membres</div>
+        </div>
+
+        <div class="filters" style="margin-bottom:16px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;font-weight:600;cursor:pointer">
+            <input type="checkbox" id="rpps-show-verified" onchange="renderRppsTable()" style="width:16px;height:16px;cursor:pointer">
+            Afficher aussi les déjà vérifiés
+          </label>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>RPPS</th>
+                <th>Spécialité</th>
+                <th>Statut membre</th>
+                <th>RPPS vérifié</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rpps-tbody">
+              <tr><td colspan="7" class="table-loading">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- Section: Décrypteurs admin -->
       <div id="section-decrypteurs-admin" class="section-panel">
         <div class="main-header" style="display:flex;align-items:center;justify-content:space-between">
           <div>
-            <div class="main-title">Décrypteurs</div>
-            <div class="main-sub">Gérer les articles publiés</div>
+            <div class="main-title">Gérer les articles</div>
+            <div class="main-sub">Créer et gérer les articles manuels</div>
           </div>
-          <button class="btn-primary-sm" onclick="toggleNewDecrypteur()">+ Nouvel article</button>
+          <button id="btn-toggle-new-article" class="btn-primary-sm" onclick="toggleNewDecrypteur()">+ Nouvel article</button>
+        </div>
+
+        <div class="banner-info" style="background:rgba(42,109,184,0.07);border:1.5px solid rgba(42,109,184,0.2);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:0.83rem;color:var(--blue-dark);display:flex;align-items:center;gap:10px">
+          <span style="font-size:1.1rem">ℹ️</span>
+          <span>Les articles du pipeline arrivent dans <strong>«&nbsp;À valider&nbsp;»</strong>. Ce formulaire permet d'écrire un article manuellement.</span>
         </div>
 
         <div id="new-decrypteur-form" style="display:none" class="card-form">
@@ -397,13 +579,12 @@
               </select>
             </div>
           </div>
-          <div style="margin-top:16px;display:flex;gap:10px">
-            <button class="btn-primary-sm" onclick="saveDecrypteur()">Publier l'article</button>
-            <button class="btn-cancel" onclick="toggleNewDecrypteur()">Annuler</button>
+          <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
+            <button class="btn-primary-sm" onclick="saveDecrypteur()">Soumettre pour validation</button>
           </div>
         </div>
 
-        <div class="table-wrap">
+        <div id="decrypteurs-table-wrap" class="table-wrap">
           <table>
             <thead>
               <tr>
@@ -471,7 +652,306 @@
         </div>
       </div>
 
+      <!-- Section: Communication (super-admin) -->
+      <div id="section-communication" class="section-panel">
+        <div class="main-header">
+          <div class="main-title">Communication</div>
+          <div class="main-sub">Envoi de newsletters et communiqués de presse</div>
+        </div>
+
+        <!-- Sub-tabs -->
+        <div style="display:flex;gap:0;margin-bottom:28px;border-bottom:2px solid var(--line);padding-bottom:0">
+          <button id="ctab-newsletter" onclick="showCommTab('newsletter')"
+            style="padding:10px 20px;font-family:inherit;font-size:.85rem;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:3px solid var(--blue);color:var(--blue);margin-bottom:-2px">
+            📧 Newsletter
+          </button>
+          <button id="ctab-communique" onclick="showCommTab('communique')"
+            style="padding:10px 20px;font-family:inherit;font-size:.85rem;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted);margin-bottom:-2px">
+            📣 Communiqué de presse
+          </button>
+          <button id="ctab-historique" onclick="showCommTab('historique')"
+            style="padding:10px 20px;font-family:inherit;font-size:.85rem;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted);margin-bottom:-2px">
+            📋 Historique
+          </button>
+        </div>
+
+        <!-- Newsletter panel -->
+        <div id="cpanel-newsletter">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+
+            <!-- Colonne gauche : champs -->
+            <div class="card-form" style="margin:0">
+              <div class="form-group" style="margin-bottom:16px">
+                <label>Liste Brevo adhérents</label>
+                <select id="nl-list-id" style="max-width:100%">
+                  <option value="">Chargement…</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label>Sujet de l'email</label>
+                <input type="text" id="nl-subject" placeholder="ex: Résultats de notre plaidoyer — Mai 2025" oninput="updateNlPreview()">
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label>Accroche <span style="font-weight:400;color:var(--muted)">— en tête, italique, avant la salutation</span></label>
+                <textarea id="nl-accroche" rows="2" placeholder="Ce mois-ci, voici ce que nous avons accompli ensemble…" oninput="updateNlPreview()" style="resize:vertical"></textarea>
+              </div>
+
+              <!-- Blocs de contenu -->
+              <div class="form-group" style="margin-bottom:16px">
+                <label style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                  <span>Contenu <span style="font-weight:400;color:var(--muted)">— alternez texte et images</span></span>
+                  <span style="display:flex;gap:6px">
+                    <button type="button" onclick="addBlock('text')"
+                      style="font-family:inherit;font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:6px;border:1.5px solid var(--blue);background:rgba(42,109,184,.07);color:var(--blue);cursor:pointer">
+                      + Texte
+                    </button>
+                    <button type="button" onclick="addBlock('image')"
+                      style="font-family:inherit;font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:6px;border:1.5px solid var(--teal);background:rgba(56,168,181,.07);color:var(--teal);cursor:pointer">
+                      + Image
+                    </button>
+                  </span>
+                </label>
+                <div id="nl-blocks" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+                  <div style="text-align:center;padding:24px;color:var(--muted);font-size:.82rem;border:2px dashed var(--line);border-radius:10px">
+                    Ajoutez des blocs texte ou image ci-dessus
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+                <div class="form-group" style="margin:0">
+                  <label>Bouton CTA — texte <span style="font-weight:400;color:var(--muted)">(optionnel)</span></label>
+                  <input type="text" id="nl-cta-text" placeholder="Lire la suite →" oninput="updateNlPreview()">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label>Lien du bouton</label>
+                  <input type="url" id="nl-cta-url" placeholder="https://…" oninput="updateNlPreview()">
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <button class="btn-primary-sm" id="btn-send-nl" onclick="sendNewsletter()" style="background:var(--blue-dark)">📧 Envoyer la newsletter</button>
+                <span id="nl-status" style="font-size:.8rem;color:var(--muted)"></span>
+              </div>
+            </div>
+
+            <!-- Colonne droite : aperçu live -->
+            <div style="position:sticky;top:80px">
+              <div style="font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Aperçu en direct</div>
+              <div style="border:1.5px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+                <iframe id="nl-preview" style="width:100%;height:560px;border:none"></iframe>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Communiqué panel -->
+        <div id="cpanel-communique" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+
+            <!-- Colonne gauche : champs -->
+            <div class="card-form" style="margin:0">
+              <div class="form-group" style="margin-bottom:16px">
+                <label>Liste Brevo presse</label>
+                <select id="cp-list-id" style="max-width:100%">
+                  <option value="">Chargement…</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label>Sujet de l'email</label>
+                <input type="text" id="cp-subject" placeholder="ex: Communiqué de presse — Générations Médecins réagit à…" oninput="updateCpPreview()">
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label>Titre du communiqué</label>
+                <input type="text" id="cp-titre" placeholder="ex: Générations Médecins appelle à une réforme urgente du numerus clausus" oninput="updateCpPreview()">
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label>Corps</label>
+                <textarea id="cp-corps" rows="9" placeholder="Rédigez ici le contenu du communiqué…" oninput="updateCpPreview()" style="resize:vertical"></textarea>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+                <div class="form-group" style="margin:0">
+                  <label>Contact presse — nom</label>
+                  <input type="text" id="cp-contact-nom" placeholder="Dr Alexis Bourla" oninput="updateCpPreview()">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label>Téléphone</label>
+                  <input type="tel" id="cp-contact-tel" placeholder="+33 6 …" oninput="updateCpPreview()">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:20px">
+                <label>Email contact presse</label>
+                <input type="email" id="cp-contact-email" placeholder="cdp@generations-medecins.fr" oninput="updateCpPreview()">
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <button class="btn-primary-sm" id="btn-send-cp" onclick="sendCommunique()" style="background:#1a5c3e">📣 Envoyer aux médias</button>
+                <span id="cp-status" style="font-size:.8rem;color:var(--muted)"></span>
+              </div>
+            </div>
+
+            <!-- Aperçu live -->
+            <div style="position:sticky;top:80px">
+              <div style="font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Aperçu en direct</div>
+              <div style="border:1.5px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+                <iframe id="cp-preview" style="width:100%;height:600px;border:none"></iframe>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Historique panel -->
+        <div id="cpanel-historique" style="display:none">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Sujet</th>
+                  <th>Envoyé le</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="historique-tbody">
+                <tr><td colspan="4" style="text-align:center;color:var(--muted);padding:32px">Chargement…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
     </main>
+  </div>
+
+  <!-- Modale aperçu historique -->
+  <div class="modal-overlay" id="hist-preview-overlay" onclick="closeHistPreview(event)">
+    <div class="modal" style="min-width:680px;max-width:780px;max-height:85vh;display:flex;flex-direction:column" onclick="event.stopPropagation()">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-shrink:0">
+        <h3 id="hist-preview-title" style="margin:0">Aperçu</h3>
+        <button onclick="closeHistPreview()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted)">✕</button>
+      </div>
+      <iframe id="hist-preview-iframe" style="flex:1;border:1.5px solid var(--line);border-radius:10px;min-height:500px"></iframe>
+    </div>
+  </div>
+
+  <!-- Plaidoyer dossier modal -->
+  <div class="modal-overlay" id="dossier-modal-overlay" onclick="closeDossierModal(event)">
+    <div class="modal" style="min-width:520px;max-width:640px" onclick="event.stopPropagation()">
+      <h3 style="margin-bottom:16px">Dossier plaidoyer</h3>
+
+      <div style="margin-bottom:18px">
+        <label style="font-size:.8rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">TITRE</label>
+        <div style="display:flex;gap:8px">
+          <input id="dossier-titre-input" type="text" style="flex:1;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:.9rem;font-family:inherit" placeholder="Titre du dossier">
+          <button class="btn-primary-sm" onclick="saveDossierTitre()">Sauvegarder</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom:18px">
+        <label style="font-size:.8rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">AVANCEMENT GLOBAL (%)</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="dossier-avancement-input" type="number" min="0" max="100" style="width:90px;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:.9rem;font-family:inherit" placeholder="0">
+          <button class="btn-primary-sm" onclick="saveDossierAvancement()">Sauvegarder</button>
+          <span style="font-size:.78rem;color:var(--muted)">(indépendant des étapes)</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <label style="font-size:.8rem;font-weight:700;color:var(--muted);display:block;margin-bottom:8px">ÉTAPES</label>
+        <div id="etapes-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px"></div>
+        <div style="display:grid;grid-template-columns:1fr 80px auto;gap:8px;align-items:end">
+          <div>
+            <label style="font-size:.75rem;color:var(--muted)">Description de l'étape</label>
+            <input id="etape-texte" type="text" style="width:100%;padding:7px 10px;border:1.5px solid var(--line);border-radius:7px;font-size:.85rem;font-family:inherit;box-sizing:border-box" placeholder="Ex : Réunion URPS obtenue">
+          </div>
+          <div>
+            <label style="font-size:.75rem;color:var(--muted)">% jalón</label>
+            <input id="etape-pct" type="number" min="0" max="100" style="width:100%;padding:7px 10px;border:1.5px solid var(--line);border-radius:7px;font-size:.85rem;font-family:inherit;box-sizing:border-box" placeholder="60">
+          </div>
+          <button class="btn-primary-sm" onclick="addEtape()" style="margin-bottom:1px">+ Ajouter</button>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:20px">
+        <button class="btn-cancel" onclick="closeDossierModal()">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Membre edit modal -->
+  <div id="membre-edit-overlay" onclick="if(event.target===this)closeMemberModal()">
+    <div id="membre-edit-modal">
+      <h3 id="membre-edit-title">Modifier le profil</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>Prénom</label><input id="me-prenom" type="text"></div>
+        <div class="form-group"><label>Nom</label><input id="me-nom" type="text"></div>
+        <div class="form-group full">
+          <label>Email</label>
+          <div class="email-display" id="me-email-display">—</div>
+        </div>
+        <div class="form-group"><label>Téléphone</label><input id="me-telephone" type="tel"></div>
+        <div class="form-group">
+          <label>Code postal</label>
+          <input id="me-cp" type="text" maxlength="5" oninput="updateRegionDisplay()">
+        </div>
+        <div class="form-group">
+          <label>Région (calculée)</label>
+          <div class="region-display" id="me-region-display">—</div>
+        </div>
+        <div class="form-group"><label>RPPS</label><input id="me-rpps" type="text" maxlength="11"></div>
+        <div class="form-group"><label>Spécialité</label><input id="me-specialite" type="text"></div>
+        <div class="form-group"><label>Secteur</label>
+          <select id="me-secteur">
+            <option value="">—</option>
+            <option value="S1">Secteur 1</option>
+            <option value="S2">Secteur 2</option>
+            <option value="S3">Secteur 3 / OPTAM</option>
+            <option value="non_conventionné">Non conventionné</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Mode d'exercice</label>
+          <select id="me-mode">
+            <option value="">—</option>
+            <option value="liberal_seul">Libéral seul</option>
+            <option value="liberal_groupe">Libéral en groupe</option>
+            <option value="salarie">Salarié</option>
+            <option value="mixte">Mixte</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input id="me-est-interne" type="checkbox" style="width:16px;height:16px">
+            Est interne
+          </label>
+        </div>
+        <div class="form-group" id="me-statut-group">
+          <label>Statut</label>
+          <select id="me-statut">
+            <option value="en_attente">En attente</option>
+            <option value="actif">Actif</option>
+            <option value="suspendu">Suspendu</option>
+          </select>
+        </div>
+        <div class="form-group full" id="me-subadmin-group" style="display:none">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input id="me-subadmin" type="checkbox" style="width:16px;height:16px">
+            Sous-administrateur (accès panneau admin)
+          </label>
+        </div>
+        <div class="form-group full" id="me-superadmin-badge" style="display:none">
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(42,109,184,0.08);border:1.5px solid rgba(42,109,184,0.25);border-radius:9px;font-size:.83rem;font-weight:700;color:var(--blue-dark)">
+            ⭐ Super Administrateur — vous êtes le seul à pouvoir supprimer des comptes et exporter la base adhérent.
+          </div>
+        </div>
+      </div>
+      <input type="hidden" id="me-id">
+      <input type="hidden" id="me-user-id">
+      <div class="modal-actions" style="margin-top:20px">
+        <button class="btn-cancel" onclick="closeMemberModal()">Annuler</button>
+        <button class="btn-primary-sm" onclick="saveMember()">Enregistrer</button>
+      </div>
+    </div>
   </div>
 
   <!-- Delete confirm modal -->
@@ -488,6 +968,36 @@
 
   <div class="toast" id="toast"></div>
 
+<!-- Galerie d'images newsletter -->
+<div id="gallery-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:white;border-radius:16px;width:860px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="padding:20px 24px;border-bottom:1.5px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div>
+        <div style="font-size:1rem;font-weight:800;color:var(--blue-dark)">Galerie d'images</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:2px">Téléversez ou réutilisez une image existante</div>
+      </div>
+      <button onclick="closeGallery()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);line-height:1">✕</button>
+    </div>
+    <div style="padding:16px 24px;border-bottom:1px solid var(--line);flex-shrink:0">
+      <label id="gallery-upload-label" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px dashed var(--line);border-radius:10px;cursor:pointer;transition:border-color .2s;background:var(--surface)"
+        onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--line)'">
+        <span style="font-size:1.4rem">⬆</span>
+        <div>
+          <div style="font-size:.85rem;font-weight:700;color:var(--ink)">Téléverser une nouvelle image</div>
+          <div style="font-size:.72rem;color:var(--muted)">JPG, PNG, WebP — max 5 Mo</div>
+        </div>
+        <input type="file" id="gallery-file-input" accept="image/*" style="display:none" onchange="uploadGalleryImage(this)">
+        <span id="gallery-upload-status" style="margin-left:auto;font-size:.78rem;color:var(--muted)"></span>
+      </label>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1">
+      <div id="gallery-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+        <div style="text-align:center;padding:40px;color:var(--muted);font-size:.85rem;grid-column:1/-1">Chargement…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
@@ -496,19 +1006,73 @@
 
   let allMembres = [];
   let deleteTargetId = null;
+  let isSuperAdmin = false;
+  let currentUserId = null;
+  let adminSet = new Set(); // set of user_ids that are admins
+
+  // Member map keyed by id for safe modal opening
+  const memberMap = {};
+
+  // ── Dept → Région map ────────────────────────────────────────
+  const DEPT_REGION = {
+    '01':'Auvergne-Rhône-Alpes','02':'Hauts-de-France','03':'Auvergne-Rhône-Alpes',
+    '04':'Provence-Alpes-Côte d\'Azur','05':'Provence-Alpes-Côte d\'Azur','06':'Provence-Alpes-Côte d\'Azur',
+    '07':'Auvergne-Rhône-Alpes','08':'Grand Est','09':'Occitanie','10':'Grand Est',
+    '11':'Occitanie','12':'Occitanie','13':'Provence-Alpes-Côte d\'Azur','14':'Normandie',
+    '15':'Auvergne-Rhône-Alpes','16':'Nouvelle-Aquitaine','17':'Nouvelle-Aquitaine','18':'Centre-Val de Loire',
+    '19':'Nouvelle-Aquitaine','21':'Bourgogne-Franche-Comté','22':'Bretagne','23':'Nouvelle-Aquitaine',
+    '24':'Nouvelle-Aquitaine','25':'Bourgogne-Franche-Comté','26':'Auvergne-Rhône-Alpes','27':'Normandie',
+    '28':'Centre-Val de Loire','29':'Bretagne','2A':'Corse','2B':'Corse',
+    '30':'Occitanie','31':'Occitanie','32':'Occitanie','33':'Nouvelle-Aquitaine','34':'Occitanie',
+    '35':'Bretagne','36':'Centre-Val de Loire','37':'Centre-Val de Loire','38':'Auvergne-Rhône-Alpes',
+    '39':'Bourgogne-Franche-Comté','40':'Nouvelle-Aquitaine','41':'Centre-Val de Loire',
+    '42':'Auvergne-Rhône-Alpes','43':'Auvergne-Rhône-Alpes','44':'Pays de la Loire','45':'Centre-Val de Loire',
+    '46':'Occitanie','47':'Nouvelle-Aquitaine','48':'Occitanie','49':'Pays de la Loire','50':'Normandie',
+    '51':'Grand Est','52':'Grand Est','53':'Pays de la Loire','54':'Grand Est','55':'Grand Est',
+    '56':'Bretagne','57':'Grand Est','58':'Bourgogne-Franche-Comté','59':'Hauts-de-France',
+    '60':'Hauts-de-France','61':'Normandie','62':'Hauts-de-France','63':'Auvergne-Rhône-Alpes',
+    '64':'Nouvelle-Aquitaine','65':'Occitanie','66':'Occitanie','67':'Grand Est','68':'Grand Est',
+    '69':'Auvergne-Rhône-Alpes','70':'Bourgogne-Franche-Comté','71':'Bourgogne-Franche-Comté',
+    '72':'Pays de la Loire','73':'Auvergne-Rhône-Alpes','74':'Auvergne-Rhône-Alpes',
+    '75':'Île-de-France','76':'Normandie','77':'Île-de-France','78':'Île-de-France',
+    '79':'Nouvelle-Aquitaine','80':'Hauts-de-France','81':'Occitanie','82':'Occitanie',
+    '83':'Provence-Alpes-Côte d\'Azur','84':'Provence-Alpes-Côte d\'Azur','85':'Pays de la Loire',
+    '86':'Nouvelle-Aquitaine','87':'Nouvelle-Aquitaine','88':'Grand Est','89':'Bourgogne-Franche-Comté',
+    '90':'Bourgogne-Franche-Comté','91':'Île-de-France','92':'Île-de-France','93':'Île-de-France',
+    '94':'Île-de-France','95':'Île-de-France',
+    '971':'Guadeloupe','972':'Martinique','973':'Guyane','974':'La Réunion','976':'Mayotte'
+  };
+
+  function cpToRegion(cp) {
+    if (!cp) return '—';
+    const dept = cp.startsWith('97') ? cp.slice(0,3) : cp.slice(0,2);
+    return DEPT_REGION[dept] || '—';
+  }
 
   // ── Auth guard ──────────────────────────────────────────────
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'connexion.html'; return; }
 
-    const { data: adminRow } = await sb.from('admins').select('id').eq('user_id', session.user.id).single();
+    const { data: adminRow } = await sb.from('admins').select('user_id, role').eq('user_id', session.user.id).single();
     if (!adminRow) { window.location.href = 'espace-membre.html'; return; }
 
+    isSuperAdmin = adminRow?.role === 'super_admin';
+    currentUserId = session.user.id;
+
+    // Show/hide super-admin only UI
+    if (isSuperAdmin) {
+      document.getElementById('btn-csv-export').style.display = 'inline-flex';
+      document.querySelectorAll('.super-admin-only').forEach(el => el.style.display = '');
+    }
+
+    document.body.style.visibility = 'visible';
     document.getElementById('admin-email').textContent = session.user.email;
     loadMembres();
     loadDecrypteurs();
     loadPlaidoyer();
+    loadArticlesAValider();
+    loadRpps();
   }
 
   // ── Toast ───────────────────────────────────────────────────
@@ -525,6 +1089,7 @@
     document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
     document.getElementById('section-' + id).classList.add('active');
     document.getElementById('nav-' + id).classList.add('active');
+    if (id === 'communication') { loadBrevoLists(); initNlPreview(); }
   };
 
   // ── Logout ──────────────────────────────────────────────────
@@ -535,6 +1100,10 @@
 
   // ── Members ─────────────────────────────────────────────────
   async function loadMembres() {
+    // Also fetch the admins set
+    const { data: adminsData } = await sb.from('admins').select('user_id');
+    adminSet = new Set((adminsData || []).map(a => a.user_id));
+
     const { data, error } = await sb.from('membres')
       .select('*')
       .order('created_at', { ascending: false });
@@ -542,6 +1111,10 @@
     if (error) { toast('Erreur chargement membres', 'error'); return; }
 
     allMembres = data || [];
+
+    // Populate memberMap
+    allMembres.forEach(m => { memberMap[m.id] = m; });
+
     updateStats();
     populateSpecialiteFilter();
     renderMembres(allMembres);
@@ -558,6 +1131,8 @@
   function populateSpecialiteFilter() {
     const specs = [...new Set(allMembres.map(m => m.specialite).filter(Boolean))].sort();
     const sel = document.getElementById('filter-specialite');
+    // Remove existing options except the first
+    while (sel.options.length > 1) sel.remove(1);
     specs.forEach(s => {
       const opt = document.createElement('option');
       opt.value = s; opt.textContent = s;
@@ -579,30 +1154,44 @@
     const tbody = document.getElementById('membres-tbody');
     document.getElementById('filter-count').textContent = `${list.length} membre${list.length > 1 ? 's' : ''}`;
     if (!list.length) {
-      tbody.innerHTML = '<tr><td colspan="8" class="table-empty">Aucun membre trouvé.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="table-empty">Aucun membre trouvé.</td></tr>';
       return;
     }
-    tbody.innerHTML = list.map(m => `
-      <tr>
-        <td>
-          <div class="td-name">${esc(m.prenom)} ${esc(m.nom)}</div>
-          <div class="td-email">${esc(m.email)}</div>
-        </td>
-        <td class="td-rpps">${esc(m.rpps || '—')}</td>
-        <td>${esc(m.specialite || '—')}</td>
-        <td>${esc(m.mode_exercice || '—')}</td>
-        <td>${esc(m.secteur || '—')}</td>
-        <td>${statusBadge(m.statut)}</td>
-        <td style="color:var(--muted);font-size:0.78rem">${fmtDate(m.created_at)}</td>
-        <td>
-          <div class="actions">
-            ${m.statut !== 'actif'    ? `<button class="btn-action btn-valider"   onclick="setStatut('${m.id}','actif')">Valider</button>` : ''}
-            ${m.statut !== 'suspendu' ? `<button class="btn-action btn-suspendre" onclick="setStatut('${m.id}','suspendu')">Suspendre</button>` : ''}
-            <button class="btn-action btn-supprimer" onclick="openModal('${m.id}')">Supprimer</button>
-          </div>
-        </td>
-      </tr>
-    `).join('');
+    tbody.innerHTML = list.map(m => {
+      const region = cpToRegion(m.code_postal);
+      const validerBtn = m.statut !== 'actif'
+        ? `<button class="btn-action btn-valider btn-icon" onclick="setStatut('${m.id}','actif')" title="Valider">✓</button>`
+        : '';
+      const suspendreBtnHtml = m.statut !== 'suspendu' && isSuperAdmin
+        ? `<button class="btn-action btn-suspendre btn-icon" onclick="confirmSuspendre('${m.id}')" title="Suspendre">⏸</button>`
+        : '';
+      const supprimerBtnHtml = isSuperAdmin
+        ? `<button class="btn-action btn-supprimer btn-icon" onclick="openModal('${m.id}')" title="Supprimer">🗑</button>`
+        : '';
+      return `
+        <tr>
+          <td>
+            <div class="td-name" style="cursor:pointer;color:var(--blue);text-decoration:underline;text-underline-offset:3px" onclick="openMemberModal('${m.id}')">${esc(m.prenom)} ${esc(m.nom)}</div>
+            <div class="td-email">${esc(m.email)}</div>
+          </td>
+          <td style="font-size:0.82rem">${esc(m.telephone || '—')}</td>
+          <td style="font-size:0.82rem">${esc(m.code_postal || '—')}</td>
+          <td style="font-size:0.78rem;color:var(--muted)">${esc(region)}</td>
+          <td>${esc(m.specialite || '—')}</td>
+          <td>${esc(m.mode_exercice || '—')}</td>
+          <td>${esc(m.secteur || '—')}</td>
+          <td>${statusBadge(m.statut)}</td>
+          <td style="color:var(--muted);font-size:0.78rem">${fmtDate(m.created_at)}</td>
+          <td>
+            <div class="actions">
+              ${validerBtn}
+              ${suspendreBtnHtml}
+              ${supprimerBtnHtml}
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
   }
 
   function renderAttente(list) {
@@ -622,8 +1211,8 @@
         <td style="color:var(--muted);font-size:0.78rem">${fmtDate(m.created_at)}</td>
         <td>
           <div class="actions">
-            <button class="btn-action btn-valider"   onclick="setStatut('${m.id}','actif')">Valider ✓</button>
-            <button class="btn-action btn-supprimer" onclick="openModal('${m.id}')">Refuser</button>
+            <button class="btn-action btn-valider btn-icon" onclick="setStatut('${m.id}','actif')" title="Valider">✓</button>
+            <button class="btn-action btn-supprimer btn-icon" onclick="openModal('${m.id}')" title="Refuser">🗑</button>
           </div>
         </td>
       </tr>
@@ -639,7 +1228,7 @@
       if (st   && m.statut    !== st)   return false;
       if (spec && m.specialite !== spec) return false;
       if (q) {
-        const hay = `${m.prenom} ${m.nom} ${m.email} ${m.rpps}`.toLowerCase();
+        const hay = `${m.prenom} ${m.nom} ${m.email}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -679,6 +1268,38 @@
     if (e.target === e.currentTarget) closeModal();
   });
 
+  // ── CSV Export (super-admin only) ────────────────────────────
+  window.exportCSV = async function() {
+    const { data, error } = await sb.from('membres').select('*').order('created_at', { ascending: false });
+    if (error) { toast('Erreur export : ' + error.message, 'error'); return; }
+    const cols = ['prenom','nom','email','telephone','code_postal','region','specialite','secteur','mode_exercice','rpps','statut','created_at'];
+    const header = cols.join(',');
+    const rows = (data || []).map(m => {
+      const region = cpToRegion(m.code_postal);
+      return [
+        m.prenom, m.nom, m.email, m.telephone, m.code_postal, region,
+        m.specialite, m.secteur, m.mode_exercice, m.rpps, m.statut, m.created_at
+      ].map(v => {
+        if (v == null) return '';
+        const s = String(v);
+        if (s.includes(',') || s.includes('"') || s.includes('\n')) return '"' + s.replace(/"/g, '""') + '"';
+        return s;
+      }).join(',');
+    });
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const today = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `adherents_${today}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Export CSV téléchargé ✓', 'success');
+  };
+
   // ── Décrypteurs ─────────────────────────────────────────────
   async function loadDecrypteurs() {
     const { data } = await sb.from('decrypteurs').select('id,titre,categorie,publie_le,acces').order('publie_le', { ascending: false });
@@ -699,11 +1320,14 @@
   }
 
   window.toggleNewDecrypteur = function() {
-    const el = document.getElementById('new-decrypteur-form');
-    el.style.display = el.style.display === 'none' ? 'block' : 'none';
-    if (el.style.display === 'block') {
-      document.getElementById('d-date').value = new Date().toISOString().slice(0,10);
-    }
+    const form  = document.getElementById('new-decrypteur-form');
+    const table = document.getElementById('decrypteurs-table-wrap');
+    const btn   = document.getElementById('btn-toggle-new-article');
+    const showing = form.style.display !== 'none';
+    form.style.display  = showing ? 'none'  : 'block';
+    table.style.display = showing ? 'block' : 'none';
+    btn.textContent = showing ? '+ Nouvel article' : '← Retour à la liste';
+    if (!showing) document.getElementById('d-date').value = new Date().toISOString().slice(0,10);
   };
 
   window.saveDecrypteur = async function() {
@@ -716,11 +1340,12 @@
       contenu:   document.getElementById('d-contenu').value.trim(),
       auteur:    document.getElementById('d-auteur').value.trim() || 'Rédaction GM',
       acces:     document.getElementById('d-acces').value,
+      publie:    false,
     };
     if (!payload.titre || !payload.slug) { toast('Titre et slug requis', 'error'); return; }
     const { error } = await sb.from('decrypteurs').insert(payload);
     if (error) { toast('Erreur : ' + error.message, 'error'); return; }
-    toast('Article publié ✓', 'success');
+    toast('Article soumis — en attente de validation ✓', 'success');
     toggleNewDecrypteur();
     loadDecrypteurs();
   };
@@ -735,7 +1360,9 @@
 
   // ── Plaidoyer ───────────────────────────────────────────────
   async function loadPlaidoyer() {
-    const { data } = await sb.from('plaidoyer_dossiers').select('*').order('created_at', { ascending: false });
+    const { data } = await sb.from('plaidoyer_dossiers')
+      .select('*, plaidoyer_etapes(id)')
+      .order('created_at', { ascending: false });
     const tbody = document.getElementById('plaidoyer-tbody');
     if (!data || !data.length) {
       tbody.innerHTML = '<tr><td colspan="5" class="table-empty">Aucun dossier.</td></tr>';
@@ -743,7 +1370,16 @@
     }
     tbody.innerHTML = data.map(d => `
       <tr>
-        <td style="font-weight:700">${esc(d.titre)}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-weight:700;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="openDossierModal('${d.id}','${esc(d.titre).replace(/'/g,"\\'")}',${d.avancement_pct||0})">
+              ${esc(d.titre)}
+            </span>
+            ${d.plaidoyer_etapes && d.plaidoyer_etapes.length > 0
+              ? `<span style="min-width:20px;height:20px;padding:0 6px;background:var(--blue);color:#fff;border-radius:999px;font-size:.7rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center">${d.plaidoyer_etapes.length}</span>`
+              : ''}
+          </div>
+        </td>
         <td>${esc(d.trimestre || '—')}</td>
         <td>${statusBadge(d.statut)}</td>
         <td>
@@ -757,7 +1393,6 @@
         <td>
           <div class="actions">
             <button class="btn-action btn-valider" onclick="setDossierStatut('${d.id}','victoire')">Victoire</button>
-            <button class="btn-action btn-suspendre" onclick="promptAvancement('${d.id}', ${d.avancement_pct || 0})">% avancement</button>
             <button class="btn-action btn-supprimer" onclick="deleteDossier('${d.id}')">Supprimer</button>
           </div>
         </td>
@@ -786,20 +1421,87 @@
     loadPlaidoyer();
   };
 
+  // ── Dossier modal (titre + étapes) ─────────────────────────
+  let currentDossierId = null;
+
+  window.openDossierModal = async function(id, titre, avancement) {
+    currentDossierId = id;
+    document.getElementById('dossier-titre-input').value = titre;
+    document.getElementById('dossier-avancement-input').value = avancement || 0;
+    document.getElementById('etape-texte').value = '';
+    document.getElementById('etape-pct').value = '';
+    document.getElementById('dossier-modal-overlay').classList.add('open');
+    await renderEtapes();
+  };
+
+  window.closeDossierModal = function(e) {
+    if (e && e.target !== document.getElementById('dossier-modal-overlay')) return;
+    document.getElementById('dossier-modal-overlay').classList.remove('open');
+    currentDossierId = null;
+  };
+
+  async function renderEtapes() {
+    const el = document.getElementById('etapes-list');
+    if (!currentDossierId) return;
+    const { data } = await sb.from('plaidoyer_etapes')
+      .select('*').eq('dossier_id', currentDossierId).order('pourcentage');
+    if (!data || !data.length) {
+      el.innerHTML = '<div style="font-size:.83rem;color:var(--muted);font-style:italic">Aucune étape — ajoutez-en une ci-dessous.</div>';
+      return;
+    }
+    el.innerHTML = data.map(e => `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border-radius:8px">
+        <div style="width:38px;height:38px;border-radius:50%;background:var(--grad);color:#fff;font-size:.75rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${e.pourcentage}%</div>
+        <div style="flex:1;font-size:.85rem;font-weight:600">${esc(e.texte)}</div>
+        <button onclick="deleteEtape('${e.id}')" style="border:none;background:none;cursor:pointer;color:var(--danger);font-size:.8rem;padding:2px 6px">✕</button>
+      </div>`).join('');
+  }
+
+  window.addEtape = async function() {
+    const texte = document.getElementById('etape-texte').value.trim();
+    const pct   = parseInt(document.getElementById('etape-pct').value) || 0;
+    if (!texte) { toast('Décrivez l\'étape', 'error'); return; }
+    if (!currentDossierId) return;
+    const { error } = await sb.from('plaidoyer_etapes').insert({ dossier_id: currentDossierId, texte, pourcentage: pct });
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    // Update dossier avancement_pct to match the highest étape
+    await sb.from('plaidoyer_dossiers').update({ avancement_pct: pct }).eq('id', currentDossierId);
+    document.getElementById('etape-texte').value = '';
+    document.getElementById('etape-pct').value = '';
+    toast('Étape ajoutée ✓', 'success');
+    await renderEtapes();
+    loadPlaidoyer();
+  };
+
+  window.deleteEtape = async function(id) {
+    const { error } = await sb.from('plaidoyer_etapes').delete().eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Étape supprimée', 'success');
+    await renderEtapes();
+  };
+
+  window.saveDossierTitre = async function() {
+    const titre = document.getElementById('dossier-titre-input').value.trim();
+    if (!titre || !currentDossierId) return;
+    const { error } = await sb.from('plaidoyer_dossiers').update({ titre }).eq('id', currentDossierId);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Titre mis à jour ✓', 'success');
+    loadPlaidoyer();
+  };
+
+  window.saveDossierAvancement = async function() {
+    const pct = Math.min(100, Math.max(0, parseInt(document.getElementById('dossier-avancement-input').value) || 0));
+    if (!currentDossierId) return;
+    const { error } = await sb.from('plaidoyer_dossiers').update({ avancement_pct: pct }).eq('id', currentDossierId);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Avancement mis à jour ✓', 'success');
+    loadPlaidoyer();
+  };
+
   window.setDossierStatut = async function(id, statut) {
     const { error } = await sb.from('plaidoyer_dossiers').update({ statut }).eq('id', id);
     if (error) { toast('Erreur : ' + error.message, 'error'); return; }
     toast('Statut mis à jour ✓', 'success');
-    loadPlaidoyer();
-  };
-
-  window.promptAvancement = async function(id, current) {
-    const val = prompt(`Nouvel avancement (0-100) — actuellement ${current}%`, current);
-    if (val === null) return;
-    const pct = Math.min(100, Math.max(0, parseInt(val) || 0));
-    const { error } = await sb.from('plaidoyer_dossiers').update({ avancement_pct: pct }).eq('id', id);
-    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
-    toast('Avancement mis à jour ✓', 'success');
     loadPlaidoyer();
   };
 
@@ -809,6 +1511,165 @@
     if (error) { toast('Erreur : ' + error.message, 'error'); return; }
     toast('Dossier supprimé', 'success');
     loadPlaidoyer();
+  };
+
+  // ── Articles à valider ──────────────────────────────────────
+  async function loadArticlesAValider() {
+    const { data, error } = await sb.from('decrypteurs')
+      .select('*')
+      .eq('publie', false)
+      .order('created_at', { ascending: false });
+
+    const tbody = document.getElementById('articles-valider-tbody');
+    const counterEl = document.getElementById('articles-valider-counter');
+
+    if (error) {
+      tbody.innerHTML = '<tr><td colspan="7" class="table-empty">Erreur de chargement.</td></tr>';
+      return;
+    }
+
+    const list = data || [];
+
+    // Compteur
+    if (list.length === 0) {
+      counterEl.innerHTML = `
+        <div class="pending-counter zero">
+          <span style="font-size:1.1rem">✅</span>
+          <span>Aucun article en attente. La veille publie automatiquement ici chaque lundi.</span>
+        </div>`;
+      tbody.innerHTML = '<tr><td colspan="7" class="table-empty">Aucun article en attente. La veille publie automatiquement ici chaque lundi.</td></tr>';
+      return;
+    }
+
+    counterEl.innerHTML = `
+      <div class="pending-counter">
+        <span class="count-num">${list.length}</span>
+        <span>article${list.length > 1 ? 's' : ''} en attente de validation</span>
+      </div>`;
+
+    const CATS = ['avenant','plfss','decret','jurisprudence','urssaf','numerique','greve-mobilisation','reforme-etudes-medicales','urssaf'];
+    const catOpts = (current) => CATS.map(c =>
+      `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`).join('');
+
+    tbody.innerHTML = list.map(a => {
+      const resume = a.resume ? (a.resume.length > 120 ? esc(a.resume.slice(0, 120)) + '…' : esc(a.resume)) : '—';
+      const tags = Array.isArray(a.tags) ? a.tags.join(', ') : (a.tags || '—');
+      return `
+        <tr>
+          <td style="font-weight:700;max-width:200px">${esc(a.titre || '—')}</td>
+          <td style="font-size:0.78rem;color:var(--muted)">${esc(a.source || '—')}</td>
+          <td>
+            <select class="cat-select" onchange="updateCategorie('${a.id}', this.value)">
+              ${catOpts(a.categorie)}
+            </select>
+          </td>
+          <td style="font-size:0.78rem;color:var(--muted);max-width:140px">${esc(tags)}</td>
+          <td class="resume-cell">${resume}</td>
+          <td style="color:var(--muted);font-size:0.78rem;white-space:nowrap">${fmtDate(a.created_at)}</td>
+          <td>
+            <div class="actions">
+              <button class="btn-action btn-publier" onclick="publierArticle('${a.id}')" title="Publier"><span class="btn-label">Publier ✓</span></button>
+              <a class="btn-voir" href="decrypteur.html?slug=${encodeURIComponent(a.slug || '')}" target="_blank" title="Voir">Voir →</a>
+              <button class="btn-action btn-supprimer" onclick="supprimerArticleAValider('${a.id}')" title="Supprimer">🗑</button>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  window.updateCategorie = async function(id, categorie) {
+    const { error } = await sb.from('decrypteurs').update({ categorie }).eq('id', id);
+    if (error) toast('Erreur : ' + error.message, 'error');
+    else toast('Catégorie mise à jour ✓', 'success');
+  };
+
+  window.publierArticle = async function(id) {
+    const { error } = await sb.from('decrypteurs').update({ publie: true }).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Article publié ✓', 'success');
+    await loadArticlesAValider();
+  };
+
+  window.supprimerArticleAValider = async function(id) {
+    if (!confirm('Supprimer cet article définitivement ?')) return;
+    const { error } = await sb.from('decrypteurs').delete().eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Article supprimé', 'success');
+    await loadArticlesAValider();
+  };
+
+  // ── RPPS ────────────────────────────────────────────────────
+  let allRppsData = [];
+
+  async function loadRpps() {
+    const { data, error } = await sb.from('membres')
+      .select('id,prenom,nom,email,rpps,specialite,statut,rpps_verifie,est_interne')
+      .order('rpps_verifie', { ascending: true });
+
+    if (error) {
+      document.getElementById('rpps-tbody').innerHTML =
+        '<tr><td colspan="7" class="table-empty">Erreur de chargement.</td></tr>';
+      return;
+    }
+    allRppsData = data || [];
+    renderRppsTable();
+  }
+
+  window.renderRppsTable = function() {
+    const showVerified = document.getElementById('rpps-show-verified').checked;
+    const tbody = document.getElementById('rpps-tbody');
+
+    let list = allRppsData;
+    if (!showVerified) {
+      list = list.filter(m => !m.rpps_verifie && !m.est_interne);
+    }
+
+    if (!list.length) {
+      tbody.innerHTML = `<tr><td colspan="7" class="table-empty">${showVerified ? 'Aucun membre.' : 'Aucun RPPS à vérifier.'}</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map(m => {
+      const rppsCell = m.rpps
+        ? `<span class="rpps-copy" title="Cliquer pour sélectionner">${esc(m.rpps)}</span>`
+        : '<span style="color:var(--muted)">—</span>';
+
+      const rppsVerifBadge = m.rpps_verifie
+        ? '<span class="status-badge status-actif">● Vérifié</span>'
+        : '<span class="status-badge status-attente">● En attente</span>';
+
+      let actions = '';
+      if (m.est_interne) {
+        actions = '<span class="badge-interne">Interne</span>';
+      } else {
+        const rppsUrl = `https://annuaire.sante.fr/web/site-pro/recherche-professionnelle?name=&firstName=&rpps=${encodeURIComponent(m.rpps || '')}`;
+        actions = `
+          <div class="actions">
+            ${!m.rpps_verifie ? `<button class="btn-action btn-rpps-ok" onclick="validerRpps('${m.id}')">RPPS OK ✓</button>` : ''}
+            ${m.rpps ? `<a class="btn-ext" href="${rppsUrl}" target="_blank">Vérifier sur RPPS ↗</a>` : ''}
+          </div>`;
+      }
+
+      return `
+        <tr>
+          <td>
+            <div class="td-name">${esc(m.prenom)} ${esc(m.nom)}</div>
+          </td>
+          <td class="td-email">${esc(m.email)}</td>
+          <td>${rppsCell}</td>
+          <td>${esc(m.specialite || '—')}</td>
+          <td>${statusBadge(m.statut)}</td>
+          <td>${rppsVerifBadge}</td>
+          <td>${actions}</td>
+        </tr>`;
+    }).join('');
+  };
+
+  window.validerRpps = async function(id) {
+    const { error } = await sb.from('membres').update({ rpps_verifie: true }).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('RPPS validé ✓', 'success');
+    await loadRpps();
   };
 
   // ── Helpers ──────────────────────────────────────────────────
@@ -821,8 +1682,586 @@
     return new Date(s).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
   }
 
+  // ── Region display update (called from CP input) ─────────────
+  window.updateRegionDisplay = function() {
+    const cp = document.getElementById('me-cp').value.trim();
+    document.getElementById('me-region-display').textContent = cpToRegion(cp);
+  };
+
+  // ── Modal édition membre ─────────────────────────────────────
+  window.openMemberModal = async function(m_id) {
+    const { data: m, error } = await sb.from('membres').select('*').eq('id', m_id).single();
+    if (error || !m) { toast('Impossible de charger ce membre', 'error'); return; }
+    document.getElementById('me-id').value             = m.id;
+    document.getElementById('me-user-id').value        = m.user_id || '';
+    document.getElementById('me-prenom').value         = m.prenom || '';
+    document.getElementById('me-nom').value            = m.nom || '';
+    document.getElementById('me-email-display').textContent = m.email || '—';
+    document.getElementById('me-telephone').value      = m.telephone || '';
+    document.getElementById('me-cp').value             = m.code_postal || '';
+    document.getElementById('me-region-display').textContent = cpToRegion(m.code_postal);
+    document.getElementById('me-rpps').value           = m.rpps || '';
+    document.getElementById('me-specialite').value     = m.specialite || '';
+    document.getElementById('me-secteur').value        = m.secteur || '';
+    document.getElementById('me-mode').value           = m.mode_exercice || '';
+    document.getElementById('me-est-interne').checked  = !!m.est_interne;
+    document.getElementById('me-statut').value         = m.statut || 'en_attente';
+    document.getElementById('membre-edit-title').textContent = `${m.prenom} ${m.nom}`;
+
+    // Super-admin only fields
+    const subAdminGroup = document.getElementById('me-subadmin-group');
+    const superBadge    = document.getElementById('me-superadmin-badge');
+    const isSelf = m.user_id && m.user_id === currentUserId;
+    if (isSuperAdmin && isSelf) {
+      // Own super-admin account: show badge, hide sub-admin checkbox
+      subAdminGroup.style.display = 'none';
+      superBadge.style.display    = 'block';
+    } else if (isSuperAdmin && !isSelf) {
+      // Another member: show sub-admin checkbox
+      subAdminGroup.style.display = 'block';
+      superBadge.style.display    = 'none';
+      const isAdmin = m.user_id && adminSet.has(m.user_id);
+      document.getElementById('me-subadmin').checked = isAdmin;
+    } else {
+      subAdminGroup.style.display = 'none';
+      superBadge.style.display    = 'none';
+    }
+
+    document.getElementById('membre-edit-overlay').classList.add('open');
+  };
+
+  window.closeMemberModal = function() {
+    document.getElementById('membre-edit-overlay').classList.remove('open');
+  };
+
+  window.saveMember = async function() {
+    const id     = document.getElementById('me-id').value;
+    const userId = document.getElementById('me-user-id').value;
+    const payload = {
+      prenom:        document.getElementById('me-prenom').value.trim(),
+      nom:           document.getElementById('me-nom').value.trim(),
+      telephone:     document.getElementById('me-telephone').value.trim() || null,
+      code_postal:   document.getElementById('me-cp').value.trim() || null,
+      rpps:          document.getElementById('me-rpps').value.trim() || null,
+      specialite:    document.getElementById('me-specialite').value.trim() || null,
+      secteur:       document.getElementById('me-secteur').value || null,
+      mode_exercice: document.getElementById('me-mode').value || null,
+      est_interne:   document.getElementById('me-est-interne').checked,
+    };
+
+    // Super-admin can edit statut
+    if (isSuperAdmin) {
+      payload.statut = document.getElementById('me-statut').value;
+    }
+
+    const { error } = await sb.from('membres').update(payload).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+
+    // Handle sub-admin checkbox (super-admin only)
+    if (isSuperAdmin && userId) {
+      const isSubAdmin = document.getElementById('me-subadmin').checked;
+      // Don't remove super-admin's own admin record
+      const { data: { session } } = await sb.auth.getSession();
+      const isSelf = session && session.user.id === userId;
+      if (isSubAdmin) {
+        // Upsert with role='admin' (won't override super_admin due to DB logic, but safe)
+        const { error: uErr } = await sb.from('admins').upsert({ user_id: userId, role: 'admin' }, { onConflict: 'user_id', ignoreDuplicates: false });
+        if (uErr) toast('Erreur admin upsert : ' + uErr.message, 'error');
+      } else if (!isSelf) {
+        const { error: dErr } = await sb.from('admins').delete().eq('user_id', userId);
+        if (dErr) toast('Erreur admin delete : ' + dErr.message, 'error');
+      }
+      // Refresh adminSet
+      const { data: adminsData } = await sb.from('admins').select('user_id');
+      adminSet = new Set((adminsData || []).map(a => a.user_id));
+    }
+
+    toast('Profil mis à jour ✓', 'success');
+    closeMemberModal();
+    await loadMembres();
+  };
+
+  window.confirmSuspendre = function(id) {
+    if (!confirm('Suspendre ce membre ? Il ne pourra plus accéder à l\'espace membre.')) return;
+    setStatut(id, 'suspendu');
+  };
+
   init();
+
+  // ── Communication ────────────────────────────────────────────
+
+  let brevoListsLoaded = false;
+
+  async function loadBrevoLists() {
+    if (brevoListsLoaded) return;
+    brevoListsLoaded = true;
+    const { data: { session } } = await sb.auth.getSession();
+    let lists = [];
+    try {
+      const res = await fetch('/.netlify/functions/get-brevo-lists', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      lists = await res.json();
+      if (!Array.isArray(lists)) throw new Error(`[${res.status}] ${lists.error || JSON.stringify(lists)}`);
+    } catch (e) {
+      ['nl-list-id','cp-list-id'].forEach(id => {
+        document.getElementById(id).innerHTML = `<option value="">⚠ ${e.message}</option>`;
+      });
+      toast('Impossible de charger les listes Brevo : ' + e.message, 'error');
+      return;
+    }
+    const opts = lists.map(l => {
+      const count = l.uniqueSubscribers ?? l.totalSubscribers ?? '?';
+      return `<option value="${l.id}">${l.name} (${count} contacts)</option>`;
+    }).join('');
+    ['nl-list-id','cp-list-id'].forEach(id => {
+      document.getElementById(id).innerHTML = '<option value="">— Choisir une liste —</option>' + opts;
+    });
+  }
+
+  window.showCommTab = function(tab) {
+    ['newsletter','communique','historique'].forEach(t => {
+      document.getElementById('cpanel-' + t).style.display = t === tab ? '' : 'none';
+      const btn = document.getElementById('ctab-' + t);
+      btn.style.borderBottomColor = t === tab ? 'var(--blue)' : 'transparent';
+      btn.style.color = t === tab ? 'var(--blue)' : 'var(--muted)';
+    });
+    if (tab !== 'historique') loadBrevoLists();
+    if (tab === 'historique') loadHistorique();
+  };
+
+  // ── Galerie d'images (Supabase Storage) ─────────────────────
+  const BUCKET = 'newsletter-images';
+  let galleryTargetBlockId = null;
+
+  window.openGallery = async function(blockId) {
+    galleryTargetBlockId = blockId;
+    document.getElementById('gallery-overlay').style.display = 'flex';
+    await refreshGalleryGrid();
+  };
+
+  window.closeGallery = function() {
+    document.getElementById('gallery-overlay').style.display = 'none';
+    galleryTargetBlockId = null;
+  };
+
+  // Fermer en cliquant en dehors
+  document.getElementById('gallery-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeGallery();
+  });
+
+  async function refreshGalleryGrid() {
+    const grid = document.getElementById('gallery-grid');
+    grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:.85rem;grid-column:1/-1">Chargement…</div>';
+    const { data, error } = await sb.storage.from(BUCKET).list('', { limit: 200, sortBy: { column: 'created_at', order: 'desc' } });
+    if (error || !data || data.length === 0) {
+      grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:.85rem;grid-column:1/-1">Aucune image — téléversez-en une ci-dessus.</div>';
+      return;
+    }
+    grid.innerHTML = data.filter(f => f.name !== '.emptyFolderPlaceholder').map(f => {
+      const url = sb.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl;
+      return `<div style="border:1.5px solid var(--line);border-radius:10px;overflow:hidden;background:white;position:relative;cursor:pointer" onclick="selectGalleryImage('${url}')">
+        <div style="width:100%;aspect-ratio:4/3;overflow:hidden;background:#f0f4f9">
+          <img src="${url}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy">
+        </div>
+        <div style="padding:8px 10px;font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${f.name}">${f.name}</div>
+        <button onclick="event.stopPropagation();deleteGalleryImage('${f.name}')"
+          style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:white;border:none;border-radius:5px;padding:2px 7px;font-size:.7rem;cursor:pointer;font-family:inherit">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+
+  window.deleteGalleryImage = async function(name) {
+    if (!confirm(`Supprimer "${name}" de la galerie ?`)) return;
+    await sb.storage.from(BUCKET).remove([name]);
+    await refreshGalleryGrid();
+  };
+
+  window.uploadGalleryImage = async function(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const status = document.getElementById('gallery-upload-status');
+    status.textContent = '⏳ Envoi…';
+    const ext = file.name.split('.').pop();
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await sb.storage.from(BUCKET).upload(path, file, { contentType: file.type, upsert: false });
+    if (error) { status.textContent = '✗ ' + error.message; return; }
+    status.textContent = '✓ Image ajoutée';
+    input.value = '';
+    setTimeout(() => { status.textContent = ''; }, 2500);
+    await refreshGalleryGrid();
+  };
+
+  // ── Blocs de contenu (newsletter) ───────────────────────────
+  let nlBlocks = [];
+  let nlBlockCtr = 0;
+
+  function saveBlockValues() {
+    nlBlocks.forEach(b => {
+      if (b.type === 'text') {
+        const el = document.getElementById(`blk-text-${b.id}`);
+        if (el) b.text = el.value;
+      } else {
+        const u = document.getElementById(`blk-img-url-${b.id}`);
+        const c = document.getElementById(`blk-img-cap-${b.id}`);
+        if (u) b.url = u.value;
+        if (c) b.caption = c.value;
+      }
+    });
+  }
+
+  function renderBlocks() {
+    const container = document.getElementById('nl-blocks');
+    if (!nlBlocks.length) {
+      container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:.82rem;border:2px dashed var(--line);border-radius:10px">Ajoutez des blocs texte ou image ci-dessus</div>';
+      return;
+    }
+    container.innerHTML = nlBlocks.map((b, i) => {
+      const isFirst = i === 0, isLast = i === nlBlocks.length - 1;
+      const nav = `
+        <div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0">
+          <button type="button" onclick="moveBlock(${b.id},-1)" ${isFirst?'disabled':''} title="Monter"
+            style="font-size:.75rem;padding:2px 7px;border-radius:4px;border:1px solid var(--line);background:white;cursor:pointer;${isFirst?'opacity:.3':''}" >↑</button>
+          <button type="button" onclick="moveBlock(${b.id},1)" ${isLast?'disabled':''} title="Descendre"
+            style="font-size:.75rem;padding:2px 7px;border-radius:4px;border:1px solid var(--line);background:white;cursor:pointer;${isLast?'opacity:.3':''}">↓</button>
+        </div>`;
+      const del = `<button type="button" onclick="removeBlock(${b.id})" title="Supprimer"
+        style="padding:4px 9px;border-radius:5px;border:1px solid #f0c0c0;background:#fff5f5;color:#c0392b;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">✕</button>`;
+
+      if (b.type === 'text') {
+        return `<div style="display:flex;gap:8px;align-items:flex-start;background:var(--surface);padding:10px 12px;border-radius:10px;border:1px solid var(--line)">
+          ${nav}
+          <textarea id="blk-text-${b.id}" rows="4" placeholder="Votre texte…" oninput="onBlockInput(${b.id},'text')"
+            style="flex:1;resize:vertical;font-family:inherit;font-size:.84rem;border:1.5px solid var(--line);border-radius:7px;padding:8px 10px">${b.text || ''}</textarea>
+          ${del}
+        </div>`;
+      } else {
+        return `<div style="display:flex;gap:8px;align-items:center;background:var(--surface);padding:10px 12px;border-radius:10px;border:1.5px solid rgba(56,168,181,.25)">
+          ${nav}
+          <div id="blk-img-thumb-${b.id}" style="width:48px;height:48px;border-radius:7px;background:#e8edf4;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--muted)">
+            ${b.url ? `<img src="${b.url}" style="width:100%;height:100%;object-fit:cover">` : '🖼'}
+          </div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">
+            <input type="url" id="blk-img-url-${b.id}" value="${b.url||''}" placeholder="URL de l'image…" oninput="onBlockInput(${b.id},'img-url')" style="font-size:.82rem;width:100%">
+            <input type="text" id="blk-img-cap-${b.id}" value="${b.caption||''}" placeholder="Légende (optionnel)" oninput="onBlockInput(${b.id},'img-cap')" style="font-size:.82rem;width:100%">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+            <button type="button" onclick="openGallery(${b.id})"
+              style="padding:4px 9px;border-radius:5px;border:1.5px solid var(--teal);background:rgba(56,168,181,.07);color:var(--teal);font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit">🖼 Galerie</button>
+            ${del}
+          </div>
+        </div>`;
+      }
+    }).join('');
+  }
+
+  window.addBlock = function(type) {
+    saveBlockValues();
+    const id = ++nlBlockCtr;
+    nlBlocks.push({ id, type, text: '', url: '', caption: '' });
+    renderBlocks();
+    updateNlPreview();
+    // Focus nouvelle textarea si texte
+    if (type === 'text') setTimeout(() => document.getElementById(`blk-text-${id}`)?.focus(), 50);
+  };
+
+  window.removeBlock = function(id) {
+    saveBlockValues();
+    nlBlocks = nlBlocks.filter(b => b.id !== id);
+    renderBlocks();
+    updateNlPreview();
+  };
+
+  window.moveBlock = function(id, dir) {
+    saveBlockValues();
+    const i = nlBlocks.findIndex(b => b.id === id);
+    const j = i + dir;
+    if (j < 0 || j >= nlBlocks.length) return;
+    [nlBlocks[i], nlBlocks[j]] = [nlBlocks[j], nlBlocks[i]];
+    renderBlocks();
+    updateNlPreview();
+  };
+
+  window.onBlockInput = function(id, field) {
+    const b = nlBlocks.find(b => b.id === id);
+    if (!b) return;
+    if (field === 'text')    { b.text    = document.getElementById(`blk-text-${id}`)?.value || ''; }
+    if (field === 'img-url') {
+      b.url = document.getElementById(`blk-img-url-${id}`)?.value || '';
+      const thumb = document.getElementById(`blk-img-thumb-${id}`);
+      if (thumb) thumb.innerHTML = b.url ? `<img src="${b.url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : '🖼';
+    }
+    if (field === 'img-cap') { b.caption = document.getElementById(`blk-img-cap-${id}`)?.value || ''; }
+    updateNlPreview();
+  };
+
+  window.selectGalleryImage = function(url) {
+    if (galleryTargetBlockId !== null) {
+      const b = nlBlocks.find(b => b.id === galleryTargetBlockId);
+      if (b) {
+        b.url = url;
+        const urlEl = document.getElementById(`blk-img-url-${galleryTargetBlockId}`);
+        const thumbEl = document.getElementById(`blk-img-thumb-${galleryTargetBlockId}`);
+        if (urlEl) urlEl.value = url;
+        if (thumbEl) thumbEl.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
+        updateNlPreview();
+      }
+    }
+    closeGallery();
+  };
+
+  function buildNlHtml() {
+    const subj     = document.getElementById('nl-subject').value.trim();
+    const accroche = document.getElementById('nl-accroche').value.trim();
+    const ctaText  = document.getElementById('nl-cta-text').value.trim();
+    const ctaUrl   = document.getElementById('nl-cta-url').value.trim();
+    const logoUrl  = window.location.origin + '/logoGM.jpeg';
+
+    const accrocheHtml = accroche
+      ? `<tr><td style="padding:0 0 22px"><p style="margin:0;font-size:17px;color:#2a3a50;line-height:1.8;font-style:italic">${accroche.replace(/\n/g,'<br>')}</p></td></tr>`
+      : '';
+
+    const blocksHtml = nlBlocks.map(b => {
+      if (b.type === 'text') {
+        if (!b.text.trim()) return '';
+        return b.text.split(/\n\n+/).map(p =>
+          `<tr><td style="padding:0 0 16px"><p style="margin:0;font-size:15px;color:#2a3445;line-height:1.75">${p.replace(/\n/g,'<br>')}</p></td></tr>`
+        ).join('');
+      } else {
+        if (!b.url) return '';
+        return `<tr><td style="padding:0 0 20px">
+          <img src="${b.url}" alt="${b.caption||''}" style="width:100%;border-radius:8px;display:block">
+          ${b.caption ? `<p style="margin:6px 0 0;font-size:12px;color:#6b7a8d;text-align:center;font-style:italic">${b.caption}</p>` : ''}
+        </td></tr>`;
+      }
+    }).join('') || '<tr><td><p style="margin:0 0 18px;font-size:15px;color:#aab0bb;line-height:1.75;font-style:italic">Contenu à rédiger…</p></td></tr>';
+
+    const ctaHtml = (ctaText && ctaUrl)
+      ? `<tr><td style="padding:10px 0 28px">
+          <table cellpadding="0" cellspacing="0"><tr>
+            <td style="background:linear-gradient(135deg,#1a5c3e,#27956a,#38a8b5);border-radius:8px">
+              <a href="${ctaUrl}" style="display:inline-block;padding:13px 28px;color:white;font-weight:700;font-size:14px;text-decoration:none">${ctaText}</a>
+            </td></tr></table></td></tr>` : '';
+
+    return `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f0f4f9;font-family:'Helvetica Neue',Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f4f9;padding:32px 0">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">
+  <tr><td style="background:linear-gradient(135deg,#1a5c3e,#27956a,#38a8b5);border-radius:14px 14px 0 0;padding:32px 40px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:8px">Générations Médecins Île-de-France</div>
+    <div style="font-size:22px;font-weight:800;color:white;line-height:1.3">${subj || 'Titre de la newsletter'}</div>
+  </td></tr>
+  <tr><td style="background:white;padding:36px 40px">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      ${accrocheHtml}
+      <tr><td style="padding:0 0 18px"><p style="margin:0;font-size:15px;color:#1a2332;line-height:1.75">Chères adhérentes, chers adhérents,</p></td></tr>
+      ${blocksHtml}
+      ${ctaHtml}
+      <tr><td><p style="margin:0;font-size:15px;color:#1a2332;line-height:1.75">Bien cordialement,<br><strong>L'équipe Générations Médecins IDF</strong></p></td></tr>
+    </table>
+  </td></tr>
+  <tr><td style="background:#f0f4f9;border-top:1px solid #e8edf4;border-radius:0 0 14px 14px;padding:20px 40px;text-align:center">
+    <img src="${logoUrl}" alt="Générations Médecins" style="width:120px;height:120px;border-radius:20px;object-fit:cover;display:block;margin:0 auto 12px">
+    <p style="margin:0 0 5px;font-size:11px;color:#6b7a8d">Générations Médecins Île-de-France · Mouvement médical indépendant</p>
+    <p style="margin:0;font-size:11px;color:#6b7a8d"><a href="{{unsubscribe}}" style="color:#6b7a8d">Se désabonner</a></p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>`;
+  }
+
+  window.updateNlPreview = function() {
+    document.getElementById('nl-preview').srcdoc = buildNlHtml();
+  };
+
+  // ── Communiqué builder ───────────────────────────────────────
+  function buildCpHtml() {
+    const titre      = document.getElementById('cp-titre').value.trim();
+    const corps      = document.getElementById('cp-corps').value.trim();
+    const cNom       = document.getElementById('cp-contact-nom').value.trim();
+    const cTel       = document.getElementById('cp-contact-tel').value.trim();
+    const cEmail     = document.getElementById('cp-contact-email').value.trim();
+    const dateStr    = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    const logoUrl    = window.location.origin + '/logoGM.jpeg';
+
+    const corpsHtml = corps
+      ? corps.split(/\n\n+/).map(p =>
+          `<p style="margin:0 0 16px;font-size:14px;color:#2a3445;line-height:1.8">${p.replace(/\n/g,'<br>')}</p>`
+        ).join('')
+      : '<p style="color:#aab0bb;font-size:14px;font-style:italic">Corps du communiqué…</p>';
+
+    const contactHtml = (cNom || cTel || cEmail) ? `
+      <tr><td style="border-top:1px solid #e8edf4;padding:20px 0 0;margin-top:20px">
+        <p style="margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6b7a8d">Contact presse</p>
+        ${cNom   ? `<p style="margin:0;font-size:13px;color:#1a2332;font-weight:700">${cNom}</p>` : ''}
+        ${cTel   ? `<p style="margin:2px 0 0;font-size:13px;color:#2a6db8">${cTel}</p>` : ''}
+        ${cEmail ? `<p style="margin:2px 0 0;font-size:13px;color:#2a6db8">${cEmail}</p>` : ''}
+      </td></tr>` : '';
+
+    return `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f0;font-family:Georgia,'Times New Roman',serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f0;padding:32px 0">
+<tr><td align="center">
+<table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%">
+
+  <!-- En-tête institution -->
+  <tr><td style="background:white;border-bottom:3px solid #1a5c3e;border-radius:12px 12px 0 0;padding:24px 40px">
+    <table width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td>
+        <div style="font-size:13px;font-weight:700;color:#1a5c3e;letter-spacing:.04em">GÉNÉRATIONS MÉDECINS ÎLE-DE-FRANCE</div>
+        <div style="font-size:11px;color:#6b7a8d;margin-top:2px">Mouvement médical indépendant</div>
+      </td>
+      <td align="right" style="font-size:11px;color:#6b7a8d">Paris, le ${dateStr}</td>
+    </tr></table>
+  </td></tr>
+
+  <!-- Bandeau COMMUNIQUÉ DE PRESSE -->
+  <tr><td style="background:#1a5c3e;padding:14px 40px;text-align:center">
+    <span style="font-size:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:white">— COMMUNIQUÉ DE PRESSE —</span>
+  </td></tr>
+
+  <!-- Corps -->
+  <tr><td style="background:white;padding:36px 40px">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr><td style="padding:0 0 24px">
+        <p style="margin:0;font-size:19px;font-weight:700;color:#1a2332;line-height:1.4;font-family:'Helvetica Neue',Arial,sans-serif">${titre || 'Titre du communiqué'}</p>
+      </td></tr>
+      <tr><td>${corpsHtml}</td></tr>
+      ${contactHtml}
+    </table>
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style="background:#f5f5f0;border-top:2px solid #e8edf4;border-radius:0 0 12px 12px;padding:16px 40px;text-align:center">
+    <p style="margin:0;font-size:11px;color:#6b7a8d;font-family:'Helvetica Neue',Arial,sans-serif">
+      <img src="${logoUrl}" alt="Générations Médecins" style="width:120px;height:120px;border-radius:20px;object-fit:cover;display:block;margin:0 auto 12px">
+      Générations Médecins Île-de-France · <a href="{{unsubscribe}}" style="color:#6b7a8d">Se désabonner</a>
+    </p>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body></html>`;
+  }
+
+  window.updateCpPreview = function() {
+    document.getElementById('cp-preview').srcdoc = buildCpHtml();
+  };
+
+  function initNlPreview() {
+    updateNlPreview();
+    updateCpPreview();
+  }
+
+  // ── Historique ───────────────────────────────────────────────
+  async function loadHistorique() {
+    const tbody = document.getElementById('historique-tbody');
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:32px">Chargement…</td></tr>';
+    const { data, error } = await sb.from('communications').select('*').order('created_at', { ascending: false });
+    if (error) { tbody.innerHTML = `<tr><td colspan="4" style="color:#c0392b;padding:20px">Erreur : ${error.message}</td></tr>`; return; }
+    if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:32px">Aucune communication envoyée.</td></tr>'; return; }
+    tbody.innerHTML = data.map(c => {
+      const badge = c.type === 'newsletter'
+        ? `<span style="background:rgba(42,109,184,.1);color:var(--blue);padding:2px 8px;border-radius:5px;font-size:.72rem;font-weight:700">Newsletter</span>`
+        : `<span style="background:rgba(26,92,62,.1);color:#1a5c3e;padding:2px 8px;border-radius:5px;font-size:.72rem;font-weight:700">CDP</span>`;
+      const date = new Date(c.created_at).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      return `<tr>
+        <td>${badge}</td>
+        <td style="font-weight:600">${c.subject}</td>
+        <td style="color:var(--muted);font-size:.82rem">${date}</td>
+        <td><button class="btn-icon" onclick="previewHist('${c.id}',\`${c.subject.replace(/`/g,"'")}\`)" title="Aperçu">👁</button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  window.previewHist = async function(id, subject) {
+    const { data } = await sb.from('communications').select('html_content').eq('id', id).single();
+    if (!data?.html_content) { toast('Aperçu indisponible', 'error'); return; }
+    document.getElementById('hist-preview-title').textContent = subject;
+    document.getElementById('hist-preview-iframe').srcdoc = data.html_content;
+    document.getElementById('hist-preview-overlay').style.display = 'flex';
+  };
+
+  window.closeHistPreview = function(e) {
+    if (e && e.target !== document.getElementById('hist-preview-overlay')) return;
+    document.getElementById('hist-preview-overlay').style.display = 'none';
+  };
+
+  async function saveCommToDb(type, subject, htmlContent, blocks, listId, campaignId) {
+    const { data: { session } } = await sb.auth.getSession();
+    await sb.from('communications').insert({
+      type, subject, html_content: htmlContent,
+      blocks: blocks || null,
+      recipient_list_id: listId ? parseInt(listId) : null,
+      brevo_campaign_id: campaignId || null,
+      sent_by: session.user.id,
+      status: 'sent'
+    });
+  }
+
+  async function callCommFunction(path, payload, btnId, statusId, onSuccess) {
+    const btn = document.getElementById(btnId);
+    const status = document.getElementById(statusId);
+    btn.disabled = true;
+    btn.textContent = '⏳ Envoi en cours…';
+    status.textContent = '';
+    status.style.color = 'var(--muted)';
+
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const res = await fetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error + (json.detail ? ' — ' + (json.detail.message || JSON.stringify(json.detail)) : '') || 'Erreur serveur');
+      status.textContent = '✓ Envoyé avec succès !';
+      status.style.color = '#3d8a1a';
+      toast('Envoi réussi !');
+      if (onSuccess) await onSuccess(json);
+    } catch (e) {
+      status.textContent = '✗ ' + e.message;
+      status.style.color = '#c0392b';
+      toast('Erreur : ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = btnId === 'btn-send-nl' ? '📧 Envoyer la newsletter' : '📣 Envoyer aux médias';
+    }
+  }
+
+  window.sendNewsletter = function() {
+    const subject = document.getElementById('nl-subject').value.trim();
+    const listId  = document.getElementById('nl-list-id').value;
+    if (!subject) { toast('Remplissez le sujet', 'error'); return; }
+    if (!listId)  { toast('Choisissez une liste Brevo', 'error'); return; }
+    saveBlockValues();
+    const htmlContent = buildNlHtml();
+    const blocks = nlBlocks.map(({ type, text, url, caption }) => ({ type, text, url, caption }));
+    if (!confirm(`Envoyer cette newsletter à tous les abonnés Brevo ?\n\nSujet : ${subject}`)) return;
+    callCommFunction('/.netlify/functions/send-newsletter', { subject, htmlContent, listId }, 'btn-send-nl', 'nl-status',
+      (json) => saveCommToDb('newsletter', subject, htmlContent, blocks, listId, json.campaignId));
+  };
+
+  window.sendCommunique = function() {
+    const subject = document.getElementById('cp-subject').value.trim();
+    const listId  = document.getElementById('cp-list-id').value;
+    if (!subject) { toast('Remplissez le sujet', 'error'); return; }
+    if (!listId)  { toast('Choisissez une liste Brevo presse', 'error'); return; }
+    const htmlContent = buildCpHtml();
+    if (!confirm(`Envoyer ce communiqué aux contacts presse Brevo ?\n\nSujet : ${subject}`)) return;
+    callCommFunction('/.netlify/functions/send-communique', { subject, htmlContent, listId, senderEmailCdp: true }, 'btn-send-cp', 'cp-status',
+      (json) => saveCommToDb('communique', subject, htmlContent, null, listId, json.campaignId));
+  };
+
 })();
 </script>
+
 </body>
 </html>

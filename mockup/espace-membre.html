@@ -52,6 +52,8 @@
       padding: 9px 11px; border-radius: 9px;
       font-size: 0.85rem; font-weight: 600; color: var(--ink);
       text-decoration: none; transition: background 0.15s;
+      border: none; background: none; cursor: pointer;
+      font-family: inherit; width: 100%; text-align: left; box-shadow: none; outline: none;
     }
     .sidebar-link:hover { background: var(--surface); }
     .sidebar-link.active { background: rgba(50,106,162,0.08); color: var(--blue); font-weight: 700; }
@@ -127,6 +129,46 @@
     .profile-field label { font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; display: block; margin-bottom: 3px; }
     .profile-field span  { font-size: 0.9rem; font-weight: 600; color: var(--ink); }
 
+    /* Sections cachées/visibles */
+    .member-section { display: none; }
+    .member-section.active { display: block; }
+
+    /* Feed décrypteurs */
+    .feed-empty { padding: 40px; text-align: center; color: var(--muted); background: white; border-radius: var(--r); border: 1.5px dashed var(--line); }
+    .feed-empty .big { font-size: 2rem; margin-bottom: 10px; }
+    .decrypteur-cards { display: grid; gap: 14px; }
+    .decrypteur-card {
+      background: white; border: 1.5px solid var(--line); border-radius: var(--r);
+      padding: 20px; text-decoration: none; color: inherit; display: block; transition: all 0.2s;
+    }
+    .decrypteur-card:hover { border-color: rgba(42,109,184,0.3); box-shadow: 0 4px 16px rgba(42,109,184,0.08); transform: translateY(-1px); }
+    .dc-meta { font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; }
+    .dc-titre { font-size: 0.95rem; font-weight: 800; color: var(--blue-dark); margin-bottom: 6px; line-height: 1.35; }
+    .dc-resume { font-size: 0.83rem; color: var(--muted); line-height: 1.55; margin-bottom: 10px; }
+    .dc-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .dc-tag { font-size: 0.68rem; font-weight: 700; padding: 2px 9px; border-radius: 999px; background: rgba(42,109,184,0.07); color: var(--blue); }
+
+    /* Préférences tags */
+    .pref-card { background: white; border: 1.5px solid var(--line); border-radius: var(--r); padding: 24px; margin-bottom: 20px; }
+    .pref-card h3 { font-size: 0.92rem; font-weight: 800; color: var(--blue-dark); margin-bottom: 14px; }
+    .pref-pills { display: flex; flex-wrap: wrap; gap: 7px; }
+    .pref-pill { display: inline-flex; }
+    .pref-pill input { display: none; }
+    .pref-pill span {
+      padding: 5px 13px; border-radius: 999px; border: 1.5px solid var(--line);
+      font-size: 0.78rem; font-weight: 600; color: var(--muted); cursor: pointer;
+      transition: all 0.15s; user-select: none;
+    }
+    .pref-pill input:checked + span { background: rgba(42,109,184,0.08); border-color: var(--blue); color: var(--blue); font-weight: 700; }
+    .pref-pill span:hover { border-color: rgba(42,109,184,0.4); color: var(--blue); }
+    .btn-save-pref {
+      padding: 11px 28px; background: var(--grad); color: white; border: none;
+      border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 800;
+      cursor: pointer; margin-top: 8px; transition: opacity 0.2s;
+    }
+    .btn-save-pref:hover { opacity: 0.9; }
+    .pref-saved { font-size: 0.8rem; color: #2d7a1a; font-weight: 700; display: none; margin-top: 8px; }
+
     #loading { text-align: center; padding: 60px; color: var(--muted); font-size: 0.9rem; }
 
     @media (max-width: 860px) {
@@ -173,10 +215,11 @@
           <div class="member-status status-attente" id="sidebar-status">⏳ En attente de validation</div>
 
           <nav class="sidebar-nav">
-            <a href="#tableau-de-bord" class="sidebar-link active"><span class="ico">🏠</span> Tableau de bord</a>
-            <a href="#profil" class="sidebar-link"><span class="ico">👤</span> Mon profil</a>
+            <button class="sidebar-link active" onclick="showSection('dashboard')" id="nav-dashboard"><span class="ico">🏠</span> Tableau de bord</button>
+            <button class="sidebar-link" onclick="showSection('decrypteurs')" id="nav-decrypteurs"><span class="ico">📰</span> Mes Décrypteurs</button>
+            <button class="sidebar-link" onclick="showSection('preferences')" id="nav-preferences"><span class="ico">🏷️</span> Mes préférences</button>
+            <button class="sidebar-link" onclick="showSection('profil')" id="nav-profil"><span class="ico">👤</span> Mon profil</button>
             <div class="sidebar-sep"></div>
-            <a href="decrypteurs.html" class="sidebar-link"><span class="ico">📰</span> Décrypteurs</a>
             <a href="courriers.html" class="sidebar-link"><span class="ico">📋</span> Courriers</a>
             <a href="outils.html" class="sidebar-link"><span class="ico">🛠️</span> Outils</a>
             <div class="sidebar-sep"></div>
@@ -200,6 +243,9 @@
               <p>Un administrateur vérifiera votre RPPS et activera votre compte sous 48h. Les outils réservés aux adhérents seront alors accessibles.</p>
             </div>
           </div>
+
+          <!-- ══ SECTION : DASHBOARD ══ -->
+          <div class="member-section active" id="section-dashboard">
 
           <!-- Outils disponibles -->
           <div class="section-label" style="margin-bottom:16px">Vos outils</div>
@@ -260,11 +306,46 @@
             </div>
           </div>
 
-          <!-- Profil -->
-          <div id="profil" class="profile-card">
-            <h2>Mon profil</h2>
-            <div class="profile-grid" id="profile-grid">
-              <!-- Rempli par JS -->
+          </div><!-- /section-dashboard -->
+
+          <!-- ══ SECTION : MES DÉCRYPTEURS ══ -->
+          <div class="member-section" id="section-decrypteurs">
+            <div class="dashboard-header">
+              <h1>Mes Décrypteurs</h1>
+              <p id="feed-subtitle">Actualités filtrées selon vos préférences.</p>
+            </div>
+            <div id="feed-container"><div class="feed-empty"><div class="big">📰</div>Chargement…</div></div>
+          </div>
+
+          <!-- ══ SECTION : PRÉFÉRENCES ══ -->
+          <div class="member-section" id="section-preferences">
+            <div class="dashboard-header">
+              <h1>Mes préférences</h1>
+              <p>Choisissez les thèmes, spécialités et régions qui vous intéressent. Votre feed "Mes Décrypteurs" sera filtré en conséquence.</p>
+            </div>
+
+            <div class="pref-card">
+              <h3>🎯 Thèmes</h3>
+              <div class="pref-pills" id="pref-themes"></div>
+            </div>
+            <div class="pref-card">
+              <h3>🔬 Spécialités</h3>
+              <div class="pref-pills" id="pref-specialites"></div>
+            </div>
+            <div class="pref-card">
+              <h3>📍 Régions</h3>
+              <div class="pref-pills" id="pref-regions"></div>
+            </div>
+
+            <button class="btn-save-pref" id="btn-save-pref">Enregistrer mes préférences →</button>
+            <div class="pref-saved" id="pref-saved">✓ Préférences enregistrées</div>
+          </div>
+
+          <!-- ══ SECTION : MON PROFIL ══ -->
+          <div class="member-section" id="section-profil">
+            <div class="dashboard-header"><h1>Mon profil</h1></div>
+            <div class="profile-card">
+              <div class="profile-grid" id="profile-grid"></div>
             </div>
           </div>
 
@@ -297,35 +378,39 @@
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-  const MODE_LABEL = {
-    liberal_seul:    'Libéral seul',
-    liberal_groupe:  'Libéral groupe / MSP',
-    salarie:         'Salarié',
-    mixte:           'Mixte',
-    remplacant:      'Remplaçant',
-    interne:         'Interne',
+  let currentMembre = null;
+  let allTagsRef    = [];
+
+  // ── Navigation sections ─────────────────────────────────────
+  window.showSection = function(id) {
+    document.querySelectorAll('.member-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.sidebar-nav .sidebar-link').forEach(l => l.classList.remove('active'));
+    document.getElementById('section-' + id).classList.add('active');
+    document.getElementById('nav-' + id).classList.add('active');
+    if (id === 'decrypteurs') loadFeed();
+    if (id === 'preferences') renderPreferences();
   };
 
+  // ── Init ────────────────────────────────────────────────────
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'connexion.html'; return; }
 
-    const { data: membre } = await sb
-      .from('membres')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .single();
+    const [{ data: membre }, { data: tagsRef }] = await Promise.all([
+      sb.from('membres').select('*').eq('user_id', session.user.id).single(),
+      sb.from('tags_ref').select('slug,label,type').order('type').order('label'),
+    ]);
+
+    allTagsRef = tagsRef || [];
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('member-content').style.display = 'block';
 
-    if (!membre) {
-      document.getElementById('main-prenom').textContent = 'Médecin';
-      return;
-    }
+    if (!membre) { document.getElementById('main-prenom').textContent = 'Médecin'; return; }
+    currentMembre = membre;
 
-    // Remplir sidebar
-    const initiales = ((membre.prenom || '?')[0] + (membre.nom || '?')[0]).toUpperCase();
+    // Sidebar
+    const initiales = ((membre.prenom||'?')[0] + (membre.nom||'?')[0]).toUpperCase();
     document.getElementById('avatar-initiales').textContent = initiales;
     document.getElementById('sidebar-name').textContent = `Dr ${membre.prenom} ${membre.nom}`;
     document.getElementById('sidebar-spec').textContent = membre.specialite || '';
@@ -336,41 +421,132 @@
     if (membre.statut === 'actif') {
       stEl.textContent = '✓ Adhérent actif';
       stEl.className = 'member-status status-actif';
-      // Débloquer outils membres
       ['tile-sos','tile-annonces','tile-vote'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.remove('locked');
+        const el = document.getElementById(id); if (el) el.classList.remove('locked');
       });
     } else if (membre.statut === 'suspendu') {
-      stEl.textContent = '✗ Suspendu';
-      stEl.className = 'member-status status-suspendu';
+      stEl.textContent = '✗ Suspendu'; stEl.className = 'member-status status-suspendu';
     } else {
       document.getElementById('pending-banner').style.display = 'flex';
     }
 
-    // Vérifier admin
+    // Admin
     const { data: adminRow } = await sb.from('admins').select('user_id').eq('user_id', session.user.id).single();
     if (adminRow) document.getElementById('admin-link').style.display = 'flex';
 
     // Profil
+    const modeLabel = (membre.mode_exercice || '').split(',').map(v => ({
+      liberal_seul:'Libéral seul', liberal_groupe:'Libéral groupe/MSP',
+      salarie:'Salarié', mixte:'Mixte', remplacant:'Remplaçant', interne:'Interne',
+    }[v] || v)).join(', ');
     const fields = [
-      { label: 'Prénom', val: membre.prenom },
-      { label: 'Nom', val: membre.nom },
-      { label: 'Email', val: membre.email },
-      { label: 'RPPS', val: membre.rpps || '—' },
-      { label: 'Spécialité', val: membre.specialite || '—' },
-      { label: "Mode d'exercice", val: MODE_LABEL[membre.mode_exercice] || membre.mode_exercice || '—' },
-      { label: 'Secteur', val: membre.secteur || '—' },
-      { label: 'Statut', val: membre.statut },
+      { label:'Prénom', val: membre.prenom },
+      { label:'Nom', val: membre.nom },
+      { label:'Email', val: membre.email },
+      { label:'Téléphone', val: membre.telephone || '—' },
+      { label:'Code postal', val: membre.code_postal || '—' },
+      { label:'RPPS', val: membre.est_interne ? 'Interne (RPPS non requis)' : (membre.rpps || '—') },
+      { label:'RPPS vérifié', val: membre.rpps_verifie ? '✓ Oui' : 'En attente' },
+      { label:'Spécialité', val: membre.specialite || '—' },
+      { label:"Mode d'exercice", val: modeLabel || '—' },
+      { label:'Secteur', val: membre.secteur || '—' },
+      { label:'Statut', val: membre.statut },
     ];
     document.getElementById('profile-grid').innerHTML = fields.map(f =>
-      `<div class="profile-field"><label>${f.label}</label><span>${f.val}</span></div>`
+      `<div class="profile-field"><label>${esc(f.label)}</label><span>${esc(String(f.val))}</span></div>`
     ).join('');
   }
 
+  // ── Feed décrypteurs personnalisé ───────────────────────────
+  async function loadFeed() {
+    const container = document.getElementById('feed-container');
+    const prefs = currentMembre?.tags_preferences || [];
+
+    if (!prefs.length) {
+      container.innerHTML = `<div class="feed-empty">
+        <div class="big">🏷️</div>
+        <strong>Aucune préférence définie.</strong><br>
+        <span style="font-size:0.85rem">Configurez vos thèmes, spécialités et régions dans <a href="#" onclick="showSection('preferences');return false" style="color:var(--blue);font-weight:700">Mes préférences</a> pour voir les articles qui vous correspondent.</span>
+      </div>`;
+      document.getElementById('feed-subtitle').textContent = 'Configurez vos préférences pour personnaliser ce feed.';
+      return;
+    }
+
+    container.innerHTML = '<div class="feed-empty"><div class="big">📰</div>Chargement…</div>';
+
+    // Récupérer articles publiés (filtre côté JS sur les tags)
+    const { data: articles } = await sb.from('decrypteurs')
+      .select('id,titre,slug,resume,extrait,categorie,tags,source,publie_le,auteur')
+      .eq('publie', true)
+      .order('publie_le', { ascending: false })
+      .limit(100);
+
+    if (!articles?.length) {
+      container.innerHTML = '<div class="feed-empty"><div class="big">📭</div>Aucun article publié pour l\'instant.</div>';
+      return;
+    }
+
+    // Filtre : au moins 1 tag en commun avec les prefs
+    const filtered = articles.filter(a => {
+      if (!a.tags?.length) return false;
+      return a.tags.some(t => prefs.includes(t));
+    });
+
+    document.getElementById('feed-subtitle').textContent = `${filtered.length} article${filtered.length > 1 ? 's' : ''} correspondant à vos préférences.`;
+
+    if (!filtered.length) {
+      container.innerHTML = '<div class="feed-empty"><div class="big">🔍</div>Aucun article ne correspond encore à vos préférences actuelles.</div>';
+      return;
+    }
+
+    // Labels des tags
+    const tagLabels = Object.fromEntries(allTagsRef.map(t => [t.slug, t.label]));
+
+    container.innerHTML = `<div class="decrypteur-cards">${filtered.slice(0,20).map(a => {
+      const date = a.publie_le ? new Date(a.publie_le).toLocaleDateString('fr-FR', {day:'2-digit',month:'short',year:'numeric'}) : '';
+      const tags = (a.tags||[]).slice(0,4).map(t => `<span class="dc-tag">${esc(tagLabels[t]||t)}</span>`).join('');
+      const resume = a.resume || a.extrait || '';
+      return `<a href="decrypteur.html?slug=${encodeURIComponent(a.slug)}" class="decrypteur-card">
+        <div class="dc-meta">${esc(a.source||'GM')} · ${date}</div>
+        <div class="dc-titre">${esc(a.titre)}</div>
+        <div class="dc-resume">${esc(resume.slice(0,180))}${resume.length>180?'…':''}</div>
+        <div class="dc-tags">${tags}</div>
+      </a>`;
+    }).join('')}</div>`;
+  }
+
+  // ── Préférences tags ────────────────────────────────────────
+  function renderPreferences() {
+    const prefs = currentMembre?.tags_preferences || [];
+    const groups = { theme: 'pref-themes', specialite: 'pref-specialites', region: 'pref-regions' };
+    for (const [type, containerId] of Object.entries(groups)) {
+      const tags = allTagsRef.filter(t => t.type === type);
+      document.getElementById(containerId).innerHTML = tags.map(t => `
+        <label class="pref-pill">
+          <input type="checkbox" name="pref" value="${t.slug}" ${prefs.includes(t.slug) ? 'checked' : ''}>
+          <span>${esc(t.label)}</span>
+        </label>`).join('');
+    }
+  }
+
+  document.getElementById('btn-save-pref').addEventListener('click', async () => {
+    const checked = [...document.querySelectorAll('input[name="pref"]:checked')].map(el => el.value);
+    const { error } = await sb.from('membres').update({ tags_preferences: checked }).eq('id', currentMembre.id);
+    if (!error) {
+      currentMembre.tags_preferences = checked;
+      const msg = document.getElementById('pref-saved');
+      msg.style.display = 'block';
+      setTimeout(() => msg.style.display = 'none', 3000);
+    }
+  });
+
+  // ── Utils ────────────────────────────────────────────────────
+  function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
   document.getElementById('logout-btn').addEventListener('click', async () => {
-    await sb.auth.signOut();
-    window.location.href = 'index.html';
+    await sb.auth.signOut(); window.location.href = 'index.html';
   });
 
   init();

@@ -46,6 +46,19 @@
       background-position: right 10px center;
     }
     .filter-select:focus { outline: none; border-color: var(--blue); }
+    .filter-reset {
+      margin-left: auto;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: color 0.15s;
+    }
+    .filter-reset:hover { color: var(--blue); }
 
     .articles-grid {
       display: grid;
@@ -61,7 +74,8 @@
       transition: all 0.2s;
       text-decoration: none;
       color: inherit;
-      display: block;
+      display: flex;
+      flex-direction: column;
     }
     .article-card:hover {
       box-shadow: 0 8px 32px rgba(50,106,162,0.1);
@@ -84,7 +98,12 @@
       letter-spacing: 0.06em;
       backdrop-filter: blur(4px);
     }
-    .article-body { padding: 20px; }
+    .article-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
     .article-title {
       font-size: 0.95rem;
       font-weight: 700;
@@ -96,12 +115,39 @@
       font-size: 0.82rem;
       color: var(--muted);
       line-height: 1.55;
+      margin-bottom: 12px;
+    }
+    .article-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
       margin-bottom: 14px;
+    }
+    .tag-pill {
+      background: rgba(42,109,184,0.08);
+      color: var(--blue);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .tag-pill-more {
+      background: rgba(100,116,139,0.08);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
     }
     .article-meta {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: auto;
+    }
+    .article-source-date {
       font-size: 0.72rem;
       color: var(--muted);
     }
@@ -129,6 +175,14 @@
     .veille-title { font-size: 0.92rem; font-weight: 700; color: var(--blue-dark); margin-bottom: 3px; }
     .veille-desc { font-size: 0.8rem; color: var(--muted); }
 
+    .no-results {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
     @media (max-width: 760px) {
       .articles-grid { grid-template-columns: 1fr 1fr; }
     }
@@ -154,6 +208,7 @@
         <a href="regions.html">Régions</a>
         <a href="bureau.html">Bureau</a>
       </nav>
+      <a href="connexion.html" id="header-login-link" style="font-size:.85rem;font-weight:700;color:var(--blue-dark);text-decoration:none;white-space:nowrap;">Se connecter</a>
       <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
     </div>
   </header>
@@ -181,39 +236,40 @@
 
       <!-- Filtres -->
       <div class="filter-bar">
-        <span class="filter-label">Je suis</span>
-        <select class="filter-select">
-          <option>Toutes spécialités</option>
-          <option>Médecin généraliste</option>
-          <option>Psychiatre</option>
-          <option>Cardiologue</option>
-          <option>Interne</option>
-          <option>Remplaçant</option>
+        <span class="filter-label">Filtrer par</span>
+        <select id="filter-theme" class="filter-select">
+          <option value="">Tous les thèmes</option>
         </select>
-        <select class="filter-select">
-          <option>Tous secteurs</option>
-          <option>Secteur 1</option>
-          <option>Secteur 2</option>
-          <option>Secteur 3 / non conventionné</option>
+        <select id="filter-specialite" class="filter-select">
+          <option value="">Toutes les spécialités</option>
         </select>
-        <select class="filter-select">
-          <option>Tous modes d'exercice</option>
-          <option>Libéral</option>
-          <option>Salarié</option>
-          <option>Mixte</option>
+        <select id="filter-region" class="filter-select">
+          <option value="">Toutes les régions</option>
         </select>
-        <select class="filter-select">
-          <option>Toutes catégories</option>
-          <option>Convention</option>
-          <option>PLFSS</option>
-          <option>Décret</option>
-          <option>Jurisprudence</option>
-        </select>
+        <button id="filter-reset" class="filter-reset">Réinitialiser</button>
       </div>
 
       <!-- Articles -->
+      <!-- Navigation éditions -->
+      <div id="edition-nav" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:12px 18px;background:#f5f7fb;border-radius:12px;border:1.5px solid var(--line);position:relative">
+        <button id="btn-prev-week" onclick="changeWeek(-1)" style="border:none;background:none;cursor:pointer;font-size:.85rem;font-weight:700;color:var(--blue);padding:4px 8px">← Semaine précédente</button>
+        <span id="edition-label" style="font-size:.88rem;font-weight:700;color:var(--ink)"></span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button id="btn-next-week" onclick="changeWeek(1)" style="border:none;background:none;cursor:pointer;font-size:.85rem;font-weight:700;color:var(--blue);padding:4px 8px">Semaine suivante →</button>
+          <button onclick="toggleCal()" title="Choisir une date" style="border:1.5px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;padding:5px 10px;font-size:1rem;line-height:1">📅</button>
+        </div>
+        <!-- Calendrier popover -->
+        <div id="cal-popover" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1.5px solid var(--line);border-radius:14px;box-shadow:0 12px 40px rgba(23,54,95,.14);padding:16px;z-index:99;min-width:260px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <button onclick="calNav(-1)" style="border:none;background:none;cursor:pointer;font-weight:700;color:var(--blue);font-size:.9rem">‹</button>
+            <span id="cal-month-label" style="font-size:.9rem;font-weight:800;color:var(--ink)"></span>
+            <button onclick="calNav(1)"  style="border:none;background:none;cursor:pointer;font-weight:700;color:var(--blue);font-size:.9rem">›</button>
+          </div>
+          <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:.78rem"></div>
+        </div>
+      </div>
+
       <div id="articles-grid" class="articles-grid">
-        <!-- chargement Supabase -->
         <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:0.9rem">Chargement…</div>
       </div>
 
@@ -264,16 +320,36 @@
   };
   const DEFAULT_CAT = { grad: 'linear-gradient(135deg,#17365f,#326aa2)', label: 'Décrypteur' };
 
+  // State
+  let allArticles = [];
+  let tagsMap = {}; // slug -> label
+  let activeFilters = { theme: '', specialite: '', region: '' };
+
   function fmt(iso) {
     if (!iso) return '';
     return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
+  function renderTagPills(tags) {
+    if (!tags || tags.length === 0) return '';
+    const visible = tags.slice(0, 4);
+    const rest = tags.length - 4;
+    let html = visible.map(slug => {
+      const label = tagsMap[slug] || slug;
+      return `<span class="tag-pill">${label}</span>`;
+    }).join('');
+    if (rest > 0) html += `<span class="tag-pill-more">+${rest}</span>`;
+    return `<div class="article-tags">${html}</div>`;
+  }
+
   function card(a) {
     const cat = CAT[a.categorie] || DEFAULT_CAT;
-    const chip = a.tags && a.tags.includes('en-analyse')
-      ? '<span class="chip chip-orange">⏳ En analyse</span>'
-      : '<span class="chip chip-green">✓ Vérifié</span>';
+    const chip = '';
+    const sourcePart = a.source ? `${a.source} · ` : '';
+    const datePart = fmt(a.publie_le);
+    const sourceDate = (sourcePart || datePart)
+      ? `<span class="article-source-date">${sourcePart}${datePart}</span>`
+      : '';
     return `
       <a href="decrypteur.html?slug=${a.slug}" class="article-card">
         <div class="article-top" style="background:${cat.grad}">
@@ -282,31 +358,218 @@
         <div class="article-body">
           <div class="article-title">${a.titre}</div>
           <p class="article-excerpt">${a.extrait || ''}</p>
+          ${renderTagPills(a.tags)}
           <div class="article-meta">
-            <span>${fmt(a.publie_le)}</span>
+            ${sourceDate}
             ${chip}
           </div>
         </div>
       </a>`;
   }
 
-  async function load() {
+  function applyFilters() {
     const grid = document.getElementById('articles-grid');
-    const { data, error } = await sb
-      .from('decrypteurs')
-      .select('id,titre,slug,extrait,categorie,tags,publie_le')
-      .eq('publie', true)
-      .order('publie_le', { ascending: false });
+    const { theme, specialite, region } = activeFilters;
 
-    if (error || !data || data.length === 0) {
-      grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px">Aucun article publié pour le moment.</p>';
-      return;
+    const filtered = allArticles.filter(a => {
+      const tags = a.tags || [];
+      if (theme && !tags.includes(theme)) return false;
+      if (specialite && !tags.includes(specialite)) return false;
+      if (region && !tags.includes(region)) return false;
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div class="no-results">Aucun article ne correspond à ces filtres.</div>';
+    } else {
+      grid.innerHTML = filtered.map(card).join('');
     }
-    grid.innerHTML = data.map(card).join('');
   }
 
+  function populateSelects(tagsRef) {
+    const themes = tagsRef.filter(t => t.type === 'theme');
+    const specialites = tagsRef.filter(t => t.type === 'specialite');
+    const regions = tagsRef.filter(t => t.type === 'region');
+
+    function fill(selectId, items) {
+      const sel = document.getElementById(selectId);
+      items.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.slug;
+        opt.textContent = t.label;
+        sel.appendChild(opt);
+      });
+    }
+
+    fill('filter-theme', themes);
+    fill('filter-specialite', specialites);
+    fill('filter-region', regions);
+  }
+
+  function bindFilters() {
+    ['filter-theme', 'filter-specialite', 'filter-region'].forEach(id => {
+      document.getElementById(id).addEventListener('change', function () {
+        const key = id.replace('filter-', '');
+        activeFilters[key] = this.value;
+        applyFilters();
+      });
+    });
+    document.getElementById('filter-reset').addEventListener('click', function () {
+      activeFilters = { theme: '', specialite: '', region: '' };
+      document.getElementById('filter-theme').value = '';
+      document.getElementById('filter-specialite').value = '';
+      document.getElementById('filter-region').value = '';
+      applyFilters();
+    });
+  }
+
+  // ── Edition (week) navigation ──────────────────────────────
+  const MIN_OFFSET = -3; // 4 semaines max (0, -1, -2, -3)
+  let weekOffset = 0;
+
+  function weekBounds(offset) {
+    const now = new Date();
+    const dayOfWeek = now.getDay() === 0 ? 6 : now.getDay() - 1; // Mon=0
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - dayOfWeek + offset * 7);
+    monday.setHours(0, 0, 0, 0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+    return { monday, sunday };
+  }
+
+  function fmtWeekLabel(monday, sunday) {
+    const opts = { day: 'numeric', month: 'long' };
+    const m = monday.toLocaleDateString('fr-FR', opts);
+    const s = sunday.toLocaleDateString('fr-FR', { ...opts, year: 'numeric' });
+    return weekOffset === 0 ? `Cette semaine · ${m} – ${s}` : `Édition · ${m} – ${s}`;
+  }
+
+  async function loadEdition() {
+    const grid = document.getElementById('articles-grid');
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:0.9rem">Chargement…</div>';
+
+    const { monday, sunday } = weekBounds(weekOffset);
+    document.getElementById('edition-label').textContent = fmtWeekLabel(monday, sunday);
+    document.getElementById('btn-next-week').style.visibility = weekOffset >= 0 ? 'hidden' : 'visible';
+    document.getElementById('btn-prev-week').style.visibility = weekOffset <= MIN_OFFSET ? 'hidden' : 'visible';
+
+    const { data, error } = await sb.from('decrypteurs')
+      .select('id,titre,slug,extrait,categorie,tags,auteur,source,publie_le')
+      .eq('publie', true)
+      .gte('publie_le', monday.toISOString().slice(0, 10))
+      .lte('publie_le', sunday.toISOString().slice(0, 10))
+      .order('publie_le', { ascending: false })
+      .limit(15);
+
+    if (error || !data || data.length === 0) {
+      grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px">Aucun article pour cette semaine.</p>';
+      return;
+    }
+    allArticles = data;
+    applyFilters();
+  }
+
+  window.changeWeek = function(dir) {
+    weekOffset = Math.max(MIN_OFFSET, Math.min(0, weekOffset + dir));
+    loadEdition();
+  };
+
+  // ── Calendrier popover ─────────────────────────────────────
+  let calMonthOffset = 0; // offset en mois depuis aujourd'hui
+
+  function toggleCal() {
+    const pop = document.getElementById('cal-popover');
+    if (pop.style.display === 'none') {
+      calMonthOffset = 0;
+      renderCal();
+      pop.style.display = 'block';
+      document.addEventListener('click', closeCal, { once: false });
+    } else {
+      pop.style.display = 'none';
+    }
+  }
+  window.toggleCal = toggleCal;
+
+  function closeCal(e) {
+    const pop = document.getElementById('cal-popover');
+    if (!pop.contains(e.target) && e.target.getAttribute('onclick') !== 'toggleCal()') {
+      pop.style.display = 'none';
+      document.removeEventListener('click', closeCal);
+    }
+  }
+
+  window.calNav = function(dir) {
+    calMonthOffset += dir;
+    renderCal();
+  };
+
+  function renderCal() {
+    const today = new Date();
+    const d = new Date(today.getFullYear(), today.getMonth() + calMonthOffset, 1);
+    const year = d.getFullYear(), month = d.getMonth();
+
+    document.getElementById('cal-month-label').textContent =
+      d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+
+    const grid = document.getElementById('cal-grid');
+    const headers = ['L','M','M','J','V','S','D'];
+    let html = headers.map(h => `<div style="font-weight:700;color:var(--muted);padding:3px 0">${h}</div>`).join('');
+
+    // First day of month (Mon=0)
+    let startDay = new Date(year, month, 1).getDay();
+    startDay = startDay === 0 ? 6 : startDay - 1;
+
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Compute bounds for highlight
+    const { monday: curMon, sunday: curSun } = weekBounds(weekOffset);
+
+    for (let i = 0; i < startDay; i++) html += '<div></div>';
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      // Compute week offset of this day relative to current week
+      const nowMon = weekBounds(0).monday;
+      const diffDays = Math.round((date - nowMon) / 86400000);
+      const diffWeeks = Math.floor(diffDays / 7);
+      const inRange = diffWeeks >= MIN_OFFSET && diffWeeks <= 0;
+
+      const isInCurrentEdition = date >= curMon && date <= curSun;
+      const isToday = date.toDateString() === today.toDateString();
+
+      const bg   = isInCurrentEdition ? 'background:var(--blue);color:#fff;border-radius:6px;'
+                 : inRange             ? 'background:rgba(42,109,184,0.08);border-radius:6px;cursor:pointer;'
+                 : 'color:var(--muted);';
+      const bold = isToday ? 'font-weight:800;' : '';
+      const click = inRange && !isInCurrentEdition
+        ? `onclick="jumpToWeek(${diffWeeks})"`
+        : '';
+
+      html += `<div style="padding:4px 2px;${bg}${bold}" ${click}>${day}</div>`;
+    }
+    grid.innerHTML = html;
+  }
+
+  window.jumpToWeek = function(offset) {
+    weekOffset = Math.max(MIN_OFFSET, Math.min(0, offset));
+    document.getElementById('cal-popover').style.display = 'none';
+    loadEdition();
+  };
+
+  async function load() {
+    const tagsRes = await sb.from('tags_ref').select('slug,label,type');
+    if (tagsRes.data) {
+      tagsRes.data.forEach(t => { tagsMap[t.slug] = t.label; });
+      populateSelects(tagsRes.data);
+    }
+    await loadEdition();
+  }
+
+  bindFilters();
   load();
 })();
 </script>
+  <script src="auth-header.js"></script>
 </body>
 </html>

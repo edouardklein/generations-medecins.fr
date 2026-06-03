@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Décrypteur — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    /* Article header zone */
+    .article-header {
+      padding: 48px 0 40px;
+    }
+    .article-header-inner {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .breadcrumb {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      margin-bottom: 20px;
+      transition: color 0.15s;
+    }
+    .breadcrumb:hover { color: white; }
+    .breadcrumb-arrow { font-size: 1rem; }
+
+    .cat-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      backdrop-filter: blur(4px);
+      margin-bottom: 16px;
+    }
+
+    .article-h1 {
+      font-size: 2rem;
+      font-weight: 900;
+      color: white;
+      line-height: 1.25;
+      margin-bottom: 20px;
+    }
+
+    .article-meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.7);
+    }
+    .meta-sep { opacity: 0.4; }
+    .meta-tag-pill {
+      background: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.9);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    /* Article body */
+    .article-content {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 48px 24px 64px;
+    }
+
+    .article-chapeau {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.6;
+      margin-bottom: 32px;
+      padding-bottom: 28px;
+      border-bottom: 2px solid var(--line);
+    }
+
+    .article-body-text {
+      font-size: 0.95rem;
+      color: var(--ink);
+      line-height: 1.75;
+    }
+    .article-body-text p { margin-bottom: 18px; }
+    .article-body-text h2 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin: 36px 0 14px;
+      line-height: 1.3;
+    }
+    .article-body-text strong { font-weight: 700; }
+
+    /* Members gate */
+    .members-gate {
+      margin-top: 40px;
+      padding: 36px;
+      background: linear-gradient(135deg, rgba(42,109,184,0.05), rgba(88,170,179,0.05));
+      border: 1.5px solid rgba(42,109,184,0.2);
+      border-radius: var(--r);
+      text-align: center;
+    }
+    .members-gate-icon { font-size: 2rem; margin-bottom: 12px; }
+    .members-gate-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin-bottom: 8px;
+    }
+    .members-gate-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.55;
+    }
+
+    /* Source link */
+    .source-link-block {
+      margin-top: 40px;
+      padding: 18px 22px;
+      background: var(--surface);
+      border: 1.5px solid var(--line);
+      border-radius: var(--r);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .source-link-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .source-link-url {
+      font-size: 0.82rem;
+      color: var(--blue);
+      font-weight: 600;
+      word-break: break-all;
+      text-decoration: none;
+    }
+    .source-link-url:hover { text-decoration: underline; }
+
+    /* Not found */
+    .not-found {
+      max-width: 500px;
+      margin: 80px auto;
+      text-align: center;
+      padding: 0 24px;
+    }
+    .not-found-icon { font-size: 2.5rem; margin-bottom: 16px; }
+    .not-found h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin-bottom: 10px;
+    }
+    .not-found p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+      line-height: 1.55;
+    }
+
+    /* Loading skeleton */
+    .article-loading {
+      max-width: 760px;
+      margin: 60px auto;
+      padding: 0 24px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      .article-h1 { font-size: 1.5rem; }
+      .article-content { padding: 32px 16px 48px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html" class="active">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="connexion.html" id="header-login-link" style="font-size:.85rem;font-weight:700;color:var(--blue-dark);text-decoration:none;white-space:nowrap;">Se connecter</a>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <!-- Dynamic article header (gradient changes per category) -->
+  <div id="article-header-zone">
+    <div class="article-loading">Chargement…</div>
+  </div>
+
+  <!-- Article body -->
+  <section class="section" style="padding-top:0">
+    <div id="article-body-zone"></div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Ne ratez plus rien.</h2>
+    <p>Recevez une veille personnalisée selon votre spécialité, votre secteur et votre mode d'exercice.</p>
+    <a href="adherer.html" class="btn btn-white btn-lg">Activer ma veille →</a>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+<script>
+(function () {
+  const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  const CAT = {
+    avenant:      { grad: 'linear-gradient(135deg,#17365f,#326aa2)', label: 'Convention' },
+    convention:   { grad: 'linear-gradient(135deg,#17365f,#326aa2)', label: 'Convention' },
+    plfss:        { grad: 'linear-gradient(135deg,#1a5c5c,#58aab3)', label: 'PLFSS' },
+    decret:       { grad: 'linear-gradient(135deg,#3b1f6e,#6b42b3)', label: 'Décret' },
+    jurisprudence:{ grad: 'linear-gradient(135deg,#1a4a2e,#2d7a4f)', label: 'Jurisprudence' },
+    urssaf:       { grad: 'linear-gradient(135deg,#5a2d00,#b06c00)', label: 'URSSAF' },
+    numerique:    { grad: 'linear-gradient(135deg,#2d1a5a,#5a3ea0)', label: 'Numérique en santé' },
+    observatoire: { grad: 'linear-gradient(135deg,#0d3b2e,#1a7a5e)', label: 'Observatoire' },
+    urgence:      { grad: 'linear-gradient(135deg,#7c1b1b,#dc2626)', label: 'Urgent' },
+  };
+  const DEFAULT_CAT = { grad: 'linear-gradient(135deg,#17365f,#326aa2)', label: 'Décrypteur' };
+
+  function fmt(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  // Basic Markdown → HTML
+  function mdToHtml(text) {
+    if (!text) return '';
+    // Split into lines for heading detection, then rejoin as paragraphs
+    const lines = text.split('\n');
+    const processed = [];
+    let i = 0;
+    while (i < lines.length) {
+      const line = lines[i];
+      // h1 → h2, h2 → h3 (we use h2 for article sections)
+      if (/^### (.+)/.test(line)) {
+        processed.push(`<h3>${line.replace(/^### /, '')}</h3>`);
+      } else if (/^## (.+)/.test(line)) {
+        processed.push(`<h2>${line.replace(/^## /, '')}</h2>`);
+      } else if (/^# (.+)/.test(line)) {
+        processed.push(`<h2>${line.replace(/^# /, '')}</h2>`);
+      } else {
+        processed.push(line);
+      }
+      i++;
+    }
+    // Join and split on blank lines to create paragraphs
+    const joined = processed.join('\n');
+    const blocks = joined.split(/\n\n+/);
+    const paragraphs = blocks.map(block => {
+      block = block.trim();
+      if (!block) return '';
+      // Already an HTML block tag — don't wrap
+      if (/^<h[2-6]>/.test(block)) return block;
+      // Inline formatting
+      block = block.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      block = block.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      // Internal newlines → <br>
+      block = block.replace(/\n/g, '<br>');
+      return `<p>${block}</p>`;
+    });
+    return paragraphs.join('\n');
+  }
+
+  function showNotFound() {
+    document.getElementById('article-header-zone').innerHTML = '';
+    document.getElementById('article-body-zone').innerHTML = `
+      <div class="not-found">
+        <div class="not-found-icon">📭</div>
+        <h2>Article non disponible</h2>
+        <p>Cet article n'existe pas ou n'est pas encore publié.</p>
+        <a href="decrypteurs.html" class="btn btn-primary">← Retour aux décrypteurs</a>
+      </div>`;
+  }
+
+  async function load() {
+    // Parse slug from URL
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('slug');
+    if (!slug) { showNotFound(); return; }
+
+    // Load article + tags_ref in parallel
+    const [articleRes, tagsRes] = await Promise.all([
+      sb.from('decrypteurs')
+        .select('*')
+        .eq('slug', slug)
+        .eq('publie', true)
+        .single(),
+      sb.from('tags_ref').select('slug,label,type')
+    ]);
+
+    if (articleRes.error || !articleRes.data) {
+      showNotFound();
+      return;
+    }
+
+    const a = articleRes.data;
+    const tagsMap = {};
+    if (tagsRes.data) tagsRes.data.forEach(t => { tagsMap[t.slug] = t.label; });
+
+    // Update page title
+    document.title = `${a.titre} — Générations Médecins`;
+
+    const cat = CAT[a.categorie] || DEFAULT_CAT;
+    const tags = a.tags || [];
+
+    // Build tag pills for meta bar
+    const tagPills = tags.map(slug => {
+      const label = tagsMap[slug] || slug;
+      return `<span class="meta-tag-pill">${label}</span>`;
+    }).join('');
+
+    // Compose meta bar parts
+    const metaParts = [];
+    if (a.auteur) metaParts.push(`<span>${a.auteur}</span>`);
+    if (a.source) metaParts.push(`<span>${a.source}</span>`);
+    if (a.publie_le) metaParts.push(`<span>${fmt(a.publie_le)}</span>`);
+    const metaBarContent = metaParts.join('<span class="meta-sep">·</span>') + (tagPills ? (metaParts.length ? '<span class="meta-sep">·</span>' : '') + tagPills : '');
+
+    // Render header zone
+    document.getElementById('article-header-zone').innerHTML = `
+      <div class="article-header" style="background:${cat.grad}">
+        <div class="article-header-inner">
+          <a href="decrypteurs.html" class="breadcrumb">
+            <span class="breadcrumb-arrow">←</span> Tous les décrypteurs
+          </a>
+          <div class="cat-badge">${cat.label}</div>
+          <h1 class="article-h1">${a.titre}</h1>
+          <div class="article-meta-bar">${metaBarContent}</div>
+        </div>
+      </div>`;
+
+    // Check access — detect logged-in user via Supabase session
+    const { data: { session } } = await sb.auth.getSession();
+    const isLoggedIn = !!session;
+    const isMembers = a.acces === 'membres';
+    const showGate = isMembers && !isLoggedIn;
+
+    // Build body content
+    let bodyHtml = '';
+
+    // Chapeau (résumé)
+    if (a.resume) {
+      bodyHtml += `<div class="article-chapeau">${a.resume}</div>`;
+    }
+
+    if (showGate) {
+      bodyHtml += `
+        <div class="members-gate">
+          <div class="members-gate-icon">🔒</div>
+          <div class="members-gate-title">Réservé aux membres</div>
+          <div class="members-gate-desc">La suite de cet article est accessible aux adhérents de Générations Médecins. L'adhésion est gratuite et prend moins d'une minute.</div>
+          <a href="adherer.html" class="btn btn-primary">Adhérer gratuitement →</a>
+        </div>`;
+    } else if (a.contenu) {
+      bodyHtml += `<div class="article-body-text">${mdToHtml(a.contenu)}</div>`;
+    }
+
+    // Source link
+    if (a.url) {
+      bodyHtml += `
+        <div class="source-link-block">
+          <span class="source-link-label">Source officielle</span>
+          <a href="${a.url}" target="_blank" rel="noopener noreferrer" class="source-link-url">${a.url}</a>
+        </div>`;
+    }
+
+    document.getElementById('article-body-zone').innerHTML = `
+      <div class="article-content">${bodyHtml}</div>`;
+  }
+
+  load();
+})();
+</script>
+  <script src="auth-header.js"></script>
+</body>
+</html>
