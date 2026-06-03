@@ -15,19 +15,18 @@
 
 const GOOGLE_NEWS_BASE = 'https://news.google.com/rss/search?q={q}&hl=fr&gl=FR&ceid=FR:fr';
 const GOOGLE_NEWS_QUERIES = [
-  'convention médicale médecins',
-  'syndicat médecin négociation CNAM',
+  'convention médicale médecins généralistes',
+  'syndicat médecin libéral CNAM',
   'déserts médicaux installation médecin',
-  'honoraires médecins secteur',
+  'honoraires médecins secteur conventionnel',
   'médecin libéral retraite CARMF',
   'PLFSS médecins libéraux',
+  'médecine libérale actualité',
+  'accès aux soins médecin',
 ];
 
 const RSS_FEEDS = [
-  { nom: 'Egora',                url: 'https://www.egora.fr/rss.xml' },
-  { nom: 'Quotidien du Médecin', url: 'https://www.lequotidiendumedecin.fr/feed' },
-  { nom: 'JIM',                  url: 'https://www.jim.fr/rss/actualites.xml' },
-  { nom: 'Medscape France',      url: 'https://francais.medscape.com/rss/actualites' },
+  { nom: 'Egora', url: 'https://www.egora.fr/rss.xml' },
   ...GOOGLE_NEWS_QUERIES.map(q => ({
     nom: 'Google News',
     url: GOOGLE_NEWS_BASE.replace('{q}', encodeURIComponent(q)),
@@ -86,7 +85,7 @@ function isRecent(pubDateStr) {
 // ── Claude Haiku classification ──────────────────────────────────────────────
 
 async function classifyArticle(article) {
-  const prompt = `Tu analyses un article pour le syndicat Générations Médecins IDF (médecins généralistes libéraux).
+  const prompt = `Tu analyses un article pour le syndicat Générations Médecins IDF.
 
 Titre : ${article.title}
 Source : ${article.nom}
@@ -95,13 +94,16 @@ Résumé : ${article.description?.slice(0, 500) || ''}
 
 Réponds en JSON strict avec ces champs :
 {
-  "pertinent": true|false,          // concerne les médecins généralistes libéraux français ?
-  "tags": [],                        // liste de 1 à 3 tags parmi : ${TAGS_ALLOWED.map(t => `"${t}"`).join(', ')}
-  "national": true|false,           // sujet national ou régional IDF ?
-  "resume": "string 80 mots max"    // résumé neutre et factuel
+  "pertinent": true|false,
+  "tags": [],
+  "resume": "string 80 mots max"
 }
 
-Si l'article n'est pas pertinent, renvoie pertinent:false et laisse les autres champs vides.`;
+Règle de pertinence (large) : l'article est pertinent s'il concerne la médecine en France, les médecins (généralistes OU spécialistes OU libéraux OU hospitaliers), la santé publique, l'assurance maladie, les politiques de santé, les conditions d'exercice ou la rémunération des médecins. Seuls les articles sans rapport avec la médecine (sport, culture, faits divers) sont non pertinents.
+
+Tags disponibles (1 à 3) : ${TAGS_ALLOWED.map(t => `"${t}"`).join(', ')}
+
+Si non pertinent : renvoie pertinent:false, tags:[], resume:"".`;
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -262,7 +264,13 @@ async function runVeille() {
       if (await urlAlreadyExists(item.link)) { results.skipped++; continue; }
 
       const classification = await classifyArticle({ ...item, nom: feed.nom });
-      if (!classification?.pertinent) { results.skipped++; continue; }
+      // Si GPT échoue (quota, timeout, parse error) on inclut l'article sans tags plutôt que de le perdre
+      if (classification === null) {
+        // GPT indisponible : on importe avec tags vides
+      } else if (!classification.pertinent) {
+        results.skipped++;
+        continue;
+      }
 
       const titre = item.title.slice(0, 250);
       const slug  = slugify(titre) + '-' + Date.now().toString(36);
@@ -273,7 +281,7 @@ async function runVeille() {
         url:          item.link,
         source:       feed.nom,
         publie_le:    item.pubDate ? new Date(item.pubDate).toISOString().slice(0, 10) : today,
-        resume:       classification.resume || item.description?.slice(0, 300) || '',
+        resume:       classification?.resume || item.description?.replace(/<[^>]+>/g, '').slice(0, 300) || '',
         contenu:      item.content || item.description || '',
         auteur:       null,
         categorie:    'veille',
@@ -281,7 +289,7 @@ async function runVeille() {
         publie:       true,
         auto_import:  true,
         veille_statut: 'publie',
-        tags:         classification.tags || [],
+        tags:         classification?.tags || [],
       };
 
       const inserted = await insertDecrypteur(row);
