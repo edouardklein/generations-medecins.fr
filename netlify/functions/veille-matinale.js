@@ -170,7 +170,7 @@ async function sendAdminDigest(articles) {
     <tr>
       <td style="padding:10px 12px;border-bottom:1px solid #e8edf2">
         <strong>${a.titre}</strong><br>
-        <span style="font-size:13px;color:#555">${a.source_nom} — ${new Date(a.publie_le).toLocaleDateString('fr-FR')}</span><br>
+        <span style="font-size:13px;color:#555">${a.source} — ${new Date(a.publie_le).toLocaleDateString('fr-FR')}</span><br>
         <span style="font-size:13px">${a.resume || ''}</span><br>
         ${a.tags?.length ? `<span style="font-size:12px;color:#38a8b5">${a.tags.join(' · ')}</span>` : ''}
       </td>
@@ -259,7 +259,6 @@ async function runVeille() {
         slug,
         url:          item.link,
         source:       feed.nom,
-        source_nom:   feed.nom,
         publie_le:    item.pubDate ? new Date(item.pubDate).toISOString().slice(0, 10) : today,
         resume:       classification.resume || item.description?.slice(0, 300) || '',
         contenu:      item.content || item.description || '',
@@ -274,7 +273,7 @@ async function runVeille() {
 
       const inserted = await insertDecrypteur(row);
       if (inserted) {
-        results.imported.push({ titre, source_nom: feed.nom, publie_le: row.publie_le, resume: row.resume, tags: row.tags });
+        results.imported.push({ titre, source: feed.nom, publie_le: row.publie_le, resume: row.resume, tags: row.tags });
       } else {
         results.errors.push(`Insert failed: ${titre.slice(0, 60)}`);
       }

@@ -2320,7 +2320,7 @@
 
     const { data, error } = await sb
       .from('decrypteurs')
-      .select('id, titre, source_nom, source, url, publie_le, resume, tags, veille_statut, publie')
+      .select('id, titre, source, url, publie_le, resume, tags, veille_statut, publie')
       .eq('auto_import', true)
       .eq('publie_le', filterDate)
       .order('created_at', { ascending: false });
@@ -2347,7 +2347,7 @@
         ? `<span style="background:#ffeaea;color:#c0392b;border-radius:12px;padding:2px 10px;font-size:12px;font-weight:600">Rejeté</span>`
         : `<span style="background:#eafaf1;color:#27ae60;border-radius:12px;padding:2px 10px;font-size:12px;font-weight:600">Publié</span>`;
 
-      const sourceNom = a.source_nom || a.source || '';
+      const sourceNom = a.source || '';
 
       return `
         <div id="veille-card-${a.id}" style="background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:20px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start${isRejected ? ';opacity:.55' : ''}">
