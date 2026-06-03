@@ -824,27 +824,83 @@
 
       <!-- Section: Veille automatisée (super-admin) -->
       <div id="section-veille" class="section-panel">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
-          <div>
-            <div class="main-title">Veille automatisée</div>
-            <div class="main-sub">Articles importés automatiquement ce matin — rejeter pour dépublier</div>
+        <div style="display:flex;align-items:flex-start;gap:24px">
+
+          <!-- Colonne principale -->
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+              <div>
+                <div class="main-title">Veille automatisée</div>
+                <div class="main-sub">Articles importés automatiquement ce matin — rejeter pour dépublier</div>
+              </div>
+              <button class="btn" onclick="triggerVeille()" id="btn-trigger-veille" style="background:var(--teal);color:#fff;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">
+                ▶ Lancer la veille maintenant
+              </button>
+            </div>
+            <div id="veille-status" style="margin-bottom:16px;font-size:14px;color:var(--muted)"></div>
+
+            <!-- Filtre date -->
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap">
+              <label style="font-size:14px;color:var(--muted)">Date :</label>
+              <input type="date" id="veille-date-filter" style="border:1.5px solid var(--line);border-radius:8px;padding:6px 10px;font-size:14px;color:var(--text)">
+              <button class="btn-outline" onclick="loadVeille()" style="padding:6px 14px;font-size:13px">Filtrer</button>
+            </div>
+
+            <div id="veille-grid" style="display:grid;gap:16px"></div>
+            <div id="veille-empty" style="display:none;text-align:center;padding:48px;color:var(--muted)">
+              Aucun article importé automatiquement pour cette date.
+            </div>
           </div>
-          <button class="btn" onclick="triggerVeille()" id="btn-trigger-veille" style="background:var(--teal);color:#fff;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">
-            ▶ Lancer la veille maintenant
-          </button>
-        </div>
-        <div id="veille-status" style="margin-bottom:16px;font-size:14px;color:var(--muted)"></div>
 
-        <!-- Filtre date -->
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap">
-          <label style="font-size:14px;color:var(--muted)">Date :</label>
-          <input type="date" id="veille-date-filter" style="border:1.5px solid var(--line);border-radius:8px;padding:6px 10px;font-size:14px;color:var(--text)">
-          <button class="btn-outline" onclick="loadVeille()" style="padding:6px 14px;font-size:13px">Filtrer</button>
-        </div>
+          <!-- Encart sources -->
+          <div style="flex-shrink:0;width:240px;background:#f8fafc;border:1.5px solid var(--line);border-radius:12px;padding:18px;position:sticky;top:80px">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">Sources surveillées</div>
 
-        <div id="veille-grid" style="display:grid;gap:16px"></div>
-        <div id="veille-empty" style="display:none;text-align:center;padding:48px;color:var(--muted)">
-          Aucun article importé automatiquement pour cette date.
+            <div style="font-size:12px;font-weight:600;color:var(--muted);margin:10px 0 6px">Flux RSS</div>
+            <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px">
+              <li style="display:flex;align-items:center;gap:8px;font-size:13px">
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0"></span>Egora
+              </li>
+              <li style="display:flex;align-items:center;gap:8px;font-size:13px">
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0"></span>Quotidien du Médecin
+              </li>
+              <li style="display:flex;align-items:center;gap:8px;font-size:13px">
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0"></span>JIM
+              </li>
+              <li style="display:flex;align-items:center;gap:8px;font-size:13px">
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0"></span>Medscape France
+              </li>
+            </ul>
+
+            <div style="font-size:12px;font-weight:600;color:var(--muted);margin:14px 0 6px">Google News</div>
+            <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px">
+              <li style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#555;line-height:1.3">
+                <span style="width:8px;height:8px;border-radius:50%;background:#2a6db8;flex-shrink:0;margin-top:3px"></span>Convention médicale
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#555;line-height:1.3">
+                <span style="width:8px;height:8px;border-radius:50%;background:#2a6db8;flex-shrink:0;margin-top:3px"></span>Syndicat / CNAM
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#555;line-height:1.3">
+                <span style="width:8px;height:8px;border-radius:50%;background:#2a6db8;flex-shrink:0;margin-top:3px"></span>Déserts médicaux
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#555;line-height:1.3">
+                <span style="width:8px;height:8px;border-radius:50%;background:#2a6db8;flex-shrink:0;margin-top:3px"></span>Honoraires / secteurs
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#555;line-height:1.3">
+                <span style="width:8px;height:8px;border-radius:50%;background:#2a6db8;flex-shrink:0;margin-top:3px"></span>Retraite CARMF
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#555;line-height:1.3">
+                <span style="width:8px;height:8px;border-radius:50%;background:#2a6db8;flex-shrink:0;margin-top:3px"></span>PLFSS libéraux
+              </li>
+            </ul>
+
+            <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);line-height:1.5">
+              Cron : tous les jours à 7h00<br>
+              Filtre : articles des 36 dernières heures<br>
+              Classification : GPT-4o-mini
+            </div>
+          </div>
+
         </div>
       </div>
 
