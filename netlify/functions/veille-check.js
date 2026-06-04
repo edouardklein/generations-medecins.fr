@@ -10,7 +10,7 @@ const GOOGLE_NEWS_BASE = 'https://news.google.com/rss/search?q={q}&hl=fr&gl=FR&c
 
 const FEEDS_TO_CHECK = [
   { nom: 'Egora (direct)',      url: 'https://www.egora.fr/rss.xml' },
-  { nom: "What's up Doc",       url: 'https://www.whatsupdoc-lemag.fr/rss' },
+  { nom: "What's up Doc",       url: 'https://www.whatsupdoc-lemag.fr/feed' },
   { nom: 'Quotidien (GN site)', url: GOOGLE_NEWS_BASE.replace('{q}', encodeURIComponent('site:lequotidiendumedecin.fr')) },
   { nom: 'JIM (GN site)',       url: GOOGLE_NEWS_BASE.replace('{q}', encodeURIComponent('site:jim.fr')) },
   { nom: 'Medscape (GN site)',  url: GOOGLE_NEWS_BASE.replace('{q}', encodeURIComponent('site:francais.medscape.com')) },
