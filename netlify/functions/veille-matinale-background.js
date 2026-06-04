@@ -1,7 +1,14 @@
 /**
- * Netlify Scheduled Function — Veille automatisée
- * Exécution : tous les matins à 7h00 heure de Paris (5h UTC)
- * schedule = "0 5 * * *"  (dans netlify.toml)
+ * Netlify Background Function — Veille automatisée (jusqu'à 15 min)
+ *
+ * Déclenchée :
+ *   • automatiquement chaque matin par veille-cron.js (cron 7h Paris)
+ *   • manuellement depuis l'admin (bouton « Lancer la veille »)
+ *
+ * Stratégie de collecte : les flux RSS directs des revues (Egora, Quotidien
+ * du Médecin, Medscape…) sont protégés anti-bot (403/404 depuis Netlify). On
+ * passe donc par Google News RSS avec l'opérateur `site:` qui agrège pour nous
+ * les articles de ces sources, complété par des requêtes thématiques nationales.
  *
  * Env vars requis :
  *   OPENAI_API_KEY
@@ -10,26 +17,41 @@
  *   SENDER_EMAIL         ex: contact@generations-medecins.fr
  *   SENDER_NAME          ex: Générations Médecins
  *   SUPABASE_URL
- *   SUPABASE_SERVICE_ROLE_KEY
+ *   SUPABASE_ANON_KEY
+ *   SUPABASE_SERVICE_ROLE_KEY   (sert aussi de clé partagée cron → background)
  */
 
 const GOOGLE_NEWS_BASE = 'https://news.google.com/rss/search?q={q}&hl=fr&gl=FR&ceid=FR:fr';
-const GOOGLE_NEWS_QUERIES = [
-  'convention médicale médecins généralistes',
-  'syndicat médecins libéraux CNAM négociation',
-  'médecins libéraux honoraires secteur conventionnel',
-  'médecin libéral retraite CARMF',
-  'PLFSS médecins libéraux',
-  'démographie médicale déserts France politique',
-  'grève mobilisation médecins syndicat',
-  'télémédecine téléconsultation remboursement',
+
+// On laisse Google News crawler les revues médicales pour nous (leurs flux RSS
+// directs sont protégés anti-bot et renvoient 403/404 depuis Netlify).
+// `site:` cible une source précise ; `when:2d` limite aux articles récents.
+const SOURCE_SITES = [
+  { domain: 'lequotidiendumedecin.fr', nom: 'Quotidien du Médecin' },
+  { domain: 'egora.fr',                nom: 'Egora' },
+  { domain: 'francais.medscape.com',   nom: 'Medscape' },
+  { domain: 'jim.fr',                  nom: 'JIM' },
+  { domain: 'whatsupdoc-lemag.fr',     nom: "What's up Doc" },
+];
+
+// Requêtes thématiques nationales (en complément des sources ciblées)
+const TOPIC_QUERIES = [
+  'convention médicale médecins CNAM',
+  'syndicat médecins libéraux négociation',
+  'honoraires médecins secteur conventionnel',
+  'CARMF retraite médecins libéraux',
+  'PLFSS santé médecins',
+  'numerus apertus démographie médicale',
 ];
 
 const RSS_FEEDS = [
-  { nom: 'Egora', url: 'https://www.egora.fr/rss.xml' },
-  ...GOOGLE_NEWS_QUERIES.map(q => ({
+  ...SOURCE_SITES.map(s => ({
+    nom: s.nom,
+    url: GOOGLE_NEWS_BASE.replace('{q}', encodeURIComponent(`site:${s.domain} when:2d`)),
+  })),
+  ...TOPIC_QUERIES.map(q => ({
     nom: 'Google News',
-    url: GOOGLE_NEWS_BASE.replace('{q}', encodeURIComponent(q)),
+    url: GOOGLE_NEWS_BASE.replace('{q}', encodeURIComponent(`${q} when:2d`)),
   })),
 ];
 
@@ -93,8 +115,14 @@ Article :
 
 Réponds UNIQUEMENT en JSON valide, sans texte avant ni après.
 
-Règles :
-1. "pertinent" : true si l'article concerne un enjeu NATIONAL français lié aux médecins (exercice libéral, conventionnement, honoraires, syndicats, démographie, politiques de santé, CNAM, retraite CARMF, télémédecine, formation). false si c'est un article PUREMENT LOCAL (ex: ouverture d'un cabinet dans une ville précise, un médecin qui s'installe dans un village) sans portée nationale, ou sans rapport avec la médecine.
+Règles (sois EXIGEANT, mieux vaut rejeter en cas de doute) :
+1. "pertinent" : true UNIQUEMENT si l'article :
+   - concerne la FRANCE (rejette tout article étranger : Canada, Belgique, Suisse, Afrique, etc.) ET
+   - traite d'un enjeu de PORTÉE NATIONALE intéressant les médecins libéraux français (convention, honoraires, CCAM, syndicats, CNAM, démographie médicale nationale, politiques de santé, PLFSS, CARMF, télémédecine, formation/DPC, installation).
+   pertinent = false si :
+   - article étranger (hors France),
+   - article PUREMENT LOCAL (ouverture d'un cabinet/hôpital dans une ville précise, un médecin qui s'installe dans tel village, réunion locale, initiative d'une commune ou d'un département),
+   - sans réel rapport avec l'exercice de la médecine.
 2. "tags" : entre 1 et 3 tags choisis UNIQUEMENT parmi cette liste exacte (respecte l'orthographe et la casse) : ${TAGS_ALLOWED.map(t => JSON.stringify(t)).join(', ')}
 3. "resume" : 2-3 phrases factuelles résumant l'enjeu.
 
@@ -280,17 +308,23 @@ async function runVeille() {
         continue;
       }
 
-      const titre = item.title.slice(0, 250);
-      const slug  = slugify(titre) + '-' + Date.now().toString(36);
+      // Google News formate le titre « Titre de l'article - Éditeur »
+      const rawTitle = item.title.replace(/<[^>]+>/g, '').trim();
+      const dashIdx  = rawTitle.lastIndexOf(' - ');
+      const titre    = (dashIdx > 30 ? rawTitle.slice(0, dashIdx) : rawTitle).slice(0, 250);
+      const publisher = dashIdx > 30 ? rawTitle.slice(dashIdx + 3).trim() : '';
+      // Pour les requêtes thématiques, on prend l'éditeur réel ; pour les sources ciblées, le nom du flux
+      const source   = feed.nom === 'Google News' ? (publisher || 'Google News') : feed.nom;
+      const slug     = slugify(titre) + '-' + Date.now().toString(36);
 
       const row = {
         titre,
         slug,
         url:           item.link,
-        source:        feed.nom,
+        source,
         publie_le:     item.pubDate ? new Date(item.pubDate).toISOString().slice(0, 10) : today,
-        resume:        classification.resume || (item.description || '').replace(/<[^>]+>/g, '').slice(0, 300),
-        contenu:       item.content || item.description || '',
+        resume:        classification.resume || (item.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300),
+        contenu:       (item.content || item.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
         auteur:        null,
         categorie:     'veille',
         acces:         'public',
@@ -302,7 +336,7 @@ async function runVeille() {
 
       const inserted = await insertDecrypteur(row);
       if (inserted) {
-        results.imported.push({ titre, source: feed.nom, publie_le: row.publie_le, resume: row.resume, tags: row.tags });
+        results.imported.push({ titre, source, publie_le: row.publie_le, resume: row.resume, tags: row.tags });
       } else {
         results.errors.push(`Insert failed: ${titre.slice(0, 60)}`);
       }
@@ -319,29 +353,28 @@ async function runVeille() {
   return results;
 }
 
-// ── Main handler ─────────────────────────────────────────────────────────────
+// ── Main handler (Background Function — jusqu'à 15 min) ───────────────────────
+//
+// Invocations autorisées :
+//   • cron interne   : header x-cron-key === SUPABASE_SERVICE_ROLE_KEY
+//   • admin manuel   : Authorization: Bearer <jwt super-admin>
+//
+// Une Background Function renvoie toujours 202 immédiatement ; le corps retourné
+// n'est pas transmis à l'appelant, le travail se poursuit en arrière-plan.
 
 exports.handler = async (event) => {
-  const headers = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
-  };
+  const cronKey = event.headers['x-cron-key'] || event.headers['X-Cron-Key'];
+  const isCron  = cronKey && cronKey === process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!event.httpMethod || event.httpMethod === 'GET') {
-    const results = await runVeille();
-    return { statusCode: 200, headers, body: JSON.stringify(results) };
-  }
-
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers };
-
-  if (event.httpMethod === 'POST') {
+  if (!isCron) {
     const token = (event.headers.authorization || '').replace('Bearer ', '').trim();
     const user  = await verifySuperAdmin(token);
-    if (!user) return { statusCode: 403, headers, body: '{"error":"Accès réservé aux super-admins"}' };
-    const results = await runVeille();
-    return { statusCode: 200, headers, body: JSON.stringify(results) };
+    if (!user) {
+      console.warn('Veille : invocation non autorisée refusée');
+      return { statusCode: 403 };
+    }
   }
 
-  return { statusCode: 405, headers, body: '{"error":"Method not allowed"}' };
+  const results = await runVeille();
+  return { statusCode: 200, body: JSON.stringify(results) };
 };
