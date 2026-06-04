@@ -78,24 +78,6 @@ function stripHtmlEntities(str) {
     .trim();
 }
 
-// Résout la redirection Google News pour obtenir l'URL de l'article réel
-async function resolveUrl(url) {
-  if (!url || !url.includes('news.google.com')) return url;
-  try {
-    const r = await fetch(url, {
-      method: 'GET',
-      redirect: 'follow',
-      signal: AbortSignal.timeout(6000),
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; GenerationsMedecins-Veille/2.0)' },
-    });
-    // L'URL finale après redirections est l'URL réelle de l'article
-    if (r.url && r.url !== url && !r.url.includes('news.google.com')) return r.url;
-    return url;
-  } catch {
-    return url;
-  }
-}
-
 // ── RSS parsing (minimal, no external deps) ─────────────────────────────────
 
 function parseXml(xml) {
@@ -417,13 +399,12 @@ async function runVeille() {
       const publisher = dashIdx > 30 ? rawTitle.slice(dashIdx + 3).trim() : '';
       const source    = feed.nom === 'Google News' ? (publisher || 'Google News') : feed.nom;
       const slug      = slugify(titre) + '-' + Date.now().toString(36);
-      const realUrl   = await resolveUrl(item.link);
       const resume    = classification.resume || '';
 
       const row = {
         titre,
         slug,
-        url:           realUrl,
+        url:           item.link,
         source,
         publie_le:     item.pubDate ? new Date(item.pubDate).toISOString().slice(0, 10) : today,
         resume,

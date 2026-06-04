@@ -551,7 +551,7 @@
 
         <div class="banner-info" style="background:rgba(42,109,184,0.07);border:1.5px solid rgba(42,109,184,0.2);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:0.83rem;color:var(--blue-dark);display:flex;align-items:center;gap:10px">
           <span style="font-size:1.1rem">ℹ️</span>
-          <span>Les articles du pipeline arrivent dans <strong>«&nbsp;À valider&nbsp;»</strong>. Ce formulaire permet d'écrire un article manuellement.</span>
+          <span>Cette liste regroupe les articles <strong>importés par la veille</strong> (validés) et les articles écrits manuellement. Les articles de veille rejetés n'apparaissent pas ici. « + Nouvel article » permet d'en écrire un à la main.</span>
         </div>
 
         <div id="new-decrypteur-form" style="display:none" class="card-form">
@@ -1395,21 +1395,38 @@
 
   // ── Décrypteurs ─────────────────────────────────────────────
   async function loadDecrypteurs() {
-    const { data } = await sb.from('decrypteurs').select('id,titre,categorie,publie_le,acces').order('publie_le', { ascending: false });
+    const { data } = await sb
+      .from('decrypteurs')
+      .select('id,titre,categorie,publie_le,acces,tags,source,auto_import,veille_statut,publie')
+      .order('publie_le', { ascending: false });
     const tbody = document.getElementById('decrypteurs-tbody');
-    if (!data || !data.length) {
+
+    // On masque les articles de veille rejetés : on ne montre que la veille validée + les articles manuels
+    const visibles = (data || []).filter(d => !(d.auto_import && d.veille_statut === 'rejete'));
+
+    if (!visibles.length) {
       tbody.innerHTML = '<tr><td colspan="5" class="table-empty">Aucun article.</td></tr>';
       return;
     }
-    tbody.innerHTML = data.map(d => `
+    tbody.innerHTML = visibles.map(d => {
+      const tagsHtml = (d.tags || []).length
+        ? (d.tags || []).map(t => {
+            const c = (typeof VEILLE_TAGS_COLORS !== 'undefined' && VEILLE_TAGS_COLORS[t]) || '#888';
+            return `<span style="display:inline-block;background:${c}15;color:${c};border:1px solid ${c}40;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:600;margin:1px 2px">${esc(t)}</span>`;
+          }).join('')
+        : `<span style="text-transform:capitalize;color:var(--muted)">${esc(d.categorie || '—')}</span>`;
+      const sourceLabel = d.auto_import
+        ? `<span style="font-size:0.7rem;color:var(--teal);font-weight:700">VEILLE${d.source ? ' · ' + esc(d.source) : ''}</span>`
+        : `<span style="font-size:0.7rem;color:var(--muted);font-weight:700">MANUEL</span>`;
+      return `
       <tr>
-        <td style="font-weight:700">${esc(d.titre)}</td>
-        <td><span style="text-transform:capitalize">${esc(d.categorie)}</span></td>
+        <td style="font-weight:700">${esc(d.titre)}<br>${sourceLabel}</td>
+        <td>${tagsHtml}</td>
         <td style="color:var(--muted);font-size:0.78rem">${fmtDate(d.publie_le)}</td>
         <td>${d.acces === 'public' ? '<span class="status-badge status-actif">Public</span>' : '<span class="status-badge status-attente">Membres</span>'}</td>
         <td><button class="btn-action btn-supprimer" onclick="deleteDecrypteur('${d.id}')">Supprimer</button></td>
-      </tr>
-    `).join('');
+      </tr>`;
+    }).join('');
   }
 
   window.toggleNewDecrypteur = function() {
@@ -2430,7 +2447,7 @@
             ${a.resume ? `<div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:10px">${stripHtml(a.resume)}</div>` : ''}
             <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
               ${tags}
-              ${a.url ? (() => { let d = ''; try { d = new URL(a.url).hostname.replace(/^www\./,''); } catch {} return `<a href="${a.url}" target="_blank" rel="noopener" style="font-size:12px;color:#fff;background:var(--blue);border-radius:6px;padding:3px 10px;text-decoration:none;font-weight:600;flex-shrink:0">Lire ${d ? 'sur ' + d : 'l\'article'} ↗</a>`; })() : ''}
+              ${a.url ? `<a href="${a.url}" target="_blank" rel="noopener" style="font-size:12px;color:#fff;background:var(--blue);border-radius:6px;padding:3px 10px;text-decoration:none;font-weight:600;flex-shrink:0">Lire l'article${a.source && !/google/i.test(a.source) ? ' sur ' + a.source : ''} ↗</a>` : ''}
             </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
