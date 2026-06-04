@@ -2459,12 +2459,64 @@
     loadVeille();
   };
 
+  let veilleEnCours = false; // verrou anti-double-clic
+
   window.triggerVeille = async function() {
+    if (veilleEnCours) return; // déjà une veille en cours
+
     const btn    = document.getElementById('btn-trigger-veille');
     const status = document.getElementById('veille-status');
-    btn.disabled = true;
-    btn.textContent = '⏳ Lancement…';
-    status.textContent = '';
+
+    veilleEnCours  = true;
+    btn.disabled   = true;
+    btn.style.opacity = '.6';
+    btn.style.cursor  = 'not-allowed';
+    btn.textContent = '⏳ Veille en cours…';
+
+    const DUREE_MS = 180000; // 3 min estimées
+    const launchISO = new Date().toISOString();
+
+    // Compte les articles déjà importés avant le lancement (pour mesurer le delta)
+    const compteImportes = async () => {
+      const { count } = await sb
+        .from('decrypteurs')
+        .select('id', { count: 'exact', head: true })
+        .eq('auto_import', true)
+        .gte('created_at', launchISO);
+      return count || 0;
+    };
+
+    const renderProgress = (pct, nbImportes, fini) => {
+      const pctAff = Math.min(100, Math.round(pct));
+      status.innerHTML = `
+        <div style="background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;max-width:520px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <span style="font-size:14px;font-weight:600;color:${fini ? 'var(--green)' : 'var(--blue)'}">
+              ${fini ? '✓ Veille terminée' : '⏳ Analyse des sources en cours…'}
+            </span>
+            <span style="font-size:13px;font-weight:700;color:var(--teal)">
+              ${nbImportes} article${nbImportes !== 1 ? 's' : ''} importé${nbImportes !== 1 ? 's' : ''}
+            </span>
+          </div>
+          <div style="height:8px;background:var(--surface);border-radius:6px;overflow:hidden">
+            <div style="height:100%;width:${pctAff}%;background:linear-gradient(90deg,var(--teal),var(--green));border-radius:6px;transition:width .6s ease"></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:8px">
+            ${fini
+              ? 'Tu peux relancer une veille si besoin. Les doublons sont ignorés automatiquement.'
+              : 'GPT classe chaque article (pertinence, tags). Les articles apparaissent au fur et à mesure.'}
+          </div>
+        </div>`;
+    };
+
+    const terminer = (fini = true) => {
+      veilleEnCours    = false;
+      btn.disabled     = false;
+      btn.style.opacity = '1';
+      btn.style.cursor  = 'pointer';
+      btn.textContent  = '▶ Lancer la veille maintenant';
+    };
+
     try {
       const { data: { session: s } } = await sb.auth.getSession();
       const token = s?.access_token;
@@ -2473,32 +2525,33 @@
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
+
       if (res.status === 202 || res.ok) {
-        status.innerHTML = '⏳ Veille lancée en arrière-plan. Les articles apparaissent au fur et à mesure (1 à 3 min). Actualisation automatique…';
-        status.style.color = 'var(--blue)';
-        // Rafraîchit la liste plusieurs fois pendant que la veille tourne
-        let ticks = 0;
-        const iv = setInterval(() => {
+        renderProgress(2, 0, false);
+        const start = Date.now();
+        const iv = setInterval(async () => {
+          const elapsed = Date.now() - start;
+          const nb = await compteImportes();
           loadVeille();
-          if (++ticks >= 6) { // 6 × 30 s = 3 min
+          if (elapsed >= DUREE_MS) {
             clearInterval(iv);
-            status.innerHTML = '✓ Veille terminée. Actualise la page si besoin.';
-            status.style.color = 'var(--green)';
+            renderProgress(100, nb, true);
+            terminer(true);
+          } else {
+            // Progression basée sur le temps écoulé, plafonnée à 95% tant que pas fini
+            renderProgress(Math.min(95, (elapsed / DUREE_MS) * 100), nb, false);
           }
-        }, 30000);
+        }, 5000); // toutes les 5 s : barre fluide + compteur en direct
       } else if (res.status === 403) {
-        status.textContent = 'Accès refusé (super-admin requis).';
-        status.style.color = 'var(--red)';
+        status.innerHTML = '<span style="color:var(--red)">Accès refusé (super-admin requis).</span>';
+        terminer(false);
       } else {
-        status.textContent = 'Erreur : ' + res.status;
-        status.style.color = 'var(--red)';
+        status.innerHTML = `<span style="color:var(--red)">Erreur : ${res.status}</span>`;
+        terminer(false);
       }
     } catch (e) {
-      status.textContent = 'Erreur réseau : ' + e.message;
-      status.style.color = 'var(--red)';
-    } finally {
-      btn.disabled = false;
-      btn.textContent = '▶ Lancer la veille maintenant';
+      status.innerHTML = `<span style="color:var(--red)">Erreur réseau : ${e.message}</span>`;
+      terminer(false);
     }
   };
 
