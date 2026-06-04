@@ -5,53 +5,51 @@
  *   • automatiquement chaque matin par veille-cron.js (cron 7h Paris)
  *   • manuellement depuis l'admin (bouton « Lancer la veille »)
  *
- * Stratégie de collecte : les flux RSS directs des revues (Egora, Quotidien
- * du Médecin, Medscape…) sont protégés anti-bot (403/404 depuis Netlify). On
- * passe donc par Google News RSS avec l'opérateur `site:` qui agrège pour nous
- * les articles de ces sources, complété par des requêtes thématiques nationales.
- *
  * Env vars requis :
  *   OPENAI_API_KEY
  *   BREVO_API_KEY
- *   ADMIN_EMAIL          ex: alexis.bourla@gmail.com
- *   SENDER_EMAIL         ex: contact@generations-medecins.fr
- *   SENDER_NAME          ex: Générations Médecins
+ *   ADMIN_EMAIL
+ *   SENDER_EMAIL
+ *   SENDER_NAME
  *   SUPABASE_URL
  *   SUPABASE_ANON_KEY
- *   SUPABASE_SERVICE_ROLE_KEY   (sert aussi de clé partagée cron → background)
+ *   SUPABASE_SERVICE_ROLE_KEY
  */
 
 const GOOGLE_NEWS_BASE = 'https://news.google.com/rss/search?q={q}&hl=fr&gl=FR&ceid=FR:fr';
 
-// On laisse Google News crawler les revues médicales pour nous (leurs flux RSS
-// directs sont protégés anti-bot et renvoient 403/404 depuis Netlify).
-// `site:` cible une source précise ; `when:2d` limite aux articles récents.
-const SOURCE_SITES = [
-  { domain: 'lequotidiendumedecin.fr', nom: 'Quotidien du Médecin' },
-  { domain: 'egora.fr',                nom: 'Egora' },
-  { domain: 'francais.medscape.com',   nom: 'Medscape' },
-  { domain: 'jim.fr',                  nom: 'JIM' },
-  { domain: 'whatsupdoc-lemag.fr',     nom: "What's up Doc" },
+// Flux RSS directs (les plus fiables — on les tente en priorité)
+const DIRECT_FEEDS = [
+  { nom: 'Egora',          url: 'https://www.egora.fr/rss.xml' },
+  { nom: "What's up Doc",  url: 'https://www.whatsupdoc-lemag.fr/rss' },
 ];
 
-// Requêtes thématiques nationales (en complément des sources ciblées)
+// Sources supplémentaires via Google News site: (contournement anti-bot)
+const GN_SITE_QUERIES = [
+  { domain: 'lequotidiendumedecin.fr', nom: 'Quotidien du Médecin' },
+  { domain: 'jim.fr',                  nom: 'JIM' },
+  { domain: 'francais.medscape.com',   nom: 'Medscape' },
+];
+
+// Requêtes thématiques nationales
 const TOPIC_QUERIES = [
   'convention médicale médecins CNAM',
   'syndicat médecins libéraux négociation',
   'honoraires médecins secteur conventionnel',
   'CARMF retraite médecins libéraux',
   'PLFSS santé médecins',
-  'numerus apertus démographie médicale',
 ];
 
+// Assemblage de tous les flux
 const RSS_FEEDS = [
-  ...SOURCE_SITES.map(s => ({
+  ...DIRECT_FEEDS,
+  ...GN_SITE_QUERIES.map(s => ({
     nom: s.nom,
-    url: GOOGLE_NEWS_BASE.replace('{q}', encodeURIComponent(`site:${s.domain} when:2d`)),
+    url: GOOGLE_NEWS_BASE.replace('{q}', encodeURIComponent(`site:${s.domain}`)),
   })),
   ...TOPIC_QUERIES.map(q => ({
     nom: 'Google News',
-    url: GOOGLE_NEWS_BASE.replace('{q}', encodeURIComponent(`${q} when:2d`)),
+    url: GOOGLE_NEWS_BASE.replace('{q}', encodeURIComponent(q)),
   })),
 ];
 
@@ -95,7 +93,7 @@ function isRecent(pubDateStr) {
   if (!pubDateStr) return true;
   try {
     const diff = (Date.now() - new Date(pubDateStr)) / 36e5;
-    return diff <= 36;
+    return diff <= 48; // Élargi à 48h
   } catch {
     return true;
   }
@@ -115,19 +113,13 @@ Article :
 
 Réponds UNIQUEMENT en JSON valide, sans texte avant ni après.
 
-Règles (sois EXIGEANT, mieux vaut rejeter en cas de doute) :
-1. "pertinent" : true UNIQUEMENT si l'article :
-   - concerne la FRANCE (rejette tout article étranger : Canada, Belgique, Suisse, Afrique, etc.) ET
-   - traite d'un enjeu de PORTÉE NATIONALE intéressant les médecins libéraux français (convention, honoraires, CCAM, syndicats, CNAM, démographie médicale nationale, politiques de santé, PLFSS, CARMF, télémédecine, formation/DPC, installation).
-   pertinent = false si :
-   - article étranger (hors France),
-   - article PUREMENT LOCAL (ouverture d'un cabinet/hôpital dans une ville précise, un médecin qui s'installe dans tel village, réunion locale, initiative d'une commune ou d'un département),
-   - sans réel rapport avec l'exercice de la médecine.
-2. "tags" : entre 1 et 3 tags choisis UNIQUEMENT parmi cette liste exacte (respecte l'orthographe et la casse) : ${TAGS_ALLOWED.map(t => JSON.stringify(t)).join(', ')}
-3. "resume" : 2-3 phrases factuelles résumant l'enjeu.
+Règles :
+1. "pertinent" : true si l'article concerne la FRANCE et traite d'un enjeu NATIONAL intéressant les médecins libéraux français (convention, honoraires, CCAM, syndicats, CNAM, démographie médicale, politiques de santé, PLFSS, CARMF, télémédecine, formation, installation).
+   pertinent = false si : article étranger (Canada, Belgique, etc.) OU purement local (une ville, un département).
+2. "tags" : entre 1 et 3 tags parmi : ${TAGS_ALLOWED.map(t => JSON.stringify(t)).join(', ')}
+3. "resume" : 2-3 phrases factuelles.
 
-Exemple de réponse valide :
-{"pertinent": true, "tags": ["Convention médicale", "Syndicat"], "resume": "La CNAM et les syndicats de médecins ont ouvert de nouvelles négociations conventionnelles. Les discussions portent sur la revalorisation des honoraires."}`;
+Exemple valide : {"pertinent": true, "tags": ["Convention médicale", "Syndicat"], "resume": "La CNAM a ouvert de nouvelles négociations. Les syndicats demandent une revalorisation des honoraires."}`;
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -190,7 +182,12 @@ async function insertDecrypteur(row) {
     },
     body: JSON.stringify(row),
   });
-  return res.ok ? await res.json() : null;
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    console.error(`Insert failed (${res.status}):`, body.slice(0, 200));
+    return null;
+  }
+  return await res.json();
 }
 
 // ── Slug helper ──────────────────────────────────────────────────────────────
@@ -206,12 +203,13 @@ function slugify(str) {
 
 // ── Brevo admin digest ───────────────────────────────────────────────────────
 
-async function sendAdminDigest(articles) {
-  if (!process.env.ADMIN_EMAIL || !articles.length) return;
+async function sendAdminDigest(imported, stats) {
+  if (!process.env.ADMIN_EMAIL) return;
 
-  const logoUrl = 'https://generations-medecins.fr/logoGM.jpeg';
   const siteUrl = 'https://generations-medecins.fr';
-  const rows    = articles.map(a => `
+  const dateStr = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  const articleRows = imported.map(a => `
     <tr>
       <td style="padding:10px 12px;border-bottom:1px solid #e8edf2">
         <strong>${a.titre}</strong><br>
@@ -221,24 +219,47 @@ async function sendAdminDigest(articles) {
       </td>
     </tr>`).join('');
 
+  const errorSection = stats.errors.length ? `
+    <div style="background:#fff8f8;border:1px solid #fcc;border-radius:8px;padding:16px;margin-top:16px">
+      <strong style="color:#c0392b">⚠ Erreurs (${stats.errors.length})</strong>
+      <ul style="margin:8px 0 0;padding-left:20px;font-size:13px;color:#666">
+        ${stats.errors.map(e => `<li>${e}</li>`).join('')}
+      </ul>
+    </div>` : '';
+
+  const statsSection = `
+    <div style="background:#f0f7ff;border:1px solid #c5d9f0;border-radius:8px;padding:16px;margin-top:16px;font-size:13px;color:#444">
+      <strong>Bilan de la veille</strong><br>
+      ✅ ${imported.length} article${imported.length !== 1 ? 's' : ''} importé${imported.length !== 1 ? 's' : ''}
+      · ⏭ ${stats.skipped} ignorés
+      · 🌍 ${stats.skipped_regional} non-nationaux
+      · 🤖 ${stats.gpt_errors} erreurs GPT
+      · 📡 ${stats.feed_stats.length} flux testés<br><br>
+      <strong>Flux par flux :</strong><br>
+      ${stats.feed_stats.map(f => `• ${f.nom} : ${f.status} — ${f.items} articles récupérés${f.error ? ' — ⚠ ' + f.error : ''}`).join('<br>')}
+    </div>`;
+
   const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;margin:0;padding:0">
 <div style="max-width:680px;margin:0 auto">
   <div style="background:linear-gradient(135deg,#1a5c3e,#27956a,#38a8b5);padding:32px 40px;text-align:center">
-    <img src="${logoUrl}" width="90" style="border-radius:16px;margin-bottom:12px"><br>
     <span style="color:#fff;font-size:22px;font-weight:700">Veille du matin</span><br>
-    <span style="color:rgba(255,255,255,.8);font-size:14px">${new Date().toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long'})}</span>
+    <span style="color:rgba(255,255,255,.8);font-size:14px">${dateStr}</span>
   </div>
   <div style="padding:24px 32px;background:#f8fafc">
-    <p style="color:#333;margin:0 0 16px">${articles.length} article${articles.length > 1 ? 's' : ''} importé${articles.length > 1 ? 's' : ''} automatiquement. <a href="${siteUrl}/mockup/admin.html" style="color:#2a6db8">Espace admin → Veille</a> pour rejeter les non pertinents.</p>
+    ${imported.length > 0 ? `
+    <p style="color:#333;margin:0 0 16px">${imported.length} article${imported.length > 1 ? 's' : ''} importé${imported.length > 1 ? 's' : ''} automatiquement.
+      <a href="${siteUrl}/mockup/admin.html" style="color:#2a6db8">Espace admin → Veille</a> pour rejeter les non pertinents.</p>
     <table style="width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e8edf2">
-      ${rows}
-    </table>
-  </div>
-  <div style="text-align:center;padding:20px;color:#999;font-size:12px">
-    <img src="${logoUrl}" width="60" style="border-radius:10px;margin-bottom:8px"><br>
-    Générations Médecins IDF
+      ${articleRows}
+    </table>` : `<p style="color:#666;margin:0 0 16px">Aucun article importé aujourd'hui.</p>`}
+    ${statsSection}
+    ${errorSection}
   </div>
 </div></body></html>`;
+
+  const subject = imported.length > 0
+    ? `[Veille] ${imported.length} article${imported.length > 1 ? 's' : ''} importé${imported.length > 1 ? 's' : ''} — ${new Date().toLocaleDateString('fr-FR')}`
+    : `[Veille] Aucun article importé — ${new Date().toLocaleDateString('fr-FR')}`;
 
   await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
@@ -246,10 +267,10 @@ async function sendAdminDigest(articles) {
     body: JSON.stringify({
       sender:      { name: process.env.SENDER_NAME || 'Générations Médecins', email: process.env.SENDER_EMAIL },
       to:          [{ email: process.env.ADMIN_EMAIL }],
-      subject:     `[Veille] ${articles.length} article${articles.length > 1 ? 's' : ''} importé${articles.length > 1 ? 's' : ''} — ${new Date().toLocaleDateString('fr-FR')}`,
+      subject,
       htmlContent: html,
     }),
-  });
+  }).catch(e => console.error('Brevo error:', e.message));
 }
 
 // ── Auth helper ──────────────────────────────────────────────────────────────
@@ -273,31 +294,73 @@ async function verifySuperAdmin(token) {
 // ── Core logic ───────────────────────────────────────────────────────────────
 
 async function runVeille() {
-  const results = { imported: [], skipped: 0, skipped_regional: 0, gpt_errors: 0, errors: [] };
-  const today   = new Date().toISOString().slice(0, 10);
+  const results = {
+    imported: [],
+    skipped: 0,
+    skipped_regional: 0,
+    gpt_errors: 0,
+    errors: [],
+    feed_stats: [],
+  };
+  const today = new Date().toISOString().slice(0, 10);
 
   for (const feed of RSS_FEEDS) {
+    const feedStat = { nom: feed.nom, url: feed.url, status: '', items: 0, error: '' };
     let xml;
     try {
-      const r = await fetch(feed.url, { headers: { 'User-Agent': 'GenerationsMedecins-Veille/1.0' } });
+      const r = await fetch(feed.url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; GenerationsMedecins-Veille/2.0; +https://generations-medecins.fr)',
+          'Accept':     'application/rss+xml, application/xml, text/xml, */*',
+        },
+        signal: AbortSignal.timeout(15000),
+      });
+      feedStat.status = `HTTP ${r.status}`;
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       xml = await r.text();
     } catch (e) {
+      feedStat.error = e.message;
       results.errors.push(`${feed.nom}: ${e.message}`);
+      results.feed_stats.push(feedStat);
       continue;
     }
 
     const items = parseXml(xml).filter(i => isRecent(i.pubDate));
+    feedStat.items = items.length;
+    results.feed_stats.push(feedStat);
 
-    for (const item of items.slice(0, 10)) {
+    console.log(`Feed ${feed.nom}: ${items.length} items récents`);
+
+    for (const item of items.slice(0, 8)) {
       if (!item.link || !item.title) { results.skipped++; continue; }
       if (await urlAlreadyExists(item.link)) { results.skipped++; continue; }
+
+      // Si OpenAI non configuré, on importe sans classification
+      if (!process.env.OPENAI_API_KEY) {
+        console.warn('OPENAI_API_KEY non configuré — import sans classification GPT');
+        const rawTitle = item.title.replace(/<[^>]+>/g, '').trim();
+        const dashIdx  = rawTitle.lastIndexOf(' - ');
+        const titre    = (dashIdx > 30 ? rawTitle.slice(0, dashIdx) : rawTitle).slice(0, 250);
+        const source   = feed.nom;
+        const slug     = slugify(titre) + '-' + Date.now().toString(36);
+        const row = {
+          titre, slug, url: item.link, source,
+          publie_le: item.pubDate ? new Date(item.pubDate).toISOString().slice(0, 10) : today,
+          resume: (item.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300),
+          contenu: (item.content || item.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+          auteur: null, categorie: 'avenant', acces: 'public',
+          publie: true, auto_import: true, veille_statut: 'publie', tags: [],
+        };
+        const inserted = await insertDecrypteur(row);
+        if (inserted) results.imported.push({ titre, source, publie_le: row.publie_le, resume: row.resume, tags: [] });
+        else results.errors.push(`Insert failed: ${titre.slice(0, 60)}`);
+        continue;
+      }
 
       const classification = await classifyArticle({ ...item, nom: feed.nom });
 
       if (classification === null) {
         results.gpt_errors++;
-        // GPT indisponible — on skippe plutôt que d'importer sans tags
         results.skipped++;
         continue;
       }
@@ -308,12 +371,10 @@ async function runVeille() {
         continue;
       }
 
-      // Google News formate le titre « Titre de l'article - Éditeur »
       const rawTitle = item.title.replace(/<[^>]+>/g, '').trim();
       const dashIdx  = rawTitle.lastIndexOf(' - ');
       const titre    = (dashIdx > 30 ? rawTitle.slice(0, dashIdx) : rawTitle).slice(0, 250);
       const publisher = dashIdx > 30 ? rawTitle.slice(dashIdx + 3).trim() : '';
-      // Pour les requêtes thématiques, on prend l'éditeur réel ; pour les sources ciblées, le nom du flux
       const source   = feed.nom === 'Google News' ? (publisher || 'Google News') : feed.nom;
       const slug     = slugify(titre) + '-' + Date.now().toString(36);
 
@@ -326,7 +387,7 @@ async function runVeille() {
         resume:        classification.resume || (item.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300),
         contenu:       (item.content || item.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
         auteur:        null,
-        categorie:     'veille',
+        categorie:     'avenant',
         acces:         'public',
         publie:        true,
         auto_import:   true,
@@ -343,24 +404,16 @@ async function runVeille() {
     }
   }
 
-  if (results.imported.length > 0) {
-    await sendAdminDigest(results.imported);
-  }
+  // Toujours envoyer l'email de synthèse (même à 0 articles, pour diagnostiquer)
+  await sendAdminDigest(results.imported, results);
 
-  console.log(`Veille : ${results.imported.length} importés, ${results.skipped} ignorés (dont ${results.skipped_regional} régionaux, ${results.gpt_errors} erreurs GPT), ${results.errors.length} erreurs feed`);
-  if (results.errors.length) console.error(results.errors.join('\n'));
+  console.log(`Veille : ${results.imported.length} importés, ${results.skipped} ignorés (${results.skipped_regional} régionaux, ${results.gpt_errors} GPT errors), ${results.errors.length} erreurs feed`);
+  if (results.errors.length) console.error('Erreurs:', results.errors.join('\n'));
 
   return results;
 }
 
-// ── Main handler (Background Function — jusqu'à 15 min) ───────────────────────
-//
-// Invocations autorisées :
-//   • cron interne   : header x-cron-key === SUPABASE_SERVICE_ROLE_KEY
-//   • admin manuel   : Authorization: Bearer <jwt super-admin>
-//
-// Une Background Function renvoie toujours 202 immédiatement ; le corps retourné
-// n'est pas transmis à l'appelant, le travail se poursuit en arrière-plan.
+// ── Main handler ─────────────────────────────────────────────────────────────
 
 exports.handler = async (event) => {
   const cronKey = event.headers['x-cron-key'] || event.headers['X-Cron-Key'];

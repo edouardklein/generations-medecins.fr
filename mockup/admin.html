@@ -833,9 +833,12 @@
                 <div class="main-title">Veille automatisée</div>
                 <div class="main-sub">Articles importés automatiquement ce matin — rejeter pour dépublier</div>
               </div>
-              <div style="display:flex;gap:10px;align-items:center">
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
                 <button class="btn" onclick="viderVeille()" style="background:#fff;color:#c0392b;border:1.5px solid #e74c3c;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">
                   🗑 Vider la veille
+                </button>
+                <button onclick="checkVeille()" id="btn-check-veille" style="background:#fff;color:var(--blue);border:1.5px solid var(--blue);padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">
+                  🔍 Tester les flux
                 </button>
                 <button class="btn" onclick="triggerVeille()" id="btn-trigger-veille" style="background:var(--teal);color:#fff;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">
                   ▶ Lancer la veille maintenant
@@ -2496,6 +2499,66 @@
     } finally {
       btn.disabled = false;
       btn.textContent = '▶ Lancer la veille maintenant';
+    }
+  };
+
+  window.checkVeille = async function() {
+    const btn    = document.getElementById('btn-check-veille');
+    const status = document.getElementById('veille-status');
+    btn.disabled = true;
+    btn.textContent = '⏳ Test en cours…';
+    status.textContent = '';
+    try {
+      const { data: { session: s } } = await sb.auth.getSession();
+      const token = s?.access_token;
+      const res = await fetch('/.netlify/functions/veille-check', {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.status === 403) { status.textContent = 'Accès refusé (super-admin requis).'; status.style.color = 'var(--red)'; return; }
+      if (!res.ok) { status.textContent = 'Erreur : ' + res.status; status.style.color = 'var(--red)'; return; }
+      const data = await res.json();
+
+      // Afficher variables d'environnement
+      const envRows = Object.entries(data.env).map(([k, v]) =>
+        `<span style="display:inline-block;margin:2px 4px;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:600;background:${v === true ? '#eafaf1' : '#fff8f8'};color:${v === true ? '#27ae60' : '#c0392b'}">${k}: ${v === true ? '✓' : (v === false ? '✗ NON DÉFINI' : v)}</span>`
+      ).join('');
+
+      // Afficher résultats par flux
+      const feedRows = data.feeds.map(f =>
+        `<tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:6px 10px;font-size:13px;font-weight:600">${f.nom}</td>
+          <td style="padding:6px 10px;font-size:13px;text-align:center">
+            <span style="padding:2px 8px;border-radius:6px;font-size:12px;font-weight:700;background:${f.ok ? '#eafaf1' : '#fff8f8'};color:${f.ok ? '#27ae60' : '#c0392b'}">${f.status}</span>
+          </td>
+          <td style="padding:6px 10px;font-size:13px;text-align:center">${f.items} articles</td>
+          <td style="padding:6px 10px;font-size:12px;color:var(--muted)">${f.titles?.join(' · ') || (f.error || '')}</td>
+        </tr>`
+      ).join('');
+
+      status.innerHTML = `
+        <div style="background:#f8fafc;border:1.5px solid var(--line);border-radius:10px;padding:16px;margin-bottom:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Variables d'environnement</div>
+          <div>${envRows}</div>
+        </div>
+        <div style="background:#f8fafc;border:1.5px solid var(--line);border-radius:10px;overflow:hidden">
+          <table style="width:100%;border-collapse:collapse">
+            <thead><tr style="background:var(--surface)">
+              <th style="padding:8px 10px;font-size:12px;font-weight:700;color:var(--muted);text-align:left">Flux</th>
+              <th style="padding:8px 10px;font-size:12px;font-weight:700;color:var(--muted)">Statut</th>
+              <th style="padding:8px 10px;font-size:12px;font-weight:700;color:var(--muted)">Articles</th>
+              <th style="padding:8px 10px;font-size:12px;font-weight:700;color:var(--muted);text-align:left">Titres (aperçu)</th>
+            </tr></thead>
+            <tbody>${feedRows}</tbody>
+          </table>
+        </div>`;
+      status.style.color = 'inherit';
+    } catch (e) {
+      status.textContent = 'Erreur réseau : ' + e.message;
+      status.style.color = 'var(--red)';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🔍 Tester les flux';
     }
   };
 
