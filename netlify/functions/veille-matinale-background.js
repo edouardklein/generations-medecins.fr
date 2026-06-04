@@ -64,6 +64,38 @@ const TAGS_ALLOWED = [
   'Syndicat',
 ];
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function stripHtmlEntities(str) {
+  return str
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#\d+;/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Résout la redirection Google News pour obtenir l'URL de l'article réel
+async function resolveUrl(url) {
+  if (!url || !url.includes('news.google.com')) return url;
+  try {
+    const r = await fetch(url, {
+      method: 'GET',
+      redirect: 'follow',
+      signal: AbortSignal.timeout(6000),
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; GenerationsMedecins-Veille/2.0)' },
+    });
+    // L'URL finale après redirections est l'URL réelle de l'article
+    if (r.url && r.url !== url && !r.url.includes('news.google.com')) return r.url;
+    return url;
+  } catch {
+    return url;
+  }
+}
+
 // ── RSS parsing (minimal, no external deps) ─────────────────────────────────
 
 function parseXml(xml) {
@@ -101,9 +133,9 @@ function isRecent(pubDateStr) {
 // ── GPT-4o-mini classification ───────────────────────────────────────────────
 
 async function classifyArticle(article) {
-  const description = (article.description || '').replace(/<[^>]+>/g, '').slice(0, 500);
+  const description = stripHtmlEntities((article.description || '').replace(/<[\s\S]*?>/g, ' ')).slice(0, 500);
 
-  const prompt = `Tu es assistant éditorial pour le syndicat Générations Médecins IDF.
+  const prompt = `Tu es assistant éditorial pour le syndicat Générations Médecins IDF (syndicat de médecins libéraux).
 
 Article :
 - Titre : ${article.title}
@@ -112,13 +144,22 @@ Article :
 
 Réponds UNIQUEMENT en JSON valide, sans texte avant ni après.
 
-Règles :
-1. "pertinent" : true si l'article concerne la FRANCE et traite d'un enjeu NATIONAL intéressant les médecins libéraux français (convention, honoraires, CCAM, syndicats, CNAM, démographie médicale, politiques de santé, PLFSS, CARMF, télémédecine, formation, installation).
-   pertinent = false si : article étranger (Canada, Belgique, etc.) OU purement local (une ville, un département).
-2. "tags" : entre 1 et 3 tags parmi : ${TAGS_ALLOWED.map(t => JSON.stringify(t)).join(', ')}
-3. "resume" : 2-3 phrases factuelles.
+RÈGLE FONDAMENTALE : Ce site est un site SYNDICAL pour les médecins libéraux. Il ne publie PAS d'articles de médecine clinique.
 
-Exemple valide : {"pertinent": true, "tags": ["Convention médicale", "Syndicat"], "resume": "La CNAM a ouvert de nouvelles négociations. Les syndicats demandent une revalorisation des honoraires."}`;
+1. "pertinent" : true UNIQUEMENT si l'article porte sur l'un de ces sujets :
+   ✅ À retenir : convention médicale / honoraires / CCAM / cotation · syndicats de médecins, négociations CNAM · démographie médicale, déserts médicaux, installation · médecine libérale (cabinet, remplacement, MSP) · PLFSS, politique de santé impactant l'exercice · CARMF, retraite, cotisations URSSAF · Ordre des médecins, URPS, représentativité · responsabilité médicale, procédures judiciaires contre des médecins · conditions d'exercice, burn-out des médecins · numerus apertus, formation médicale initiale · télémédecine si enjeu réglementaire/tarifaire
+
+   ❌ À rejeter absolument :
+   - Articles purement CLINIQUES : nouvelles recommandations thérapeutiques, études sur des maladies, essais cliniques, congrès de spécialité médicale (allergologie, oncologie, cardiologie…)
+   - Articles sur des maladies ou traitements (eczéma, asthme, diabète, cancer, obésité, psychiatrie…) SAUF si l'angle est l'organisation des soins ou les droits des médecins
+   - Congrès scientifiques, publications de guidelines cliniques
+   - Articles étrangers (Canada, Belgique, Suisse…)
+   - Articles purement locaux (une ville, un département)
+
+2. "tags" : entre 1 et 3 tags parmi : ${TAGS_ALLOWED.map(t => JSON.stringify(t)).join(', ')}
+3. "resume" : 2-3 phrases factuelles sur l'enjeu pour les médecins libéraux.
+
+Exemple valide : {"pertinent": true, "tags": ["Convention médicale", "Syndicat"], "resume": "La CNAM a ouvert de nouvelles négociations conventionnelles. Les syndicats demandent une revalorisation des honoraires."}`;
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -370,21 +411,23 @@ async function runVeille() {
         continue;
       }
 
-      const rawTitle = item.title.replace(/<[^>]+>/g, '').trim();
-      const dashIdx  = rawTitle.lastIndexOf(' - ');
-      const titre    = (dashIdx > 30 ? rawTitle.slice(0, dashIdx) : rawTitle).slice(0, 250);
+      const rawTitle  = stripHtmlEntities(item.title.replace(/<[\s\S]*?>/g, ' '));
+      const dashIdx   = rawTitle.lastIndexOf(' - ');
+      const titre     = (dashIdx > 30 ? rawTitle.slice(0, dashIdx) : rawTitle).slice(0, 250);
       const publisher = dashIdx > 30 ? rawTitle.slice(dashIdx + 3).trim() : '';
-      const source   = feed.nom === 'Google News' ? (publisher || 'Google News') : feed.nom;
-      const slug     = slugify(titre) + '-' + Date.now().toString(36);
+      const source    = feed.nom === 'Google News' ? (publisher || 'Google News') : feed.nom;
+      const slug      = slugify(titre) + '-' + Date.now().toString(36);
+      const realUrl   = await resolveUrl(item.link);
+      const resume    = classification.resume || '';
 
       const row = {
         titre,
         slug,
-        url:           item.link,
+        url:           realUrl,
         source,
         publie_le:     item.pubDate ? new Date(item.pubDate).toISOString().slice(0, 10) : today,
-        resume:        classification.resume || (item.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300),
-        contenu:       (item.content || item.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+        resume,
+        contenu:       resume, // on n'expose pas le HTML brut du RSS
         auteur:        null,
         categorie:     'avenant',
         acces:         'public',

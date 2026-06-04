@@ -407,10 +407,15 @@
 
     // Source link
     if (a.url) {
+      let displayDomain = '';
+      try { displayDomain = new URL(a.url).hostname.replace(/^www\./, ''); } catch {}
       bodyHtml += `
         <div class="source-link-block">
           <span class="source-link-label">Source officielle</span>
-          <a href="${a.url}" target="_blank" rel="noopener noreferrer" class="source-link-url">${a.url}</a>
+          <a href="${a.url}" target="_blank" rel="noopener noreferrer"
+             style="display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;border-radius:8px;padding:9px 18px;font-size:14px;font-weight:600;text-decoration:none">
+            Lire l'article${displayDomain ? ` sur ${displayDomain}` : ''} ↗
+          </a>
         </div>`;
     }
 

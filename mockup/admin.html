@@ -2430,7 +2430,7 @@
             ${a.resume ? `<div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:10px">${stripHtml(a.resume)}</div>` : ''}
             <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
               ${tags}
-              ${a.url ? `<a href="${a.url}" target="_blank" rel="noopener" style="font-size:12px;color:var(--blue);text-decoration:none;margin-left:4px">↗ Source</a>` : ''}
+              ${a.url ? (() => { let d = ''; try { d = new URL(a.url).hostname.replace(/^www\./,''); } catch {} return `<a href="${a.url}" target="_blank" rel="noopener" style="font-size:12px;color:#fff;background:var(--blue);border-radius:6px;padding:3px 10px;text-decoration:none;font-weight:600;flex-shrink:0">Lire ${d ? 'sur ' + d : 'l\'article'} ↗</a>`; })() : ''}
             </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
