@@ -362,6 +362,9 @@
       <button class="sidebar-link" onclick="showSection('decrypteurs-admin')" id="nav-decrypteurs-admin">
         <span class="icon">📰</span><span>Décrypteurs</span>
       </button>
+      <button class="sidebar-link super-admin-only" onclick="showSection('veille')" id="nav-veille" style="display:none">
+        <span class="icon">🔍</span><span>Veille</span>
+      </button>
       <button class="sidebar-link" onclick="showSection('plaidoyer-admin')" id="nav-plaidoyer-admin">
         <span class="icon">⚖️</span><span>Plaidoyer</span>
       </button>
@@ -369,9 +372,6 @@
       <div class="sidebar-section-label super-admin-only" style="display:none">Communication</div>
       <button class="sidebar-link super-admin-only" onclick="showSection('communication')" id="nav-communication" style="display:none">
         <span class="icon">📨</span><span>Communication</span>
-      </button>
-      <button class="sidebar-link super-admin-only" onclick="showSection('veille')" id="nav-veille" style="display:none">
-        <span class="icon">🔍</span><span>Veille</span>
       </button>
 
       <div class="sidebar-section-label">Navigation</div>
@@ -2365,6 +2365,9 @@
       dateInput.value = new Date().toISOString().slice(0, 10);
     }
     const filterDate = dateInput.value;
+    // Filtre sur created_at (date d'import) et non publie_le (date de l'article source)
+    const dayStart = filterDate + 'T00:00:00.000Z';
+    const dayEnd   = filterDate + 'T23:59:59.999Z';
 
     grid.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:24px">Chargement…</div>';
     empty.style.display = 'none';
@@ -2373,7 +2376,8 @@
       .from('decrypteurs')
       .select('id, titre, source, url, publie_le, resume, tags, veille_statut, publie')
       .eq('auto_import', true)
-      .eq('publie_le', filterDate)
+      .gte('created_at', dayStart)
+      .lte('created_at', dayEnd)
       .order('created_at', { ascending: false });
 
     if (error) {
