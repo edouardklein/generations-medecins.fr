@@ -21,7 +21,6 @@ const GOOGLE_NEWS_BASE = 'https://news.google.com/rss/search?q={q}&hl=fr&gl=FR&c
 // Flux RSS directs (les plus fiables — on les tente en priorité)
 const DIRECT_FEEDS = [
   { nom: 'Egora',          url: 'https://www.egora.fr/rss.xml' },
-  { nom: "What's up Doc",  url: 'https://www.whatsupdoc-lemag.fr/feed' },
 ];
 
 // Sources supplémentaires via Google News site: (contournement anti-bot)
@@ -29,6 +28,7 @@ const GN_SITE_QUERIES = [
   { domain: 'lequotidiendumedecin.fr', nom: 'Quotidien du Médecin' },
   { domain: 'jim.fr',                  nom: 'JIM' },
   { domain: 'francais.medscape.com',   nom: 'Medscape' },
+  { domain: 'whatsupdoc-lemag.fr',     nom: "What's up Doc" },
 ];
 
 // Requêtes thématiques nationales
