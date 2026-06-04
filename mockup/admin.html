@@ -2465,8 +2465,9 @@
       } else {
         const n = json.imported?.length || 0;
         let msg = `✓ ${n} article${n > 1 ? 's' : ''} importé${n > 1 ? 's' : ''}`;
-        if (json.skipped) msg += ` · ${json.skipped} ignorés`;
-        if (json.errors?.length) msg += ` · ${json.errors.length} erreur(s)`;
+        if (json.skipped_regional) msg += ` · ${json.skipped_regional} régionaux exclus`;
+        if (json.gpt_errors)       msg += ` · ${json.gpt_errors} erreurs GPT`;
+        if (json.errors?.length)   msg += ` · ${json.errors.length} erreurs flux`;
         status.innerHTML = msg;
         if (json.errors?.length) {
           status.innerHTML += '<br><small style="color:var(--red)">' + json.errors.join('<br>') + '</small>';

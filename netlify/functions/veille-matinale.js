@@ -16,13 +16,13 @@
 const GOOGLE_NEWS_BASE = 'https://news.google.com/rss/search?q={q}&hl=fr&gl=FR&ceid=FR:fr';
 const GOOGLE_NEWS_QUERIES = [
   'convention médicale médecins généralistes',
-  'syndicat médecin libéral CNAM',
-  'déserts médicaux installation médecin',
-  'honoraires médecins secteur conventionnel',
+  'syndicat médecins libéraux CNAM négociation',
+  'médecins libéraux honoraires secteur conventionnel',
   'médecin libéral retraite CARMF',
   'PLFSS médecins libéraux',
-  'médecine libérale actualité',
-  'accès aux soins médecin',
+  'démographie médicale déserts France politique',
+  'grève mobilisation médecins syndicat',
+  'télémédecine téléconsultation remboursement',
 ];
 
 const RSS_FEEDS = [
@@ -48,7 +48,6 @@ const TAGS_ALLOWED = [
 // ── RSS parsing (minimal, no external deps) ─────────────────────────────────
 
 function parseXml(xml) {
-  // Returns array of {title, link, pubDate, description, content}
   const items = [];
   const itemRe = /<item[^>]*>([\s\S]*?)<\/item>/gi;
   let m;
@@ -71,60 +70,65 @@ function parseXml(xml) {
 }
 
 function isRecent(pubDateStr) {
-  if (!pubDateStr) return true; // no date → keep
+  if (!pubDateStr) return true;
   try {
-    const pub  = new Date(pubDateStr);
-    const now  = new Date();
-    const diff = (now - pub) / 36e5; // hours
-    return diff <= 36; // publiée dans les 36 dernières heures
+    const diff = (Date.now() - new Date(pubDateStr)) / 36e5;
+    return diff <= 36;
   } catch {
     return true;
   }
 }
 
-// ── Claude Haiku classification ──────────────────────────────────────────────
+// ── GPT-4o-mini classification ───────────────────────────────────────────────
 
 async function classifyArticle(article) {
-  const prompt = `Tu analyses un article pour le syndicat Générations Médecins IDF.
+  const description = (article.description || '').replace(/<[^>]+>/g, '').slice(0, 500);
 
-Titre : ${article.title}
-Source : ${article.nom}
-Date : ${article.pubDate}
-Résumé : ${article.description?.slice(0, 500) || ''}
+  const prompt = `Tu es assistant éditorial pour le syndicat Générations Médecins IDF.
 
-Réponds en JSON strict avec ces champs :
-{
-  "pertinent": true|false,
-  "tags": [],
-  "resume": "string 80 mots max"
-}
+Article :
+- Titre : ${article.title}
+- Source : ${article.nom}
+- Résumé : ${description}
 
-Règle de pertinence (large) : l'article est pertinent s'il concerne la médecine en France, les médecins (généralistes OU spécialistes OU libéraux OU hospitaliers), la santé publique, l'assurance maladie, les politiques de santé, les conditions d'exercice ou la rémunération des médecins. Seuls les articles sans rapport avec la médecine (sport, culture, faits divers) sont non pertinents.
+Réponds UNIQUEMENT en JSON valide, sans texte avant ni après.
 
-Tags disponibles (1 à 3) : ${TAGS_ALLOWED.map(t => `"${t}"`).join(', ')}
+Règles :
+1. "pertinent" : true si l'article concerne un enjeu NATIONAL français lié aux médecins (exercice libéral, conventionnement, honoraires, syndicats, démographie, politiques de santé, CNAM, retraite CARMF, télémédecine, formation). false si c'est un article PUREMENT LOCAL (ex: ouverture d'un cabinet dans une ville précise, un médecin qui s'installe dans un village) sans portée nationale, ou sans rapport avec la médecine.
+2. "tags" : entre 1 et 3 tags choisis UNIQUEMENT parmi cette liste exacte (respecte l'orthographe et la casse) : ${TAGS_ALLOWED.map(t => JSON.stringify(t)).join(', ')}
+3. "resume" : 2-3 phrases factuelles résumant l'enjeu.
 
-Si non pertinent : renvoie pertinent:false, tags:[], resume:"".`;
+Exemple de réponse valide :
+{"pertinent": true, "tags": ["Convention médicale", "Syndicat"], "resume": "La CNAM et les syndicats de médecins ont ouvert de nouvelles négociations conventionnelles. Les discussions portent sur la revalorisation des honoraires."}`;
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-      'Content-Type':  'application/json',
+      Authorization:  `Bearer ${process.env.OPENAI_API_KEY}`,
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model:      'gpt-4o-mini',
-      max_tokens: 300,
-      messages:   [{ role: 'user', content: prompt }],
+      model:           'gpt-4o-mini',
+      max_tokens:      400,
+      response_format: { type: 'json_object' },
+      messages:        [{ role: 'user', content: prompt }],
     }),
   });
 
-  if (!res.ok) return null;
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    console.error('GPT error:', res.status, err?.error?.message || '');
+    return null;
+  }
+
   const data = await res.json();
   const text = data.choices?.[0]?.message?.content || '';
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) return null;
   try {
-    return JSON.parse(jsonMatch[0]);
+    const parsed = JSON.parse(text);
+    if (parsed.tags) {
+      parsed.tags = parsed.tags.filter(t => TAGS_ALLOWED.includes(t));
+    }
+    return parsed;
   } catch {
     return null;
   }
@@ -133,8 +137,6 @@ Si non pertinent : renvoie pertinent:false, tags:[], resume:"".`;
 // ── Supabase helpers ─────────────────────────────────────────────────────────
 
 async function urlAlreadyExists(url) {
-  // Déduplique uniquement parmi les imports auto des 7 derniers jours
-  // (ignore les articles de l'ancienne pipeline qui ont auto_import=false)
   const since = new Date(Date.now() - 7 * 24 * 36e5).toISOString();
   const res = await fetch(
     `${process.env.SUPABASE_URL}/rest/v1/decrypteurs?url=eq.${encodeURIComponent(url)}&auto_import=eq.true&created_at=gte.${since}&select=id&limit=1`,
@@ -153,8 +155,8 @@ async function insertDecrypteur(row) {
   const res = await fetch(`${process.env.SUPABASE_URL}/rest/v1/decrypteurs`, {
     method: 'POST',
     headers: {
-      apikey:        process.env.SUPABASE_SERVICE_ROLE_KEY,
-      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+      apikey:         process.env.SUPABASE_SERVICE_ROLE_KEY,
+      Authorization:  `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
       'Content-Type': 'application/json',
       Prefer:         'return=representation',
     },
@@ -179,9 +181,9 @@ function slugify(str) {
 async function sendAdminDigest(articles) {
   if (!process.env.ADMIN_EMAIL || !articles.length) return;
 
-  const logoUrl  = 'https://generations-medecins.fr/logoGM.jpeg';
-  const siteUrl  = 'https://generations-medecins.fr';
-  const rows     = articles.map(a => `
+  const logoUrl = 'https://generations-medecins.fr/logoGM.jpeg';
+  const siteUrl = 'https://generations-medecins.fr';
+  const rows    = articles.map(a => `
     <tr>
       <td style="padding:10px 12px;border-bottom:1px solid #e8edf2">
         <strong>${a.titre}</strong><br>
@@ -199,7 +201,7 @@ async function sendAdminDigest(articles) {
     <span style="color:rgba(255,255,255,.8);font-size:14px">${new Date().toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long'})}</span>
   </div>
   <div style="padding:24px 32px;background:#f8fafc">
-    <p style="color:#333;margin:0 0 16px">${articles.length} article${articles.length > 1 ? 's' : ''} importé${articles.length > 1 ? 's' : ''} automatiquement aujourd'hui. Rendez-vous dans l'<a href="${siteUrl}/mockup/admin.html" style="color:#2a6db8">espace admin → Veille</a> pour rejeter les articles non pertinents.</p>
+    <p style="color:#333;margin:0 0 16px">${articles.length} article${articles.length > 1 ? 's' : ''} importé${articles.length > 1 ? 's' : ''} automatiquement. <a href="${siteUrl}/mockup/admin.html" style="color:#2a6db8">Espace admin → Veille</a> pour rejeter les non pertinents.</p>
     <table style="width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e8edf2">
       ${rows}
     </table>
@@ -214,15 +216,15 @@ async function sendAdminDigest(articles) {
     method: 'POST',
     headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      sender:  { name: process.env.SENDER_NAME || 'Générations Médecins', email: process.env.SENDER_EMAIL },
-      to:      [{ email: process.env.ADMIN_EMAIL }],
-      subject: `[Veille] ${articles.length} article${articles.length > 1 ? 's' : ''} importé${articles.length > 1 ? 's' : ''} — ${new Date().toLocaleDateString('fr-FR')}`,
+      sender:      { name: process.env.SENDER_NAME || 'Générations Médecins', email: process.env.SENDER_EMAIL },
+      to:          [{ email: process.env.ADMIN_EMAIL }],
+      subject:     `[Veille] ${articles.length} article${articles.length > 1 ? 's' : ''} importé${articles.length > 1 ? 's' : ''} — ${new Date().toLocaleDateString('fr-FR')}`,
       htmlContent: html,
     }),
   });
 }
 
-// ── Auth helper (same as other functions) ────────────────────────────────────
+// ── Auth helper ──────────────────────────────────────────────────────────────
 
 async function verifySuperAdmin(token) {
   if (!token) return null;
@@ -240,10 +242,10 @@ async function verifySuperAdmin(token) {
   return admins?.[0]?.role === 'super_admin' ? user : null;
 }
 
-// ── Core logic (shared by cron + HTTP) ───────────────────────────────────────
+// ── Core logic ───────────────────────────────────────────────────────────────
 
 async function runVeille() {
-  const results = { imported: [], skipped: 0, errors: [] };
+  const results = { imported: [], skipped: 0, skipped_regional: 0, gpt_errors: 0, errors: [] };
   const today   = new Date().toISOString().slice(0, 10);
 
   for (const feed of RSS_FEEDS) {
@@ -264,10 +266,16 @@ async function runVeille() {
       if (await urlAlreadyExists(item.link)) { results.skipped++; continue; }
 
       const classification = await classifyArticle({ ...item, nom: feed.nom });
-      // Si GPT échoue (quota, timeout, parse error) on inclut l'article sans tags plutôt que de le perdre
+
       if (classification === null) {
-        // GPT indisponible : on importe avec tags vides
-      } else if (!classification.pertinent) {
+        results.gpt_errors++;
+        // GPT indisponible — on skippe plutôt que d'importer sans tags
+        results.skipped++;
+        continue;
+      }
+
+      if (!classification.pertinent) {
+        results.skipped_regional++;
         results.skipped++;
         continue;
       }
@@ -278,18 +286,18 @@ async function runVeille() {
       const row = {
         titre,
         slug,
-        url:          item.link,
-        source:       feed.nom,
-        publie_le:    item.pubDate ? new Date(item.pubDate).toISOString().slice(0, 10) : today,
-        resume:       classification?.resume || item.description?.replace(/<[^>]+>/g, '').slice(0, 300) || '',
-        contenu:      item.content || item.description || '',
-        auteur:       null,
-        categorie:    'veille',
-        acces:        'public',
-        publie:       true,
-        auto_import:  true,
+        url:           item.link,
+        source:        feed.nom,
+        publie_le:     item.pubDate ? new Date(item.pubDate).toISOString().slice(0, 10) : today,
+        resume:        classification.resume || (item.description || '').replace(/<[^>]+>/g, '').slice(0, 300),
+        contenu:       item.content || item.description || '',
+        auteur:        null,
+        categorie:     'veille',
+        acces:         'public',
+        publie:        true,
+        auto_import:   true,
         veille_statut: 'publie',
-        tags:         classification?.tags || [],
+        tags:          classification.tags || [],
       };
 
       const inserted = await insertDecrypteur(row);
@@ -305,7 +313,7 @@ async function runVeille() {
     await sendAdminDigest(results.imported);
   }
 
-  console.log(`Veille : ${results.imported.length} importés, ${results.skipped} ignorés, ${results.errors.length} erreurs`);
+  console.log(`Veille : ${results.imported.length} importés, ${results.skipped} ignorés (dont ${results.skipped_regional} régionaux, ${results.gpt_errors} erreurs GPT), ${results.errors.length} erreurs feed`);
   if (results.errors.length) console.error(results.errors.join('\n'));
 
   return results;
@@ -320,9 +328,7 @@ exports.handler = async (event) => {
     'Access-Control-Allow-Headers': 'Authorization, Content-Type',
   };
 
-  // Scheduled cron invocation (no HTTP method)
   if (!event.httpMethod || event.httpMethod === 'GET') {
-    // only run if called from Netlify scheduler (no auth needed)
     const results = await runVeille();
     return { statusCode: 200, headers, body: JSON.stringify(results) };
   }
@@ -330,15 +336,12 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers };
 
   if (event.httpMethod === 'POST') {
-    // Manual trigger from admin — requires super-admin auth
     const token = (event.headers.authorization || '').replace('Bearer ', '').trim();
     const user  = await verifySuperAdmin(token);
     if (!user) return { statusCode: 403, headers, body: '{"error":"Accès réservé aux super-admins"}' };
-
     const results = await runVeille();
     return { statusCode: 200, headers, body: JSON.stringify(results) };
   }
 
   return { statusCode: 405, headers, body: '{"error":"Method not allowed"}' };
 };
-
