@@ -106,7 +106,7 @@ function isRecent(pubDateStr) {
   if (!pubDateStr) return true;
   try {
     const diff = (Date.now() - new Date(pubDateStr)) / 36e5;
-    return diff <= 48; // Élargi à 48h
+    return diff <= 26; // ~26h : couvre un run quotidien + légère marge
   } catch {
     return true;
   }
