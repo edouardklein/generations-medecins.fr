@@ -106,6 +106,45 @@
       .doc-head { flex-direction: column; gap: 24px; }
       .doc-dest, .doc-lieu-date, .doc-signature { text-align: left; }
     }
+
+    /* ── Variables panel (slide-in from right) ── */
+    .vars-panel {
+      position: fixed; top: 0; right: -440px; width: 420px; height: 100vh;
+      background: #fff; border-left: 1.5px solid var(--line);
+      box-shadow: -8px 0 30px rgba(23,54,95,0.12);
+      z-index: 150; overflow-y: auto; transition: right .3s cubic-bezier(.4,0,.2,1);
+      display: flex; flex-direction: column;
+    }
+    .vars-panel.open { right: 0; }
+    .vars-panel-head { padding: 24px 24px 16px; border-bottom: 1px solid var(--line); }
+    .vars-panel-head h2 { font-size: 1rem; font-weight: 800; color: var(--ink); margin: 0 0 4px; }
+    .vars-panel-head p { font-size: 0.82rem; color: var(--muted); margin: 0; line-height: 1.5; }
+    .vars-panel-body { flex: 1; padding: 20px 24px; overflow-y: auto; }
+    .vars-panel-footer { padding: 16px 24px; border-top: 1px solid var(--line); background: #fff; }
+    .var-group { margin-bottom: 20px; }
+    .var-group label { display: block; font-size: 0.82rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .var-hint { font-size: 0.76rem; color: var(--muted); margin-bottom: 6px; line-height: 1.4; }
+    .var-group input[type=text], .var-group input[type=url], .var-group input[type=date],
+    .var-group textarea, .var-group select {
+      width: 100%; padding: 9px 12px; border: 1.5px solid var(--line);
+      border-radius: 9px; font-family: inherit; font-size: 0.88rem; outline: none; box-sizing: border-box;
+    }
+    .var-group input:focus, .var-group textarea:focus, .var-group select:focus { border-color: var(--blue); }
+    .var-group textarea { min-height: 72px; resize: vertical; }
+    .address-search-wrap { position: relative; }
+    .address-results {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 10;
+      background: #fff; border: 1.5px solid var(--blue); border-top: none;
+      border-radius: 0 0 9px 9px; overflow: hidden; display: none; box-shadow: 0 6px 18px rgba(23,54,95,.12);
+    }
+    .address-results.show { display: block; }
+    .addr-item { padding: 10px 12px; font-size: 0.84rem; cursor: pointer; border-bottom: 1px solid var(--surface); }
+    .addr-item:last-child { border-bottom: none; }
+    .addr-item:hover { background: var(--surface); }
+    .rpps-status { font-size: 0.76rem; color: var(--muted); margin-top: 6px; min-height: 18px; }
+    .rpps-status.ok { color: #3d8a1a; }
+    .vars-overlay-bg { position: fixed; inset: 0; background: rgba(15,32,51,0.3); z-index: 140; display: none; }
+    .vars-overlay-bg.open { display: block; }
   </style>
 </head>
 <body>
@@ -207,6 +246,21 @@
 
   <div class="toast" id="toast"></div>
 
+  <!-- Overlay bg for vars panel -->
+  <div class="vars-overlay-bg" id="vars-overlay-bg" onclick="closeVarsPanel()"></div>
+
+  <!-- Variables slide-in panel -->
+  <aside class="vars-panel" id="vars-panel">
+    <div class="vars-panel-head">
+      <h2>✏️ Compléter le courrier</h2>
+      <p>Quelques informations sont nécessaires pour personnaliser ce modèle.</p>
+    </div>
+    <div class="vars-panel-body" id="vars-fields"></div>
+    <div class="vars-panel-footer">
+      <button class="tool-btn primary" style="width:100%;padding:12px" onclick="applyVars()">Insérer et éditer le courrier →</button>
+    </div>
+  </aside>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
   (function () {
@@ -215,9 +269,11 @@
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
     let membre = null;
-    let courrierId = null;     // id de courriers_generes (null = pas encore sauvé)
+    let courrierId = null;
     let statut = 'brouillon';
     let partageToken = null;
+    let currentTemplate = '';   // raw contenu_template text
+    let currentSlug = '';       // slug du modèle chargé
 
     const $ = (id) => document.getElementById(id);
     const params = new URLSearchParams(location.search);
@@ -231,7 +287,126 @@
     window.fmt = (cmd) => document.execCommand(cmd, false, null);
     window.closeModal = (id) => $(id).classList.remove('open');
 
-    // ── Init ────────────────────────────────────────────────────────────────
+    // ── Données géographiques IDF ────────────────────────────────────────────
+    const DEPT_MAP = {
+      '75': { ville: 'Paris',                 tpl: 'Paris' },
+      '92': { ville: 'Boulogne-Billancourt',  tpl: 'Hauts-de-Seine' },
+      '93': { ville: 'Bobigny',               tpl: 'Seine-Saint-Denis' },
+      '94': { ville: 'Créteil',               tpl: 'Val-de-Marne' },
+      '91': { ville: 'Évry',                  tpl: 'Essonne' },
+      '77': { ville: 'Melun',                 tpl: 'Seine-et-Marne' },
+      '78': { ville: 'Versailles',            tpl: 'Yvelines' },
+      '95': { ville: 'Cergy',                 tpl: "Val-d'Oise" },
+      '69': { ville: 'Lyon',                  tpl: 'Rhône' },
+      '13': { ville: 'Marseille',             tpl: 'Bouches-du-Rhône' },
+      '31': { ville: 'Toulouse',              tpl: 'Haute-Garonne' },
+      '33': { ville: 'Bordeaux',              tpl: 'Gironde' },
+      '34': { ville: 'Montpellier',           tpl: 'Hérault' },
+      '44': { ville: 'Nantes',                tpl: 'Loire-Atlantique' },
+      '59': { ville: 'Lille',                 tpl: 'Nord' },
+      '67': { ville: 'Strasbourg',            tpl: 'Bas-Rhin' },
+      '06': { ville: 'Nice',                  tpl: 'Alpes-Maritimes' },
+    };
+
+    const CPAM_ADRESSES = {
+      '75': 'CPAM de Paris\n50, avenue du Professeur-André-Lemierre\n75986 Paris Cedex 20',
+      '92': 'CPAM des Hauts-de-Seine\n96, avenue de Paris\n92100 Boulogne-Billancourt',
+      '93': 'CPAM de Seine-Saint-Denis\n195, allée Georges Méliès\n93100 Montreuil',
+      '94': 'CPAM du Val-de-Marne\n2, avenue de Verdun\n94680 Vincennes Cedex',
+      '91': "CPAM de l'Essonne\n10, cours Louis Lumière\n91001 Évry Cedex",
+      '77': 'CPAM de Seine-et-Marne\n33, avenue de la Gatine\n77004 Melun Cedex',
+      '78': 'CPAM des Yvelines\n11, avenue de Saint-Cloud\n78019 Versailles Cedex',
+      '95': "CPAM du Val-d'Oise\n7, avenue du 8 mai 1945\n95000 Cergy",
+    };
+
+    // Destinataires connus par slug de modèle
+    const KNOWN_DEST = {
+      'demande-suppression-fiche-google': [
+        'Service Juridique',
+        'Google Ireland Limited',
+        'Gordon House, Barrow Street',
+        'Dublin 4, Irlande',
+      ],
+    };
+
+    // Config des champs du panel par variable name
+    const VAR_CFG = {
+      adresse_cabinet: { label: 'Adresse du cabinet',          type: 'address',
+        hint: 'Votre adresse professionnelle (n° et rue, code postal, ville)' },
+      url_fiche:       { label: 'URL de la fiche Google',       type: 'url',
+        hint: 'URL complète de la fiche Google My Business (https://maps.app.goo.gl/…)' },
+      departement:     { label: 'Département de la CPAM',       type: 'dept',
+        hint: 'Déterminé automatiquement depuis votre code postal' },
+      date_notification: { label: 'Date de notification de la MAP', type: 'date',
+        hint: 'Date indiquée sur le courrier de mise sous accord préalable' },
+      objet_map:       { label: 'Objet de la mise sous accord préalable', type: 'text',
+        hint: 'Ex. : la prescription de kinésithérapie' },
+      motifs:          { label: 'Motifs de contestation',       type: 'textarea',
+        hint: 'Décrivez vos motifs (peut être complété après dans l\'éditeur)' },
+    };
+
+    // ── Utilitaires ───────────────────────────────────────────────────────────
+    function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    function getVilleFromCP(cp) {
+      if (!cp) return '';
+      const key = cp.startsWith('75') ? '75' : cp.substring(0, 2);
+      return DEPT_MAP[key]?.ville || cp;
+    }
+
+    function getDeptCodeFromCP(cp) {
+      if (!cp) return '';
+      return cp.startsWith('75') ? '75' : cp.substring(0, 2);
+    }
+
+    function getDeptTplFromCode(code) { return DEPT_MAP[code]?.tpl || code; }
+
+    // ── Rendu du template ─────────────────────────────────────────────────────
+    // prenom_nom intentionnellement SANS "Dr" — le template l'écrit lui-même
+    function renderDocument(tpl, extra) {
+      const ville = membre?.ville || getVilleFromCP(membre?.code_postal);
+      const map = {
+        prenom_nom:  `${membre?.prenom || ''} ${membre?.nom || ''}`.trim(),
+        ville,
+        code_postal: membre?.code_postal || '',
+        rpps:        membre?.rpps || '',
+        date:        new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
+        ...extra,
+      };
+      return (tpl || '').replace(/\{\{(\w+)\}\}/g, (_, key) =>
+        (map[key] !== undefined && map[key] !== '')
+          ? escapeHtml(String(map[key]))
+          : `<mark data-var="${key}" style="background:#fff3cd;border-radius:3px;padding:0 2px">[${key}]</mark>`
+      );
+    }
+
+    function textToHtml(txt) {
+      return (txt || '').split(/\n{2,}/).map(b => `<p>${b.replace(/\n/g, '<br>')}</p>`).join('');
+    }
+
+    function detectUnknownVars(html) {
+      const matches = [...html.matchAll(/data-var="(\w+)"/g)];
+      return [...new Set(matches.map(m => m[1]))];
+    }
+
+    // ── Expéditeur ────────────────────────────────────────────────────────────
+    function fillExpediteur() {
+      const lignes = [];
+      if (membre) {
+        lignes.push(`Dr ${membre.prenom || ''} ${membre.nom || ''}`.trim());
+        if (membre.specialite) lignes.push(membre.specialite);
+        const ville = membre.ville || getVilleFromCP(membre.code_postal);
+        const villeLine = [membre.code_postal, ville].filter(Boolean).join(' ');
+        if (villeLine) lignes.push(villeLine);
+        if (membre.telephone) lignes.push('Tél : ' + membre.telephone);
+        if (membre.email) lignes.push(membre.email);
+        if (membre.rpps && !membre.est_interne) lignes.push('RPPS : ' + membre.rpps);
+      }
+      $('doc-expediteur').innerHTML = `<div class="doc-label">Expéditeur</div>` +
+        lignes.map(l => `<div>${escapeHtml(l)}</div>`).join('');
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────
     async function init() {
       const { data: { session } } = await sb.auth.getSession();
       if (!session) { location.href = 'connexion.html?next=' + encodeURIComponent(location.pathname + location.search); return; }
@@ -239,10 +414,9 @@
       const { data: m } = await sb.from('membres').select('*').eq('user_id', session.user.id).single();
       membre = m;
 
-      // Pré-remplit l'expéditeur depuis le profil
       fillExpediteur();
-      // Lieu + date du jour
-      $('doc-lieudate').textContent = `${membre?.ville || '________'}, le ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+      const ville = membre?.ville || getVilleFromCP(membre?.code_postal) || '________';
+      $('doc-lieudate').textContent = `${ville}, le ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`;
 
       const existingId = params.get('courrier');
       const modeleId   = params.get('modele');
@@ -256,51 +430,196 @@
       }
     }
 
-    function fillExpediteur() {
-      const lignes = [];
-      if (membre) {
-        lignes.push(`Dr ${membre.prenom || ''} ${membre.nom || ''}`.trim());
-        if (membre.specialite) lignes.push(membre.specialite);
-        const villeLine = [membre.code_postal, membre.ville].filter(Boolean).join(' ');
-        if (villeLine) lignes.push(villeLine);
-        if (membre.telephone) lignes.push('Tél : ' + membre.telephone);
-        if (membre.email) lignes.push(membre.email);
-        if (membre.rpps && !membre.est_interne) lignes.push('RPPS : ' + membre.rpps);
-      }
-      $('doc-expediteur').innerHTML = `<div class="doc-label">Expéditeur</div>` +
-        lignes.map(l => `<div>${escapeHtml(l)}</div>`).join('');
-    }
-
-    function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-
-    // Remplace les variables {{xxx}} connues par les données du profil
-    function fillVariables(tpl) {
-      const map = {
-        prenom_nom: `Dr ${membre?.prenom || ''} ${membre?.nom || ''}`.trim(),
-        ville: membre?.ville || '',
-        code_postal: membre?.code_postal || '',
-        rpps: membre?.rpps || '',
-        date: new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
-      };
-      return (tpl || '').replace(/\{\{(\w+)\}\}/g, (full, key) =>
-        map[key] !== undefined && map[key] !== '' ? map[key] : `<mark style="background:#fff3cd;border-radius:3px;padding:0 2px">[${key}]</mark>`);
-    }
-
-    // Convertit un template texte (avec \n) en HTML paragraphes
-    function textToHtml(txt) {
-      return (txt || '').split(/\n{2,}/).map(b => `<p>${b.replace(/\n/g, '<br>')}</p>`).join('');
-    }
-
+    // ── Chargement modèle ─────────────────────────────────────────────────────
     async function loadModele(modeleId) {
       const { data: mod, error } = await sb.from('courriers').select('*').eq('id', modeleId).single();
       if (error || !mod) { toast('Modèle introuvable', true); $('titre').value = 'Nouveau courrier'; return; }
+
+      currentTemplate = mod.contenu_template;
+      currentSlug     = mod.slug || '';
       $('titre').value = mod.titre;
-      // L'objet : on essaie d'extraire la 1re ligne "Objet :" du template, sinon le titre
-      const body = fillVariables(mod.contenu_template);
-      $('doc-body').innerHTML = textToHtml(body);
       $('doc-objet').innerHTML = 'Objet : ' + escapeHtml(mod.titre);
+
+      // Pré-remplit le destinataire connu
+      if (KNOWN_DEST[currentSlug]) {
+        $('doc-destinataire').innerHTML = `<div class="doc-label">Destinataire</div>` +
+          KNOWN_DEST[currentSlug].map(l => `<div>${escapeHtml(l)}</div>`).join('');
+      }
+
+      // Rendu initial (vars inconnues → marks jaunes)
+      const rendered = renderDocument(currentTemplate, {});
+      $('doc-body').innerHTML = textToHtml(rendered);
+
+      // Détecte les variables non remplies
+      const unknowns = detectUnknownVars(rendered);
+      if (unknowns.length) {
+        openVarsPanel(unknowns);
+      }
     }
 
+    // ── Panel variables ───────────────────────────────────────────────────────
+    function openVarsPanel(vars) {
+      const container = $('vars-fields');
+      container.innerHTML = '';
+      const deptCode = getDeptCodeFromCP(membre?.code_postal);
+
+      vars.forEach(varName => {
+        const cfg = VAR_CFG[varName] || { label: varName, type: 'text', hint: '' };
+        const group = document.createElement('div');
+        group.className = 'var-group';
+
+        let inner = '';
+
+        if (varName === 'adresse_cabinet') {
+          inner = `
+            <label>Adresse du cabinet</label>
+            <div class="var-hint">${cfg.hint}</div>
+            <div class="address-search-wrap">
+              <input type="text" id="var-adresse_cabinet" placeholder="Commencez à taper pour rechercher…" autocomplete="off">
+              <div class="address-results" id="ban-results"></div>
+            </div>
+            <div class="rpps-status" id="rpps-status"></div>`;
+        } else if (varName === 'departement') {
+          const options = Object.entries(DEPT_MAP).map(([code, d]) =>
+            `<option value="${code}" ${code === deptCode ? 'selected' : ''}>${d.tpl} (${code})</option>`
+          ).join('');
+          inner = `
+            <label>Département de la CPAM</label>
+            <div class="var-hint">${cfg.hint}</div>
+            <select id="var-departement">${options}<option value="">Autre…</option></select>`;
+        } else if (cfg.type === 'textarea') {
+          inner = `
+            <label>${escapeHtml(cfg.label)}</label>
+            ${cfg.hint ? `<div class="var-hint">${escapeHtml(cfg.hint)}</div>` : ''}
+            <textarea id="var-${varName}" placeholder="${escapeHtml(cfg.hint || '')}"></textarea>`;
+        } else if (cfg.type === 'date') {
+          inner = `
+            <label>${escapeHtml(cfg.label)}</label>
+            ${cfg.hint ? `<div class="var-hint">${escapeHtml(cfg.hint)}</div>` : ''}
+            <input type="date" id="var-${varName}">`;
+        } else {
+          inner = `
+            <label>${escapeHtml(cfg.label)}</label>
+            ${cfg.hint ? `<div class="var-hint">${escapeHtml(cfg.hint)}</div>` : ''}
+            <input type="${cfg.type === 'url' ? 'url' : 'text'}" id="var-${varName}" placeholder="${escapeHtml(cfg.hint || '')}">`;
+        }
+        group.innerHTML = inner;
+        container.appendChild(group);
+      });
+
+      $('vars-panel').classList.add('open');
+      $('vars-overlay-bg').classList.add('open');
+
+      // Wires up address search after DOM insertion
+      const addrInput = $('var-adresse_cabinet');
+      if (addrInput) {
+        let banTimer = null;
+        addrInput.addEventListener('input', () => {
+          clearTimeout(banTimer);
+          banTimer = setTimeout(() => searchBAN(addrInput.value, $('ban-results'), addrInput), 300);
+        });
+        // Auto-search via RPPS if available
+        if (membre?.rpps) rppsLookup(membre.rpps, addrInput, $('rpps-status'));
+      }
+    }
+
+    window.closeVarsPanel = function () {
+      $('vars-panel').classList.remove('open');
+      $('vars-overlay-bg').classList.remove('open');
+    };
+
+    window.applyVars = function () {
+      const extra = {};
+      // Collect all var-* inputs
+      $('vars-fields').querySelectorAll('[id^="var-"]').forEach(el => {
+        const key = el.id.replace('var-', '');
+        let val = el.value.trim();
+        // Special: departement select → convert code to tpl string + update CPAM dest
+        if (key === 'departement' && val) {
+          const deptTpl = getDeptTplFromCode(val);
+          extra[key] = deptTpl;
+          // Update destinataire block with CPAM address
+          if (CPAM_ADRESSES[val]) {
+            $('doc-destinataire').innerHTML = `<div class="doc-label">Destinataire</div>` +
+              CPAM_ADRESSES[val].split('\n').map(l => `<div>${escapeHtml(l)}</div>`).join('');
+          }
+        } else if (val) {
+          extra[key] = val;
+        }
+      });
+
+      const rendered = renderDocument(currentTemplate, extra);
+      $('doc-body').innerHTML = textToHtml(rendered);
+      closeVarsPanel();
+    };
+
+    // ── Recherche adresse BAN ─────────────────────────────────────────────────
+    async function searchBAN(q, resultsEl, targetEl) {
+      if (q.length < 4) { resultsEl.classList.remove('show'); return; }
+      try {
+        const r = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(q)}&limit=5&type=housenumber`);
+        const d = await r.json();
+        resultsEl.innerHTML = '';
+        if (!d.features?.length) { resultsEl.classList.remove('show'); return; }
+        d.features.forEach(f => {
+          const item = document.createElement('div');
+          item.className = 'addr-item';
+          item.textContent = f.properties.label;
+          item.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            targetEl.value = f.properties.label;
+            resultsEl.classList.remove('show');
+          });
+          resultsEl.appendChild(item);
+        });
+        resultsEl.classList.add('show');
+      } catch { resultsEl.classList.remove('show'); }
+      targetEl.addEventListener('blur', () => setTimeout(() => resultsEl.classList.remove('show'), 200), { once: true });
+    }
+
+    // ── Recherche RPPS / Annuaire Santé ───────────────────────────────────────
+    async function rppsLookup(rpps, targetEl, statusEl) {
+      statusEl.textContent = '🔍 Recherche via Annuaire Santé…';
+      try {
+        // FHIR PractitionerRole endpoint — ANS (Agence du Numérique en Santé)
+        const url = `https://api.annuaire.sante.fr/fhir/v1/PractitionerRole` +
+          `?practitioner.identifier=urn%3Aoid%3A1.2.250.1.71.4.2.1%7C${encodeURIComponent(rpps)}&_count=10`;
+        const r = await fetch(url, { headers: { Accept: 'application/fhir+json' } });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const bundle = await r.json();
+        const addresses = [];
+        (bundle.entry || []).forEach(e => {
+          const role = e.resource;
+          (role.address || []).forEach(a => {
+            const lines = [...(a.line || [])];
+            const cityLine = [a.postalCode, a.city].filter(Boolean).join(' ');
+            if (cityLine) lines.push(cityLine);
+            if (lines.length) addresses.push(lines.join('\n'));
+          });
+        });
+        if (!addresses.length) { statusEl.textContent = 'Aucune adresse trouvée via RPPS. Saisissez manuellement.'; return; }
+        if (addresses.length === 1) {
+          targetEl.value = addresses[0];
+          statusEl.textContent = '✓ Adresse trouvée via Annuaire Santé';
+          statusEl.className = 'rpps-status ok';
+        } else {
+          statusEl.innerHTML = '<strong>Plusieurs adresses trouvées — choisissez :</strong><br>';
+          addresses.forEach(a => {
+            const btn = document.createElement('button');
+            btn.type = 'button'; btn.className = 'tool-btn';
+            btn.style.cssText = 'font-size:.76rem;margin:4px 4px 0 0;text-align:left;white-space:pre-wrap;max-width:100%';
+            btn.textContent = a.split('\n')[0];
+            btn.title = a;
+            btn.onclick = () => { targetEl.value = a; statusEl.innerHTML = '✓ Adresse sélectionnée'; statusEl.className = 'rpps-status ok'; };
+            statusEl.appendChild(btn);
+          });
+        }
+      } catch (e) {
+        statusEl.textContent = '⚠️ Annuaire indisponible — saisissez l\'adresse manuellement.';
+      }
+    }
+
+    // ── Chargement courrier existant ──────────────────────────────────────────
     async function loadCourrier(id) {
       const { data: c, error } = await sb.from('courriers_generes').select('*').eq('id', id).single();
       if (error || !c) { toast('Courrier introuvable', true); return; }
@@ -358,7 +677,6 @@
         const { data, error } = await sb.from('courriers_generes').insert(payload).select('id').single();
         if (error) { toast('Erreur : ' + error.message, true); updateSaveState(''); return; }
         courrierId = data.id;
-        // Met l'id dans l'URL pour pouvoir recharger
         history.replaceState(null, '', `courrier-editeur.html?courrier=${courrierId}`);
       }
       updateSaveState('✓ Enregistré');
@@ -366,7 +684,7 @@
       return true;
     };
 
-    // ── Export PDF ──────────────────────────────────────────────────────────
+    // ── Export PDF ────────────────────────────────────────────────────────────
     window.exportPdf = () => window.print();
 
     // ── Signature ─────────────────────────────────────────────────────────────
@@ -379,7 +697,6 @@
       const nom = $('sign-nom').value.trim();
       if (!nom) { toast('Saisissez votre nom', true); return; }
       const btn = $('btn-send-sign'); btn.disabled = true; btn.textContent = 'Envoi…';
-      // On sauvegarde d'abord pour avoir un courrierId + le nom dans l'aperçu
       $('sig-text').textContent = nom; $('sig-text').classList.remove('sig-placeholder');
       await save();
       if (!courrierId) { btn.disabled = false; btn.textContent = "Envoyer l'email de signature"; return; }
@@ -401,7 +718,7 @@
       btn.disabled = false; btn.textContent = "Envoyer l'email de signature";
     };
 
-    // ── Partage ────────────────────────────────────────────────────────────────
+    // ── Partage ───────────────────────────────────────────────────────────────
     window.openShare = async function () {
       if (!courrierId) { const ok = await save(); if (!ok) return; }
       $('share-toggle').checked = !!partageToken;
@@ -430,7 +747,7 @@
     }
     window.copyShare = () => { navigator.clipboard.writeText($('share-url').value); toast('Lien copié'); };
 
-    // ── Mass-mailing ────────────────────────────────────────────────────────────
+    // ── Mass-mailing ──────────────────────────────────────────────────────────
     window.toggleMassMailing = async function () {
       if (!courrierId) { const ok = await save(); if (!ok) return; }
       if (!confirm('Basculer ce courrier dans le Mass-Mailing ?\n\nIl rejoindra les autres courriers du même type pour un envoi groupé coordonné par le syndicat.')) return;
