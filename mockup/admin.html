@@ -368,7 +368,8 @@
       <button class="sidebar-link" onclick="showSection('plaidoyer-admin')" id="nav-plaidoyer-admin">
         <span class="icon">⚖️</span><span>Plaidoyer</span>
       </button>
-      <button class="sidebar-link super-admin-only" onclick="showSection('mass-mailing')" id="nav-mass-mailing" style="display:none">
+      <div class="sidebar-section-label">Courriers</div>
+      <button class="sidebar-link" onclick="showSection('mass-mailing')" id="nav-mass-mailing">
         <span class="icon">📣</span><span>Mass-Mailing</span>
       </button>
 
@@ -656,17 +657,50 @@
         </div>
       </div>
 
-      <!-- Section: Mass-Mailing (super-admin) -->
+      <!-- Section: Mass-Mailing -->
       <div id="section-mass-mailing" class="section-panel">
-        <div class="main-header">
-          <div class="main-title">Mass-Mailing 📣</div>
-          <div class="main-sub">Courriers basculés par les adhérents en vue d'un envoi groupé, regroupés par modèle</div>
+        <div class="main-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div class="main-title">Mass-Mailing 📣</div>
+            <div class="main-sub">Courriers groupés des adhérents, organisés par modèle — coordonnez l'envoi</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <select id="mm-filter-statut" class="filter-select" onchange="loadMassMailing()">
+              <option value="">Tous les statuts</option>
+              <option value="signe">Signés uniquement</option>
+              <option value="brouillon">Brouillons uniquement</option>
+            </select>
+            <button class="btn-csv" onclick="loadMassMailing()">↻ Actualiser</button>
+          </div>
         </div>
-        <div id="mass-mailing-groups" style="display:flex;flex-direction:column;gap:20px">
+
+        <!-- Stats -->
+        <div class="stats-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px">
+          <div class="stat-card">
+            <div class="stat-label">Total courriers</div>
+            <div class="stat-value" id="mm-stat-total">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Signés ✓</div>
+            <div class="stat-value" id="mm-stat-signes" style="color:#2d7a1a">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Membres participants</div>
+            <div class="stat-value" id="mm-stat-membres">—</div>
+          </div>
+          <div class="stat-card highlight">
+            <div class="stat-label">Modèles actifs</div>
+            <div class="stat-value" id="mm-stat-modeles">—</div>
+          </div>
+        </div>
+
+        <div id="mass-mailing-groups" style="display:flex;flex-direction:column;gap:24px">
           <div style="color:var(--muted);font-size:14px;padding:24px">Chargement…</div>
         </div>
-        <div id="mass-mailing-empty" style="display:none;text-align:center;padding:48px;color:var(--muted)">
-          Aucun courrier en mass-mailing pour l'instant. Les adhérents peuvent basculer leurs courriers depuis l'éditeur.
+        <div id="mass-mailing-empty" style="display:none;text-align:center;padding:64px;color:var(--muted)">
+          <div style="font-size:2.4rem;margin-bottom:12px">📭</div>
+          <div style="font-weight:700;font-size:1rem;margin-bottom:6px">Aucun courrier en mass-mailing</div>
+          <div style="font-size:0.82rem">Les adhérents basculent leurs courriers depuis l'éditeur (bouton 📣).</div>
         </div>
       </div>
 
@@ -2395,21 +2429,35 @@
     wrap.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:24px">Chargement…</div>';
     empty.style.display = 'none';
 
-    // Tous les courriers basculés en mass-mailing, avec leur modèle et leur auteur
-    const { data, error } = await sb.from('courriers_generes')
-      .select('id,titre,objet,statut,signe_le,signe_par,mass_mailing_le,modele_id,membre:membre_id(prenom,nom,email,ville)')
+    const filterStatut = document.getElementById('mm-filter-statut')?.value || '';
+
+    let q = sb.from('courriers_generes')
+      .select('id,titre,objet,statut,signe_le,signe_par,mass_mailing_le,modele_id,membre:membre_id(prenom,nom,email,ville,code_postal)')
       .eq('mass_mailing', true)
       .order('mass_mailing_le', { ascending: false });
+    if (filterStatut) q = q.eq('statut', filterStatut);
+    const { data, error } = await q;
 
-    if (error) { wrap.innerHTML = `<div style="color:var(--red);padding:24px">Erreur : ${error.message}</div>`; return; }
+    if (error) { wrap.innerHTML = `<div style="color:#b91c1c;padding:24px">Erreur : ${esc(error.message)}</div>`; return; }
+
+    // Stats globales
+    const allQ = await sb.from('courriers_generes')
+      .select('id,statut,membre_id,modele_id', { count: 'exact' })
+      .eq('mass_mailing', true);
+    const allData = allQ.data || [];
+    document.getElementById('mm-stat-total').textContent   = allData.length;
+    document.getElementById('mm-stat-signes').textContent  = allData.filter(c => c.statut === 'signe').length;
+    document.getElementById('mm-stat-membres').textContent = new Set(allData.map(c => c.membre_id).filter(Boolean)).size;
+    document.getElementById('mm-stat-modeles').textContent = new Set(allData.map(c => c.modele_id || '_libre')).size;
+
     if (!data || !data.length) { wrap.innerHTML = ''; empty.style.display = 'block'; return; }
 
-    // Récupère les titres des modèles
+    // Récupère les titres + slugs des modèles
     const modeleIds = [...new Set(data.map(c => c.modele_id).filter(Boolean))];
     let modeleMap = {};
     if (modeleIds.length) {
-      const { data: mods } = await sb.from('courriers').select('id,titre').in('id', modeleIds);
-      (mods || []).forEach(m => modeleMap[m.id] = m.titre);
+      const { data: mods } = await sb.from('courriers').select('id,titre,slug').in('id', modeleIds);
+      (mods || []).forEach(m => modeleMap[m.id] = m);
     }
 
     // Regroupe par modèle
@@ -2420,35 +2468,81 @@
     });
 
     wrap.innerHTML = Object.entries(groups).map(([key, courriers]) => {
-      const nomModele = key === '_libre' ? 'Courriers libres (sans modèle)' : (modeleMap[key] || 'Modèle supprimé');
-      const signes = courriers.filter(c => c.statut === 'signe').length;
-      const emails = courriers.map(c => c.membre?.email).filter(Boolean);
-      const rows = courriers.map(c => `
-        <tr style="border-bottom:1px solid var(--line)">
-          <td style="padding:8px 10px;font-size:13px">${c.membre ? esc('Dr ' + (c.membre.prenom||'') + ' ' + (c.membre.nom||'')) : '—'}<br><span style="font-size:11px;color:var(--muted)">${esc(c.membre?.ville||'')}</span></td>
-          <td style="padding:8px 10px;font-size:13px">${esc(c.titre)}</td>
-          <td style="padding:8px 10px;text-align:center">${c.statut === 'signe'
-            ? '<span style="background:#eafaf1;color:#27ae60;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:700">Signé</span>'
-            : '<span style="background:#fff8e6;color:#b06c00;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:700">Brouillon</span>'}</td>
-          <td style="padding:8px 10px;font-size:12px;color:var(--muted)">${c.mass_mailing_le ? new Date(c.mass_mailing_le).toLocaleDateString('fr-FR') : ''}</td>
-        </tr>`).join('');
-      return `
-        <div style="background:#fff;border:1.5px solid var(--line);border-radius:12px;overflow:hidden">
-          <div style="padding:16px 20px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-            <div>
-              <div style="font-weight:800;font-size:15px;color:var(--ink)">${esc(nomModele)}</div>
-              <div style="font-size:12px;color:var(--muted);margin-top:2px">${courriers.length} courrier${courriers.length>1?'s':''} · ${signes} signé${signes>1?'s':''}</div>
+      const mod = key !== '_libre' ? modeleMap[key] : null;
+      const nomModele = key === '_libre' ? 'Courriers libres (sans modèle)' : (mod?.titre || 'Modèle supprimé');
+      const signes    = courriers.filter(c => c.statut === 'signe').length;
+      const total     = courriers.length;
+      const pct       = Math.round((signes / total) * 100);
+      const emails    = courriers.map(c => c.membre?.email).filter(Boolean);
+      const csvData   = courriers.map(c => `"${c.membre ? 'Dr ' + (c.membre.prenom||'') + ' ' + (c.membre.nom||'') : ''}","${c.membre?.email||''}","${c.membre?.ville||c.membre?.code_postal||''}","${c.statut}"`).join('\n');
+
+      const rows = courriers.map(c => {
+        const nom = c.membre ? `Dr ${c.membre.prenom||''} ${c.membre.nom||''}`.trim() : '—';
+        const ville = c.membre?.ville || c.membre?.code_postal || '';
+        const signeBadge = c.statut === 'signe'
+          ? `<span class="status-badge status-actif">✓ Signé</span>`
+          : `<span class="status-badge status-attente">Brouillon</span>`;
+        const signePar = c.signe_par ? `<br><span style="font-size:10px;color:var(--muted)">${esc(c.signe_par)}</span>` : '';
+        return `<tr>
+          <td>
+            <div style="font-weight:700;font-size:13px">${esc(nom)}</div>
+            <div style="font-size:11px;color:var(--muted)">${esc(c.membre?.email||'')}</div>
+            ${ville ? `<div style="font-size:11px;color:var(--muted)">${esc(ville)}</div>` : ''}
+          </td>
+          <td style="font-size:13px;color:var(--muted)">${esc(c.titre||'—')}</td>
+          <td style="text-align:center">${signeBadge}${signePar}</td>
+          <td style="font-size:12px;color:var(--muted)">${c.mass_mailing_le ? new Date(c.mass_mailing_le).toLocaleDateString('fr-FR') : ''}</td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <a href="courrier-editeur.html?courrier=${c.id}" target="_blank" class="btn-voir" title="Voir le courrier">👁</a>
+              <button class="btn-action btn-supprimer" onclick="mmRetirer('${c.id}')" title="Retirer du mass-mailing">✕</button>
             </div>
-            <button class="btn" onclick='copyMassEmails(${JSON.stringify(emails)})' style="background:var(--blue);color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">📋 Copier les emails (${emails.length})</button>
+          </td>
+        </tr>`;
+      }).join('');
+
+      return `
+        <div style="background:#fff;border:1.5px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(23,54,95,.05)">
+          <!-- En-tête du groupe -->
+          <div style="padding:18px 22px;background:var(--surface);border-bottom:1.5px solid var(--line)">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+              <div style="flex:1">
+                <div style="font-weight:800;font-size:15px;color:var(--ink);margin-bottom:4px">${esc(nomModele)}</div>
+                <div style="font-size:12px;color:var(--muted);margin-bottom:10px">
+                  ${total} courrier${total>1?'s':''} · <strong style="color:#2d7a1a">${signes} signé${signes>1?'s':''}</strong> · ${total-signes} brouillon${(total-signes)>1?'s':''}
+                </div>
+                <!-- Barre de progression signatures -->
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;background:#e8edf4;border-radius:99px;height:8px;overflow:hidden;max-width:220px">
+                    <div style="height:100%;border-radius:99px;background:${pct===100?'#2d7a1a':'#62c040'};width:${pct}%;transition:width .4s"></div>
+                  </div>
+                  <span style="font-size:11px;font-weight:700;color:${pct===100?'#2d7a1a':'var(--muted)'}">${pct}% signés</span>
+                </div>
+              </div>
+              <!-- Actions du groupe -->
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start">
+                <button class="btn-action btn-valider" onclick='copyMassEmails(${JSON.stringify(emails)})' title="Copier les adresses email">
+                  📋 Emails (${emails.length})
+                </button>
+                <button class="btn-action" style="background:rgba(42,109,184,.08);color:var(--blue);border-color:rgba(42,109,184,.25)"
+                  onclick='exportMmCsv(${JSON.stringify(nomModele)}, ${JSON.stringify(csvData)})' title="Exporter CSV">
+                  ⬇ CSV
+                </button>
+              </div>
+            </div>
           </div>
+          <!-- Table des courriers -->
           <table style="width:100%;border-collapse:collapse">
-            <thead><tr style="background:#fafcff">
-              <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--muted);font-weight:700">Auteur</th>
-              <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--muted);font-weight:700">Courrier</th>
-              <th style="padding:8px 10px;text-align:center;font-size:11px;color:var(--muted);font-weight:700">Statut</th>
-              <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--muted);font-weight:700">Basculé le</th>
-            </tr></thead>
-            <tbody>${rows}</tbody>
+            <thead>
+              <tr style="background:#fafcff;border-bottom:1px solid var(--line)">
+                <th style="padding:9px 14px;text-align:left;font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap">Adhérent</th>
+                <th style="padding:9px 14px;text-align:left;font-size:11px;color:var(--muted);font-weight:700">Titre du courrier</th>
+                <th style="padding:9px 14px;text-align:center;font-size:11px;color:var(--muted);font-weight:700">Statut</th>
+                <th style="padding:9px 14px;text-align:left;font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap">Basculé le</th>
+                <th style="padding:9px 14px;text-align:left;font-size:11px;color:var(--muted);font-weight:700">Actions</th>
+              </tr>
+            </thead>
+            <tbody style="border-top:none">${rows}</tbody>
           </table>
         </div>`;
     }).join('');
@@ -2456,7 +2550,26 @@
 
   window.copyMassEmails = function(emails) {
     navigator.clipboard.writeText(emails.join(', '));
-    toast(`${emails.length} email(s) copié(s)`);
+    toast(`📋 ${emails.length} email(s) copié(s) dans le presse-papiers`, 'success');
+  };
+
+  window.exportMmCsv = function(nom, rows) {
+    const header = '"Nom","Email","Ville","Statut"';
+    const blob = new Blob([header + '\n' + rows], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = ('mass-mailing-' + nom).replace(/[^a-z0-9\-]/gi, '_') + '.csv';
+    a.click();
+  };
+
+  window.mmRetirer = async function(courrierId) {
+    if (!confirm('Retirer ce courrier du mass-mailing ?')) return;
+    const { error } = await sb.from('courriers_generes')
+      .update({ mass_mailing: false, mass_mailing_le: null })
+      .eq('id', courrierId);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Courrier retiré du mass-mailing');
+    loadMassMailing();
   };
 
   // ── Veille automatisée ──────────────────────────────────────────
