@@ -368,6 +368,9 @@
       <button class="sidebar-link" onclick="showSection('plaidoyer-admin')" id="nav-plaidoyer-admin">
         <span class="icon">⚖️</span><span>Plaidoyer</span>
       </button>
+      <button class="sidebar-link super-admin-only" onclick="showSection('mass-mailing')" id="nav-mass-mailing" style="display:none">
+        <span class="icon">📣</span><span>Mass-Mailing</span>
+      </button>
 
       <div class="sidebar-section-label super-admin-only" style="display:none">Communication</div>
       <button class="sidebar-link super-admin-only" onclick="showSection('communication')" id="nav-communication" style="display:none">
@@ -650,6 +653,20 @@
               <tr><td colspan="5" class="table-loading">Chargement…</td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- Section: Mass-Mailing (super-admin) -->
+      <div id="section-mass-mailing" class="section-panel">
+        <div class="main-header">
+          <div class="main-title">Mass-Mailing 📣</div>
+          <div class="main-sub">Courriers basculés par les adhérents en vue d'un envoi groupé, regroupés par modèle</div>
+        </div>
+        <div id="mass-mailing-groups" style="display:flex;flex-direction:column;gap:20px">
+          <div style="color:var(--muted);font-size:14px;padding:24px">Chargement…</div>
+        </div>
+        <div id="mass-mailing-empty" style="display:none;text-align:center;padding:48px;color:var(--muted)">
+          Aucun courrier en mass-mailing pour l'instant. Les adhérents peuvent basculer leurs courriers depuis l'éditeur.
         </div>
       </div>
 
@@ -1183,6 +1200,7 @@
     document.getElementById('nav-' + id).classList.add('active');
     if (id === 'communication') { loadBrevoLists(); initNlPreview(); }
     if (id === 'veille') { loadVeille(); }
+    if (id === 'mass-mailing') { loadMassMailing(); }
   };
 
   // ── Logout ──────────────────────────────────────────────────
@@ -2368,6 +2386,77 @@
     if (!confirm(`Envoyer ce communiqué aux contacts presse Brevo ?\n\nSujet : ${subject}`)) return;
     callCommFunction('/.netlify/functions/send-communique', { subject, htmlContent, listId, senderEmailCdp: true }, 'btn-send-cp', 'cp-status',
       (json) => saveCommToDb('communique', subject, htmlContent, null, listId, json.campaignId));
+  };
+
+  // ── Mass-Mailing ─────────────────────────────────────────────────
+  async function loadMassMailing() {
+    const wrap  = document.getElementById('mass-mailing-groups');
+    const empty = document.getElementById('mass-mailing-empty');
+    wrap.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:24px">Chargement…</div>';
+    empty.style.display = 'none';
+
+    // Tous les courriers basculés en mass-mailing, avec leur modèle et leur auteur
+    const { data, error } = await sb.from('courriers_generes')
+      .select('id,titre,objet,statut,signe_le,signe_par,mass_mailing_le,modele_id,membre:membre_id(prenom,nom,email,ville)')
+      .eq('mass_mailing', true)
+      .order('mass_mailing_le', { ascending: false });
+
+    if (error) { wrap.innerHTML = `<div style="color:var(--red);padding:24px">Erreur : ${error.message}</div>`; return; }
+    if (!data || !data.length) { wrap.innerHTML = ''; empty.style.display = 'block'; return; }
+
+    // Récupère les titres des modèles
+    const modeleIds = [...new Set(data.map(c => c.modele_id).filter(Boolean))];
+    let modeleMap = {};
+    if (modeleIds.length) {
+      const { data: mods } = await sb.from('courriers').select('id,titre').in('id', modeleIds);
+      (mods || []).forEach(m => modeleMap[m.id] = m.titre);
+    }
+
+    // Regroupe par modèle
+    const groups = {};
+    data.forEach(c => {
+      const key = c.modele_id || '_libre';
+      (groups[key] = groups[key] || []).push(c);
+    });
+
+    wrap.innerHTML = Object.entries(groups).map(([key, courriers]) => {
+      const nomModele = key === '_libre' ? 'Courriers libres (sans modèle)' : (modeleMap[key] || 'Modèle supprimé');
+      const signes = courriers.filter(c => c.statut === 'signe').length;
+      const emails = courriers.map(c => c.membre?.email).filter(Boolean);
+      const rows = courriers.map(c => `
+        <tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:8px 10px;font-size:13px">${c.membre ? esc('Dr ' + (c.membre.prenom||'') + ' ' + (c.membre.nom||'')) : '—'}<br><span style="font-size:11px;color:var(--muted)">${esc(c.membre?.ville||'')}</span></td>
+          <td style="padding:8px 10px;font-size:13px">${esc(c.titre)}</td>
+          <td style="padding:8px 10px;text-align:center">${c.statut === 'signe'
+            ? '<span style="background:#eafaf1;color:#27ae60;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:700">Signé</span>'
+            : '<span style="background:#fff8e6;color:#b06c00;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:700">Brouillon</span>'}</td>
+          <td style="padding:8px 10px;font-size:12px;color:var(--muted)">${c.mass_mailing_le ? new Date(c.mass_mailing_le).toLocaleDateString('fr-FR') : ''}</td>
+        </tr>`).join('');
+      return `
+        <div style="background:#fff;border:1.5px solid var(--line);border-radius:12px;overflow:hidden">
+          <div style="padding:16px 20px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+            <div>
+              <div style="font-weight:800;font-size:15px;color:var(--ink)">${esc(nomModele)}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">${courriers.length} courrier${courriers.length>1?'s':''} · ${signes} signé${signes>1?'s':''}</div>
+            </div>
+            <button class="btn" onclick='copyMassEmails(${JSON.stringify(emails)})' style="background:var(--blue);color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">📋 Copier les emails (${emails.length})</button>
+          </div>
+          <table style="width:100%;border-collapse:collapse">
+            <thead><tr style="background:#fafcff">
+              <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--muted);font-weight:700">Auteur</th>
+              <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--muted);font-weight:700">Courrier</th>
+              <th style="padding:8px 10px;text-align:center;font-size:11px;color:var(--muted);font-weight:700">Statut</th>
+              <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--muted);font-weight:700">Basculé le</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }).join('');
+  }
+
+  window.copyMassEmails = function(emails) {
+    navigator.clipboard.writeText(emails.join(', '));
+    toast(`${emails.length} email(s) copié(s)`);
   };
 
   // ── Veille automatisée ──────────────────────────────────────────

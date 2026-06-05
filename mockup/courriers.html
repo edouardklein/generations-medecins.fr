@@ -184,198 +184,43 @@
 
   <div class="page-hero">
     <div class="page-hero-inner">
-      <span class="badge badge-blue">📋 Outil gratuit</span>
+      <span class="badge badge-blue">📋 Générateur de courriers</span>
       <h1>Bibliothèque de courriers</h1>
-      <p>Tous les courriers dont vous avez besoin, rédigés et vérifiés juridiquement. Copier-coller ou générer automatiquement selon votre situation.</p>
+      <p>Choisissez un modèle, personnalisez-le avec vos coordonnées, signez électroniquement, exportez en PDF. Vérifiés juridiquement.</p>
     </div>
   </div>
 
   <section class="section">
     <div class="section-inner">
 
-      <!-- Générateur IA -->
-      <div class="generateur-banner">
-        <div>
-          <h3>✨ Générateur automatisé — Bientôt disponible</h3>
-          <p>Décrivez votre situation en une phrase et obtenez un courrier personnalisé, prêt à envoyer. Alimenté par IA, relu par des juristes.</p>
+      <!-- Mes courriers (si connecté) -->
+      <div id="mes-courriers-block" style="display:none;margin-bottom:48px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+          <div class="section-label" style="margin:0">Mes courriers</div>
+          <a href="courrier-editeur.html" class="btn btn-outline" style="padding:8px 16px;font-size:0.84rem">+ Courrier vierge</a>
         </div>
-        <a href="adherer.html" class="btn btn-white" style="white-space:nowrap;flex-shrink:0">Être notifié →</a>
+        <div class="courriers-grid" id="mes-courriers-grid"></div>
+        <div id="mes-courriers-empty" style="display:none;color:var(--muted);font-size:0.9rem;padding:20px 0">Vous n'avez pas encore de courrier enregistré. Choisissez un modèle ci-dessous pour commencer.</div>
       </div>
 
-      <!-- Recherche + filtres -->
+      <!-- Recherche -->
       <div class="search-bar">
-        <input class="search-input" type="text" placeholder="Rechercher un courrier... ex : refus tiers payant, CPAM, RGPD">
+        <input class="search-input" id="search" type="text" placeholder="Rechercher un modèle... ex : refus tiers payant, CPAM, RGPD">
       </div>
 
-      <div class="filter-chips">
-        <div class="filter-chip active">Tous</div>
-        <div class="filter-chip">CPAM</div>
-        <div class="filter-chip">RGPD &amp; données</div>
-        <div class="filter-chip">Relations patients</div>
-        <div class="filter-chip">Cabinet &amp; contrats</div>
-        <div class="filter-chip">Contentieux</div>
+      <!-- Modèles (chargés depuis la base) -->
+      <div class="section-label" style="margin-bottom:16px">Modèles disponibles</div>
+      <div class="courriers-grid" id="modeles-grid" style="margin-bottom:0">
+        <div style="color:var(--muted);font-size:0.9rem;padding:20px 0">Chargement des modèles…</div>
       </div>
-
-      <!-- Courriers CPAM -->
-      <div class="section-label" style="margin-bottom:16px">CPAM</div>
-      <div class="courriers-grid" style="margin-bottom:40px">
-
-        <div class="courrier-card">
-          <span class="courrier-cat cat-cpam">CPAM</span>
-          <div class="courrier-title">Contestation d'un refus de prise en charge</div>
-          <p class="courrier-desc">Pour contester une décision de refus de remboursement ou de mise sous objectif. Référence aux textes conventionnels.</p>
-          <div class="courrier-footer">
-            <span class="courrier-dl">Télécharger .docx →</span>
-            <span class="courrier-format">Word · PDF</span>
-          </div>
-        </div>
-
-        <div class="courrier-card">
-          <span class="courrier-cat cat-cpam">CPAM</span>
-          <div class="courrier-title">Refus du tiers payant obligatoire</div>
-          <p class="courrier-desc">Modèle pour exercer votre droit de refus du tiers payant avec les justifications légales. Mis à jour avenant n°9.</p>
-          <div class="courrier-footer">
-            <span class="courrier-dl">Télécharger .docx →</span>
-            <span class="courrier-format">Word · PDF</span>
-          </div>
-        </div>
-
-        <div class="courrier-card">
-          <span class="courrier-cat cat-cpam">CPAM</span>
-          <div class="courrier-title">Demande de dérogation mise sous accord préalable</div>
-          <p class="courrier-desc">Modèle de contestation d'une mise sous accord préalable jugée abusive. Inclut les délais de réponse opposables.</p>
-          <div class="courrier-footer">
-            <span class="courrier-dl">Télécharger .docx →</span>
-            <span class="courrier-format">Word · PDF</span>
-          </div>
-        </div>
-
-        <div class="courrier-card">
-          <span class="courrier-cat cat-cpam">CPAM</span>
-          <div class="courrier-title">Signalement d'anomalie de liquidation</div>
-          <p class="courrier-desc">Pour signaler des erreurs récurrentes de remboursement. Formulation précise pour obtenir une réponse écrite.</p>
-          <div class="courrier-footer">
-            <span class="courrier-dl">Télécharger .docx →</span>
-            <span class="courrier-format">Word · PDF</span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Courriers RGPD -->
-      <div class="section-label" style="margin-bottom:16px">RGPD &amp; données</div>
-      <div class="courriers-grid" style="margin-bottom:40px">
-
-        <div class="courrier-card">
-          <span class="courrier-cat cat-rgpd">RGPD</span>
-          <div class="courrier-title">Demande de suppression fiche Google My Business</div>
-          <p class="courrier-desc">Signalement auprès de Google pour suppression ou rectification d'avis diffamatoires ou de données erronées.</p>
-          <div class="courrier-footer">
-            <span class="courrier-dl">Télécharger .docx →</span>
-            <span class="courrier-format">Word · PDF</span>
-          </div>
-        </div>
-
-        <div class="courrier-card">
-          <span class="courrier-cat cat-rgpd">RGPD</span>
-          <div class="courrier-title">Information patient sur le traitement des données</div>
-          <p class="courrier-desc">Notice d'information RGPD à remettre aux patients. Conforme aux recommandations CNIL pour les cabinets libéraux.</p>
-          <div class="courrier-footer">
-            <span class="courrier-dl">Télécharger .docx →</span>
-            <span class="courrier-format">Word · PDF</span>
-          </div>
-        </div>
-
-        <div class="courrier-card">
-          <span class="courrier-cat cat-rgpd">RGPD</span>
-          <div class="courrier-title">Réponse à une demande d'accès aux données</div>
-          <p class="courrier-desc">Réponse type à un patient exerçant son droit d'accès RGPD. Délais, format et contenu conformes.</p>
-          <div class="courrier-footer">
-            <span class="courrier-dl">Télécharger .docx →</span>
-            <span class="courrier-format">Word · PDF</span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Courriers patients -->
-      <div class="section-label" style="margin-bottom:16px">Relations patients</div>
-      <div class="courriers-grid" style="margin-bottom:40px">
-
-        <div class="courrier-card">
-          <span class="courrier-cat cat-patient">Patient</span>
-          <div class="courrier-title">Rupture de la relation thérapeutique</div>
-          <p class="courrier-desc">Pour mettre fin à la relation médecin-patient dans le respect des obligations légales. Inclut délai de prévenance et orientation.</p>
-          <div class="courrier-footer">
-            <span class="courrier-dl">Télécharger .docx →</span>
-            <span class="courrier-format">Word · PDF</span>
-          </div>
-        </div>
-
-        <div class="courrier-card">
-          <span class="courrier-cat cat-patient">Patient</span>
-          <div class="courrier-title">Refus de communication du dossier médical</div>
-          <p class="courrier-desc">Réponse à une demande de dossier médical non conforme ou abusive. Rappel des délais légaux et conditions.</p>
-          <div class="courrier-footer">
-            <span class="courrier-dl">Télécharger .docx →</span>
-            <span class="courrier-format">Word · PDF</span>
-          </div>
-        </div>
-
-        <div class="courrier-card">
-          <span class="courrier-cat cat-patient">Patient</span>
-          <div class="courrier-title">Réponse à un avis négatif en ligne</div>
-          <p class="courrier-desc">Modèle de réponse professionnelle à un avis négatif, compatible avec le secret médical. Rédigé avec des avocats.</p>
-          <div class="courrier-footer">
-            <span class="courrier-dl">Télécharger .docx →</span>
-            <span class="courrier-format">Word · PDF</span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Cabinet & contrats -->
-      <div class="section-label" style="margin-bottom:16px">Cabinet &amp; contrats</div>
-      <div class="courriers-grid" style="margin-bottom:0">
-
-        <div class="courrier-card">
-          <span class="courrier-cat cat-cabinet">Cabinet</span>
-          <div class="courrier-title">Contrat de collaboration libérale</div>
-          <p class="courrier-desc">Modèle de contrat de collaboration entre médecins libéraux. Conforme à la réglementation, personnalisable.</p>
-          <div class="courrier-footer">
-            <span class="courrier-dl">Télécharger .docx →</span>
-            <span class="courrier-format">Word · PDF</span>
-          </div>
-        </div>
-
-        <div class="courrier-card">
-          <span class="courrier-cat cat-cabinet">Cabinet</span>
-          <div class="courrier-title">Lettre de mise en demeure bailleur</div>
-          <p class="courrier-desc">Pour les litiges avec le propriétaire de vos locaux professionnels. Délais et formulations opposables.</p>
-          <div class="courrier-footer">
-            <span class="courrier-dl">Télécharger .docx →</span>
-            <span class="courrier-format">Word · PDF</span>
-          </div>
-        </div>
-
-        <div class="courrier-card">
-          <span class="courrier-cat cat-cabinet">Cabinet</span>
-          <div class="courrier-title">Dénonciation de la convention médicale</div>
-          <p class="courrier-desc">Modèle de lettre de désengagement de la convention médicale nationale. Délais et procédure inclus.</p>
-          <div class="courrier-footer">
-            <span class="courrier-dl">Télécharger .docx →</span>
-            <span class="courrier-format">Word · PDF</span>
-          </div>
-        </div>
-
-      </div>
+      <div id="modeles-empty" style="display:none;color:var(--muted);font-size:0.9rem;padding:20px 0">Aucun modèle disponible pour le moment.</div>
 
     </div>
   </section>
 
-  <section class="cta-section">
-    <h2>Accédez au générateur automatisé.</h2>
-    <p>Décrivez votre situation, obtenez le bon courrier en 30 secondes. Fonctionnalité réservée aux adhérents dès son ouverture.</p>
+  <section class="cta-section" id="cta-adherer">
+    <h2>Personnalisez et signez vos courriers.</h2>
+    <p>Le générateur reprend automatiquement vos coordonnées, vous permet de signer électroniquement et d'exporter en PDF. Réservé aux adhérents.</p>
     <a href="adherer.html" class="btn btn-white btn-lg">Adhérer maintenant →</a>
   </section>
 
@@ -399,6 +244,91 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+  (function () {
+    const sb = supabase.createClient(
+      'https://faegpfkhlkkwmtaichin.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo'
+    );
+
+    const CAT_LABEL = { cpam: 'CPAM', rgpd: 'RGPD', patients: 'Patient', cabinet: 'Cabinet', contentieux: 'Contentieux' };
+    const CAT_CLASS = { cpam: 'cat-cpam', rgpd: 'cat-rgpd', patients: 'cat-patient', cabinet: 'cat-cabinet', contentieux: 'cat-cpam' };
+    const STATUT_BADGE = {
+      brouillon: '<span style="font-size:0.7rem;font-weight:700;color:#b06c00">● Brouillon</span>',
+      signe:     '<span style="font-size:0.7rem;font-weight:700;color:#3d8a1a">✓ Signé</span>',
+      envoye:    '<span style="font-size:0.7rem;font-weight:700;color:var(--blue)">✈ Envoyé</span>',
+    };
+    const esc = (s) => { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; };
+    let allModeles = [];
+
+    async function init() {
+      const { data: { session } } = await sb.auth.getSession();
+      await loadModeles();
+      if (session) await loadMesCourriers(session);
+    }
+
+    async function loadModeles() {
+      const grid  = document.getElementById('modeles-grid');
+      const { data, error } = await sb.from('courriers')
+        .select('id,titre,description,categorie,acces').eq('publie', true).order('categorie');
+      if (error) { grid.innerHTML = `<div style="color:#c0392b;font-size:0.9rem">Erreur : ${error.message}</div>`; return; }
+      allModeles = data || [];
+      renderModeles(allModeles);
+    }
+
+    function renderModeles(list) {
+      const grid  = document.getElementById('modeles-grid');
+      const empty = document.getElementById('modeles-empty');
+      if (!list.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
+      grid.innerHTML = list.map(m => `
+        <a class="courrier-card" href="courrier-editeur.html?modele=${m.id}">
+          <span class="courrier-cat ${CAT_CLASS[m.categorie] || 'cat-cpam'}">${CAT_LABEL[m.categorie] || m.categorie || ''}</span>
+          <div class="courrier-title">${esc(m.titre)}</div>
+          <p class="courrier-desc">${esc(m.description)}</p>
+          <div class="courrier-footer">
+            <span class="courrier-dl">Personnaliser →</span>
+            <span class="courrier-format">PDF · Signature</span>
+          </div>
+        </a>`).join('');
+    }
+
+    async function loadMesCourriers(session) {
+      const { data: membre } = await sb.from('membres').select('id').eq('user_id', session.user.id).single();
+      if (!membre) return;
+      const { data } = await sb.from('courriers_generes')
+        .select('id,titre,statut,updated_at,mass_mailing').eq('membre_id', membre.id)
+        .order('updated_at', { ascending: false });
+      document.getElementById('mes-courriers-block').style.display = 'block';
+      document.getElementById('cta-adherer').style.display = 'none';
+      const grid  = document.getElementById('mes-courriers-grid');
+      const empty = document.getElementById('mes-courriers-empty');
+      if (!data || !data.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
+      grid.innerHTML = data.map(c => `
+        <a class="courrier-card" href="courrier-editeur.html?courrier=${c.id}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            ${STATUT_BADGE[c.statut] || ''}
+            ${c.mass_mailing ? '<span style="font-size:0.68rem;font-weight:700;color:var(--teal)">📣 Mass-mailing</span>' : ''}
+          </div>
+          <div class="courrier-title">${esc(c.titre)}</div>
+          <p class="courrier-desc">Modifié le ${new Date(c.updated_at).toLocaleDateString('fr-FR')}</p>
+          <div class="courrier-footer">
+            <span class="courrier-dl">Ouvrir →</span>
+          </div>
+        </a>`).join('');
+    }
+
+    // Recherche
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      renderModeles(!q ? allModeles : allModeles.filter(m =>
+        (m.titre + ' ' + (m.description || '') + ' ' + (m.categorie || '')).toLowerCase().includes(q)));
+    });
+
+    init();
+  })();
+  </script>
   <script src="auth-header.js"></script>
 </body>
 </html>

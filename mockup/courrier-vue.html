@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courrier partagé — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background: #e9eef3; }
+    .vue-bar { background: #fff; border-bottom: 1.5px solid var(--line); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .vue-bar .logo { font-size: 0.9rem; }
+    .doc-wrap { padding: 32px 16px 80px; display: flex; justify-content: center; }
+    .document {
+      background: #fff; width: 100%; max-width: 794px; min-height: 600px; padding: 60px 64px;
+      box-shadow: 0 6px 30px rgba(23,54,95,0.12); border-radius: 4px; font-size: 14px; line-height: 1.6; color: #1a2332;
+    }
+    .doc-head { display: flex; justify-content: space-between; gap: 40px; margin-bottom: 40px; }
+    .doc-block { font-size: 13px; line-height: 1.5; }
+    .doc-label { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #94a3b8; font-weight: 700; margin-bottom: 4px; }
+    .doc-dest { text-align: right; }
+    .doc-objet { font-weight: 700; margin-bottom: 24px; }
+    .doc-body p { margin: 0 0 12px; }
+    .doc-signature { margin-top: 48px; font-family: 'Times New Roman', Times, serif; font-style: italic; font-size: 18px; text-align: right; }
+    .sig-electronique { margin-top: 10px; font-family: 'Inter', sans-serif; font-style: normal; font-size: 11px; color: #3d8a1a; text-align: right; line-height: 1.5; border-top: 1px dashed #b8e8d0; padding-top: 8px; display: inline-block; }
+    .loading, .notfound { text-align: center; padding: 80px 20px; color: var(--muted); }
+    @media print { .vue-bar, footer { display: none !important; } body { background: #fff; } .document { box-shadow: none; } }
+    @media (max-width: 720px) { .document { padding: 40px 28px; } .doc-head { flex-direction: column; gap: 24px; } .doc-dest, .doc-signature { text-align: left; } }
+  </style>
+</head>
+<body>
+  <div class="vue-bar">
+    <a href="index.html" class="logo">
+      <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+      <span>Générations Médecins</span>
+    </a>
+    <button class="btn btn-outline" onclick="window.print()" style="padding:7px 16px;font-size:0.82rem">📄 Imprimer / PDF</button>
+  </div>
+
+  <div class="doc-wrap">
+    <div id="zone" style="width:100%;display:flex;justify-content:center">
+      <div class="loading">Chargement du courrier…</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · Île-de-France</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+  (function () {
+    const sb = supabase.createClient(
+      'https://faegpfkhlkkwmtaichin.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo'
+    );
+    const t = new URLSearchParams(location.search).get('t');
+    const zone = document.getElementById('zone');
+
+    async function load() {
+      if (!t) { zone.innerHTML = '<div class="notfound">Lien invalide.</div>'; return; }
+      const { data, error } = await sb.from('courriers_generes')
+        .select('titre,expediteur,destinataire,objet,contenu,signataire_nom,signe_le,signe_par')
+        .eq('partage_token', t).eq('partage_public', true).single();
+      if (error || !data) { zone.innerHTML = '<div class="notfound">Ce courrier n\'est pas disponible ou le partage a été désactivé.</div>'; return; }
+
+      const sigElec = data.signe_le
+        ? `<div class="sig-electronique"><strong>✓ Signé électroniquement</strong><br>le ${new Date(data.signe_le).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' })}<br>par ${escapeHtml(data.signe_par || '')}</div>`
+        : '';
+
+      zone.innerHTML = `
+        <div class="document">
+          <div class="doc-head">
+            <div class="doc-block">${data.expediteur?.html || ''}</div>
+            <div class="doc-block doc-dest">${data.destinataire?.html || ''}</div>
+          </div>
+          ${data.objet ? `<div class="doc-objet">Objet : ${escapeHtml(data.objet)}</div>` : ''}
+          <div class="doc-body">${data.contenu || ''}</div>
+          <div class="doc-signature">${escapeHtml(data.signataire_nom || '')}${sigElec}</div>
+        </div>`;
+      document.title = (data.titre || 'Courrier') + ' — Générations Médecins';
+    }
+    function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    load();
+  })();
+  </script>
+</body>
+</html>

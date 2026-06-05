@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Éditeur de courrier — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background: #e9eef3; }
+
+    /* Barre d'actions */
+    .editor-toolbar {
+      position: sticky; top: 0; z-index: 50;
+      background: #fff; border-bottom: 1.5px solid var(--line);
+      padding: 12px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .editor-toolbar .back { color: var(--muted); text-decoration: none; font-size: 0.85rem; font-weight: 700; }
+    .titre-input {
+      flex: 1; min-width: 180px; border: none; font-size: 1rem; font-weight: 700; color: var(--ink);
+      font-family: inherit; outline: none; padding: 6px 8px; border-radius: 8px;
+    }
+    .titre-input:focus { background: var(--surface); }
+    .tool-btn {
+      border: 1.5px solid var(--line); background: #fff; color: var(--blue-dark);
+      border-radius: 9px; padding: 8px 14px; font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap;
+    }
+    .tool-btn:hover { border-color: var(--blue); background: var(--surface); }
+    .tool-btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .tool-btn.primary:hover { background: var(--blue-dark); }
+    .tool-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .save-state { font-size: 0.78rem; color: var(--muted); margin-left: 4px; }
+
+    /* Mini barre de format texte */
+    .format-bar { display: flex; gap: 4px; padding: 8px 24px; background: #f5f8fb; border-bottom: 1px solid var(--line); }
+    .fmt { width: 32px; height: 32px; border: 1px solid var(--line); background: #fff; border-radius: 7px; cursor: pointer; font-size: 0.9rem; font-family: serif; }
+    .fmt:hover { background: var(--surface); border-color: var(--blue); }
+
+    /* Document A4 */
+    .doc-wrap { padding: 32px 16px 80px; display: flex; justify-content: center; }
+    .document {
+      background: #fff; width: 100%; max-width: 794px; /* ~A4 @96dpi */
+      min-height: 1000px; padding: 60px 64px; box-shadow: 0 6px 30px rgba(23,54,95,0.12);
+      border-radius: 4px; font-size: 14px; line-height: 1.6; color: #1a2332;
+    }
+    .doc-head { display: flex; justify-content: space-between; gap: 40px; margin-bottom: 40px; }
+    .doc-block { font-size: 13px; line-height: 1.5; }
+    .doc-block[contenteditable]:focus,
+    .doc-body[contenteditable]:focus,
+    .doc-objet[contenteditable]:focus { outline: 2px solid rgba(42,109,184,0.25); outline-offset: 4px; border-radius: 3px; }
+    .doc-label { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #94a3b8; font-weight: 700; margin-bottom: 4px; }
+    .doc-dest { text-align: right; }
+    .doc-lieu-date { text-align: right; margin-bottom: 32px; font-size: 13px; }
+    .doc-objet { font-weight: 700; margin-bottom: 24px; }
+    .doc-body { min-height: 280px; }
+    .doc-body p { margin: 0 0 12px; }
+    /* Bloc signature en Times italique */
+    .doc-signature {
+      margin-top: 48px; min-height: 80px; font-family: 'Times New Roman', Times, serif;
+      font-style: italic; font-size: 18px; color: #1a2332; text-align: right;
+    }
+    .sig-placeholder { color: #b7c4d0; }
+    .sig-electronique {
+      margin-top: 10px; font-family: 'Inter', sans-serif; font-style: normal; font-size: 11px;
+      color: #3d8a1a; text-align: right; line-height: 1.5;
+      border-top: 1px dashed #b8e8d0; padding-top: 8px; display: inline-block;
+    }
+
+    /* Modale */
+    .modal-bg { position: fixed; inset: 0; background: rgba(15,32,51,0.5); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
+    .modal-bg.open { display: flex; }
+    .modal { background: #fff; border-radius: 16px; max-width: 460px; width: 100%; padding: 28px; }
+    .modal h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--ink); }
+    .modal p { font-size: 0.86rem; color: var(--muted); line-height: 1.55; margin-bottom: 18px; }
+    .modal input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--line); border-radius: 10px; font-family: inherit; font-size: 0.95rem; margin-bottom: 16px; outline: none; }
+    .modal input:focus { border-color: var(--blue); }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .share-link { display: flex; gap: 8px; margin-top: 14px; }
+    .share-link input { margin-bottom: 0; font-size: 0.82rem; color: var(--muted); }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--ink); color: #fff; padding: 12px 22px; border-radius: 10px;
+      font-size: 0.86rem; font-weight: 600; z-index: 300; opacity: 0; transition: opacity .25s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+    .toast.error { background: #c0392b; }
+
+    .signed-banner { background: #f0faf5; border: 1px solid #b8e8d0; color: #0d6e3f; border-radius: 10px; padding: 10px 16px; font-size: 0.82rem; font-weight: 600; margin: 0 24px 0; display: none; }
+    .signed-banner.show { display: block; }
+
+    /* Impression PDF */
+    @media print {
+      .editor-toolbar, .format-bar, .signed-banner, footer, .modal-bg, .toast { display: none !important; }
+      body { background: #fff; }
+      .doc-wrap { padding: 0; }
+      .document { box-shadow: none; max-width: none; width: 100%; padding: 30px 40px; min-height: auto; }
+      .doc-block[contenteditable], .doc-body[contenteditable] { outline: none !important; }
+    }
+
+    @media (max-width: 720px) {
+      .document { padding: 40px 28px; }
+      .doc-head { flex-direction: column; gap: 24px; }
+      .doc-dest, .doc-lieu-date, .doc-signature { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barre d'actions -->
+  <div class="editor-toolbar">
+    <a href="courriers.html" class="back">← Courriers</a>
+    <input class="titre-input" id="titre" placeholder="Titre du courrier" value="">
+    <span class="save-state" id="save-state"></span>
+    <button class="tool-btn" id="btn-save" onclick="save()">💾 Enregistrer</button>
+    <button class="tool-btn" onclick="exportPdf()">📄 PDF</button>
+    <button class="tool-btn" onclick="openShare()">🔗 Partager</button>
+    <button class="tool-btn" id="btn-mass" onclick="toggleMassMailing()">📣 Mass-mailing</button>
+    <button class="tool-btn primary" id="btn-sign" onclick="openSign()">✍️ Signer</button>
+  </div>
+
+  <!-- Barre de format -->
+  <div class="format-bar">
+    <button class="fmt" onmousedown="event.preventDefault()" onclick="fmt('bold')" title="Gras" style="font-weight:800">B</button>
+    <button class="fmt" onmousedown="event.preventDefault()" onclick="fmt('italic')" title="Italique" style="font-style:italic">I</button>
+    <button class="fmt" onmousedown="event.preventDefault()" onclick="fmt('underline')" title="Souligné" style="text-decoration:underline">U</button>
+    <button class="fmt" onmousedown="event.preventDefault()" onclick="fmt('insertUnorderedList')" title="Liste">•</button>
+  </div>
+
+  <div class="signed-banner" id="signed-banner"></div>
+
+  <!-- Document -->
+  <div class="doc-wrap">
+    <div class="document" id="document">
+      <div class="doc-head">
+        <div class="doc-block" contenteditable="true" id="doc-expediteur">
+          <div class="doc-label">Expéditeur</div>
+        </div>
+        <div class="doc-block doc-dest" contenteditable="true" id="doc-destinataire">
+          <div class="doc-label">Destinataire</div>
+          À l'attention de…
+        </div>
+      </div>
+
+      <div class="doc-lieu-date" contenteditable="true" id="doc-lieudate"></div>
+
+      <div class="doc-objet" contenteditable="true" id="doc-objet">Objet : </div>
+
+      <div class="doc-body" contenteditable="true" id="doc-body">
+        <p>Madame, Monsieur,</p>
+        <p>…</p>
+      </div>
+
+      <div class="doc-signature" id="doc-signature">
+        <span class="sig-placeholder" id="sig-text">— votre signature —</span>
+        <div class="sig-electronique" id="sig-elec" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · Île-de-France</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modale Signature -->
+  <div class="modal-bg" id="modal-sign">
+    <div class="modal">
+      <h3>Signer électroniquement</h3>
+      <p>Saisissez votre nom tel qu'il apparaîtra dans le bloc de signature. Un email de confirmation vous sera envoyé : cliquez le lien pour valider.</p>
+      <input id="sign-nom" placeholder="Dr Prénom Nom">
+      <div class="modal-actions">
+        <button class="tool-btn" onclick="closeModal('modal-sign')">Annuler</button>
+        <button class="tool-btn primary" id="btn-send-sign" onclick="sendSignature()">Envoyer l'email de signature</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale Partage -->
+  <div class="modal-bg" id="modal-share">
+    <div class="modal">
+      <h3>Partager ce courrier</h3>
+      <p>Activez un lien public en lecture seule. Toute personne disposant du lien pourra consulter ce courrier.</p>
+      <label style="display:flex;align-items:center;gap:10px;font-size:0.88rem;font-weight:600;color:var(--ink);margin-bottom:14px;cursor:pointer">
+        <input type="checkbox" id="share-toggle" onchange="toggleShare()" style="width:auto;margin:0">
+        Activer le partage public
+      </label>
+      <div class="share-link" id="share-link-row" style="display:none">
+        <input id="share-url" readonly>
+        <button class="tool-btn" onclick="copyShare()">Copier</button>
+      </div>
+      <div class="modal-actions" style="margin-top:18px">
+        <button class="tool-btn" onclick="closeModal('modal-share')">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+  (function () {
+    const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    let membre = null;
+    let courrierId = null;     // id de courriers_generes (null = pas encore sauvé)
+    let statut = 'brouillon';
+    let partageToken = null;
+
+    const $ = (id) => document.getElementById(id);
+    const params = new URLSearchParams(location.search);
+
+    function toast(msg, isErr) {
+      const t = $('toast');
+      t.textContent = msg; t.className = 'toast show' + (isErr ? ' error' : '');
+      setTimeout(() => t.className = 'toast', 2600);
+    }
+
+    window.fmt = (cmd) => document.execCommand(cmd, false, null);
+    window.closeModal = (id) => $(id).classList.remove('open');
+
+    // ── Init ────────────────────────────────────────────────────────────────
+    async function init() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { location.href = 'connexion.html?next=' + encodeURIComponent(location.pathname + location.search); return; }
+
+      const { data: m } = await sb.from('membres').select('*').eq('user_id', session.user.id).single();
+      membre = m;
+
+      // Pré-remplit l'expéditeur depuis le profil
+      fillExpediteur();
+      // Lieu + date du jour
+      $('doc-lieudate').textContent = `${membre?.ville || '________'}, le ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+
+      const existingId = params.get('courrier');
+      const modeleId   = params.get('modele');
+
+      if (existingId) {
+        await loadCourrier(existingId);
+      } else if (modeleId) {
+        await loadModele(modeleId);
+      } else {
+        $('titre').value = 'Nouveau courrier';
+      }
+    }
+
+    function fillExpediteur() {
+      const lignes = [];
+      if (membre) {
+        lignes.push(`Dr ${membre.prenom || ''} ${membre.nom || ''}`.trim());
+        if (membre.specialite) lignes.push(membre.specialite);
+        const villeLine = [membre.code_postal, membre.ville].filter(Boolean).join(' ');
+        if (villeLine) lignes.push(villeLine);
+        if (membre.telephone) lignes.push('Tél : ' + membre.telephone);
+        if (membre.email) lignes.push(membre.email);
+        if (membre.rpps && !membre.est_interne) lignes.push('RPPS : ' + membre.rpps);
+      }
+      $('doc-expediteur').innerHTML = `<div class="doc-label">Expéditeur</div>` +
+        lignes.map(l => `<div>${escapeHtml(l)}</div>`).join('');
+    }
+
+    function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    // Remplace les variables {{xxx}} connues par les données du profil
+    function fillVariables(tpl) {
+      const map = {
+        prenom_nom: `Dr ${membre?.prenom || ''} ${membre?.nom || ''}`.trim(),
+        ville: membre?.ville || '',
+        code_postal: membre?.code_postal || '',
+        rpps: membre?.rpps || '',
+        date: new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
+      };
+      return (tpl || '').replace(/\{\{(\w+)\}\}/g, (full, key) =>
+        map[key] !== undefined && map[key] !== '' ? map[key] : `<mark style="background:#fff3cd;border-radius:3px;padding:0 2px">[${key}]</mark>`);
+    }
+
+    // Convertit un template texte (avec \n) en HTML paragraphes
+    function textToHtml(txt) {
+      return (txt || '').split(/\n{2,}/).map(b => `<p>${b.replace(/\n/g, '<br>')}</p>`).join('');
+    }
+
+    async function loadModele(modeleId) {
+      const { data: mod, error } = await sb.from('courriers').select('*').eq('id', modeleId).single();
+      if (error || !mod) { toast('Modèle introuvable', true); $('titre').value = 'Nouveau courrier'; return; }
+      $('titre').value = mod.titre;
+      // L'objet : on essaie d'extraire la 1re ligne "Objet :" du template, sinon le titre
+      const body = fillVariables(mod.contenu_template);
+      $('doc-body').innerHTML = textToHtml(body);
+      $('doc-objet').innerHTML = 'Objet : ' + escapeHtml(mod.titre);
+    }
+
+    async function loadCourrier(id) {
+      const { data: c, error } = await sb.from('courriers_generes').select('*').eq('id', id).single();
+      if (error || !c) { toast('Courrier introuvable', true); return; }
+      courrierId = c.id;
+      statut = c.statut;
+      partageToken = c.partage_token;
+      $('titre').value = c.titre || 'Courrier';
+      if (c.expediteur?.html) $('doc-expediteur').innerHTML = c.expediteur.html;
+      if (c.destinataire?.html) $('doc-destinataire').innerHTML = c.destinataire.html;
+      if (c.objet) $('doc-objet').innerHTML = escapeHtml(c.objet);
+      if (c.contenu) $('doc-body').innerHTML = c.contenu;
+      if (c.signataire_nom) {
+        $('sig-text').textContent = c.signataire_nom;
+        $('sig-text').classList.remove('sig-placeholder');
+      }
+      if (c.signe_le) renderSigned(c);
+      if (c.mass_mailing) markMassDone();
+      updateSaveState('Chargé');
+    }
+
+    function renderSigned(c) {
+      statut = 'signe';
+      const d = new Date(c.signe_le).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' });
+      $('sig-text').textContent = c.signataire_nom || '';
+      $('sig-text').classList.remove('sig-placeholder');
+      const e = $('sig-elec');
+      e.style.display = 'inline-block';
+      e.innerHTML = `<strong>✓ Signé électroniquement</strong><br>le ${d}<br>par ${escapeHtml(c.signe_par || '')}`;
+      const b = $('signed-banner');
+      b.textContent = `✓ Ce courrier a été signé électroniquement le ${d}`;
+      b.classList.add('show');
+      $('btn-sign').textContent = '✓ Signé';
+      $('btn-sign').disabled = true;
+    }
+
+    function updateSaveState(txt) { $('save-state').textContent = txt; }
+
+    // ── Sauvegarde ────────────────────────────────────────────────────────────
+    window.save = async function () {
+      if (!membre) { toast('Profil non chargé', true); return; }
+      const payload = {
+        membre_id:    membre.id,
+        modele_id:    params.get('modele') || null,
+        titre:        $('titre').value.trim() || 'Courrier sans titre',
+        expediteur:   { html: $('doc-expediteur').innerHTML },
+        destinataire: { html: $('doc-destinataire').innerHTML },
+        objet:        $('doc-objet').textContent.replace(/^Objet\s*:\s*/i, '').trim(),
+        contenu:      $('doc-body').innerHTML,
+      };
+      updateSaveState('Enregistrement…');
+      if (courrierId) {
+        const { error } = await sb.from('courriers_generes').update(payload).eq('id', courrierId);
+        if (error) { toast('Erreur : ' + error.message, true); updateSaveState(''); return; }
+      } else {
+        const { data, error } = await sb.from('courriers_generes').insert(payload).select('id').single();
+        if (error) { toast('Erreur : ' + error.message, true); updateSaveState(''); return; }
+        courrierId = data.id;
+        // Met l'id dans l'URL pour pouvoir recharger
+        history.replaceState(null, '', `courrier-editeur.html?courrier=${courrierId}`);
+      }
+      updateSaveState('✓ Enregistré');
+      toast('Courrier enregistré');
+      return true;
+    };
+
+    // ── Export PDF ──────────────────────────────────────────────────────────
+    window.exportPdf = () => window.print();
+
+    // ── Signature ─────────────────────────────────────────────────────────────
+    window.openSign = function () {
+      if (statut === 'signe') { toast('Déjà signé'); return; }
+      $('sign-nom').value = `Dr ${membre?.prenom || ''} ${membre?.nom || ''}`.trim();
+      $('modal-sign').classList.add('open');
+    };
+    window.sendSignature = async function () {
+      const nom = $('sign-nom').value.trim();
+      if (!nom) { toast('Saisissez votre nom', true); return; }
+      const btn = $('btn-send-sign'); btn.disabled = true; btn.textContent = 'Envoi…';
+      // On sauvegarde d'abord pour avoir un courrierId + le nom dans l'aperçu
+      $('sig-text').textContent = nom; $('sig-text').classList.remove('sig-placeholder');
+      await save();
+      if (!courrierId) { btn.disabled = false; btn.textContent = "Envoyer l'email de signature"; return; }
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        const res = await fetch('/.netlify/functions/signer-courrier', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ courrierId, signataireNom: nom }),
+        });
+        const out = await res.json();
+        if (res.ok) {
+          closeModal('modal-sign');
+          toast('Email de signature envoyé à ' + out.email);
+        } else {
+          toast('Erreur : ' + (out.error || res.status), true);
+        }
+      } catch (e) { toast('Erreur réseau : ' + e.message, true); }
+      btn.disabled = false; btn.textContent = "Envoyer l'email de signature";
+    };
+
+    // ── Partage ────────────────────────────────────────────────────────────────
+    window.openShare = async function () {
+      if (!courrierId) { const ok = await save(); if (!ok) return; }
+      $('share-toggle').checked = !!partageToken;
+      renderShareLink();
+      $('modal-share').classList.add('open');
+    };
+    window.toggleShare = async function () {
+      const on = $('share-toggle').checked;
+      if (on && !partageToken) {
+        partageToken = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)).replace(/-/g, '');
+      }
+      const { error } = await sb.from('courriers_generes')
+        .update({ partage_public: on, partage_token: on ? partageToken : null })
+        .eq('id', courrierId);
+      if (error) { toast('Erreur : ' + error.message, true); return; }
+      if (!on) partageToken = null;
+      renderShareLink();
+      toast(on ? 'Partage activé' : 'Partage désactivé');
+    };
+    function renderShareLink() {
+      const row = $('share-link-row');
+      if (partageToken) {
+        $('share-url').value = `${location.origin}/courrier-vue.html?t=${partageToken}`;
+        row.style.display = 'flex';
+      } else { row.style.display = 'none'; }
+    }
+    window.copyShare = () => { navigator.clipboard.writeText($('share-url').value); toast('Lien copié'); };
+
+    // ── Mass-mailing ────────────────────────────────────────────────────────────
+    window.toggleMassMailing = async function () {
+      if (!courrierId) { const ok = await save(); if (!ok) return; }
+      if (!confirm('Basculer ce courrier dans le Mass-Mailing ?\n\nIl rejoindra les autres courriers du même type pour un envoi groupé coordonné par le syndicat.')) return;
+      const { error } = await sb.from('courriers_generes')
+        .update({ mass_mailing: true, mass_mailing_le: new Date().toISOString() })
+        .eq('id', courrierId);
+      if (error) { toast('Erreur : ' + error.message, true); return; }
+      markMassDone();
+      toast('Courrier basculé dans le Mass-Mailing 📣');
+    };
+    function markMassDone() {
+      const b = $('btn-mass');
+      b.textContent = '📣 Dans le Mass-Mailing'; b.classList.add('primary'); b.disabled = true;
+    }
+
+    init();
+  })();
+  </script>
+  <script src="auth-header.js"></script>
+</body>
+</html>
