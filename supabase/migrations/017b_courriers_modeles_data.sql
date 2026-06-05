@@ -1,14 +1,8 @@
 -- ============================================================
--- Migration 017 — Bibliothèque de modèles de courriers
+-- Migration 017b — Bibliothèque de modèles de courriers (données)
+-- ⚠️ EXÉCUTER 017a EN PREMIER (nouvelles catégories d'enum)
 -- Idempotent : ON CONFLICT (slug) DO NOTHING
--- Étend aussi l'enum categorie_courrier
 -- ============================================================
-
--- Nouveaux types de catégories
-ALTER TYPE categorie_courrier ADD VALUE IF NOT EXISTS 'urssaf';
-ALTER TYPE categorie_courrier ADD VALUE IF NOT EXISTS 'confreres';
-ALTER TYPE categorie_courrier ADD VALUE IF NOT EXISTS 'organismes';
-ALTER TYPE categorie_courrier ADD VALUE IF NOT EXISTS 'defense';
 
 -- ============================================================
 -- PATIENTS — Honoraires & Relation
