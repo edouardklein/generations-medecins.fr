@@ -33,15 +33,15 @@ ALTER TABLE courriers_generes ADD COLUMN IF NOT EXISTS partage_token    TEXT;
 DO $$ BEGIN
     ALTER TABLE courriers_generes ADD CONSTRAINT cg_statut_check
         CHECK (statut IN ('brouillon', 'signe', 'envoye'));
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+EXCEPTION WHEN duplicate_object THEN NULL; WHEN duplicate_table THEN NULL; END $$;
 
 DO $$ BEGIN
     ALTER TABLE courriers_generes ADD CONSTRAINT cg_signature_token_unique UNIQUE (signature_token);
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+EXCEPTION WHEN duplicate_object THEN NULL; WHEN duplicate_table THEN NULL; END $$;
 
 DO $$ BEGIN
     ALTER TABLE courriers_generes ADD CONSTRAINT cg_partage_token_unique UNIQUE (partage_token);
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+EXCEPTION WHEN duplicate_object THEN NULL; WHEN duplicate_table THEN NULL; END $$;
 
 -- Index
 CREATE INDEX IF NOT EXISTS idx_cg_membre        ON courriers_generes(membre_id, updated_at DESC);
