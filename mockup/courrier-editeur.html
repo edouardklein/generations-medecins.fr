@@ -262,6 +262,8 @@
   </aside>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
   (function () {
     const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
@@ -685,7 +687,55 @@
     };
 
     // ── Export PDF ────────────────────────────────────────────────────────────
-    window.exportPdf = () => window.print();
+    window.exportPdf = async function () {
+      const btn = document.querySelector('.tool-btn[onclick="exportPdf()"]');
+      const orig = btn.textContent;
+      btn.disabled = true; btn.textContent = '⏳ Génération…';
+      try {
+        const docEl = $('document');
+        // Masque temporairement les contenteditable outlines
+        docEl.querySelectorAll('[contenteditable]').forEach(el => el.setAttribute('contenteditable', 'false'));
+
+        const canvas = await html2canvas(docEl, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+        });
+
+        docEl.querySelectorAll('[contenteditable]').forEach(el => el.setAttribute('contenteditable', 'true'));
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+        const imgW  = pageW;
+        const imgH  = (canvas.height * pageW) / canvas.width;
+        const imgData = canvas.toDataURL('image/png');
+
+        let y = 0;
+        let remaining = imgH;
+        let page = 0;
+        while (remaining > 0) {
+          if (page > 0) pdf.addPage();
+          // Clip portion visible on this page
+          const sliceH = Math.min(pageH, remaining);
+          pdf.addImage(imgData, 'PNG', 0, -y, imgW, imgH);
+          y += pageH;
+          remaining -= pageH;
+          page++;
+        }
+
+        const nom = ($('titre').value || 'courrier').replace(/[^a-z0-9\-_àâéèêëîïôùûüç]/gi, '_');
+        pdf.save(nom + '.pdf');
+        toast('PDF téléchargé');
+      } catch (e) {
+        toast('Erreur PDF : ' + e.message, true);
+        console.error(e);
+      } finally {
+        btn.disabled = false; btn.textContent = orig;
+      }
+    };
 
     // ── Signature ─────────────────────────────────────────────────────────────
     window.openSign = function () {

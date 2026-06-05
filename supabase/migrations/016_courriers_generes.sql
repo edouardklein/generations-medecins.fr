@@ -14,7 +14,9 @@ CREATE TABLE IF NOT EXISTS courriers_generes (
     updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Toutes les autres colonnes en ALTER, pour rattraper une éventuelle table partielle
+-- Toutes les colonnes en ALTER, pour rattraper une éventuelle table partielle
+-- (le CREATE TABLE IF NOT EXISTS saute silencieusement si la table existe déjà)
+ALTER TABLE courriers_generes ADD COLUMN IF NOT EXISTS titre            TEXT    NOT NULL DEFAULT 'Courrier sans titre';
 ALTER TABLE courriers_generes ADD COLUMN IF NOT EXISTS expediteur       JSONB   DEFAULT '{}'::jsonb;
 ALTER TABLE courriers_generes ADD COLUMN IF NOT EXISTS destinataire     JSONB   DEFAULT '{}'::jsonb;
 ALTER TABLE courriers_generes ADD COLUMN IF NOT EXISTS contenu          TEXT    DEFAULT '';
@@ -78,6 +80,9 @@ DROP POLICY IF EXISTS "cg: suppression" ON courriers_generes;
 CREATE POLICY "cg: suppression"
     ON courriers_generes FOR DELETE
     USING (membre_id = mon_membre_id() OR is_admin());
+
+-- Force le rechargement du cache de schéma PostgREST
+SELECT pg_notify('pgrst', 'reload schema');
 
 -- ============================================================
 -- Vue agrégée pour le mass-mailing
