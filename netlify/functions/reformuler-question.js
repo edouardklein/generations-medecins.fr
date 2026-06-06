@@ -5,11 +5,11 @@
  * reformulation en requête juridique structurée → mise à jour de la ligne
  * consultations_juridiques avec question_reformulee et statut='prete'.
  *
- * Env vars : OPENAI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_KEY
+ * Env vars : OPENAI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  */
 
 const SB  = process.env.SUPABASE_URL;
-const SSK = process.env.SUPABASE_SERVICE_KEY;
+const SSK = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 function srvHeaders(extra = {}) {
   return { apikey: SSK, Authorization: `Bearer ${SSK}`, 'Content-Type': 'application/json', ...extra };
@@ -36,7 +36,7 @@ exports.handler = async (event) => {
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'OPENAI_API_KEY non configurée' }) };
   }
   if (!SSK) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'SUPABASE_SERVICE_KEY non configurée' }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'SUPABASE_SERVICE_ROLE_KEY non configurée' }) };
   }
 
   let body;
