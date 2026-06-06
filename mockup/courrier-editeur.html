@@ -107,44 +107,117 @@
       .doc-dest, .doc-lieu-date, .doc-signature { text-align: left; }
     }
 
-    /* ── Variables panel (slide-in from right) ── */
-    .vars-panel {
-      position: fixed; top: 0; right: -440px; width: 420px; height: 100vh;
-      background: #fff; border-left: 1.5px solid var(--line);
-      box-shadow: -8px 0 30px rgba(23,54,95,0.12);
-      z-index: 150; overflow-y: auto; transition: right .3s cubic-bezier(.4,0,.2,1);
-      display: flex; flex-direction: column;
+    /* ── Robot interview panel ── */
+    .robot-overlay {
+      position: fixed; inset: 0; background: rgba(15,32,51,0.55);
+      z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px;
     }
-    .vars-panel.open { right: 0; }
-    .vars-panel-head { padding: 24px 24px 16px; border-bottom: 1px solid var(--line); }
-    .vars-panel-head h2 { font-size: 1rem; font-weight: 800; color: var(--ink); margin: 0 0 4px; }
-    .vars-panel-head p { font-size: 0.82rem; color: var(--muted); margin: 0; line-height: 1.5; }
-    .vars-panel-body { flex: 1; padding: 20px 24px; overflow-y: auto; }
-    .vars-panel-footer { padding: 16px 24px; border-top: 1px solid var(--line); background: #fff; }
-    .var-group { margin-bottom: 20px; }
-    .var-group label { display: block; font-size: 0.82rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
-    .var-hint { font-size: 0.76rem; color: var(--muted); margin-bottom: 6px; line-height: 1.4; }
-    .var-group input[type=text], .var-group input[type=url], .var-group input[type=date],
-    .var-group textarea, .var-group select {
-      width: 100%; padding: 9px 12px; border: 1.5px solid var(--line);
-      border-radius: 9px; font-family: inherit; font-size: 0.88rem; outline: none; box-sizing: border-box;
+    .robot-overlay.open { display: flex; }
+    .robot-modal {
+      background: #fff; border-radius: 20px; width: 100%; max-width: 560px;
+      max-height: 92vh; display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 28px 90px rgba(15,32,51,0.32);
     }
-    .var-group input:focus, .var-group textarea:focus, .var-group select:focus { border-color: var(--blue); }
-    .var-group textarea { min-height: 72px; resize: vertical; }
+    .robot-header {
+      padding: 20px 24px 16px; border-bottom: 1.5px solid var(--line); flex-shrink: 0;
+    }
+    .robot-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-dark), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem; flex-shrink: 0;
+    }
+    .robot-dots { display: flex; gap: 5px; align-items: center; }
+    .robot-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--line); transition: all .2s;
+    }
+    .robot-dot.done  { background: var(--teal); }
+    .robot-dot.current { background: var(--blue); transform: scale(1.3); }
+    .robot-privacy {
+      background: #f5f8fc; border: 1px solid var(--line); border-radius: 10px;
+      padding: 10px 14px; margin-top: 12px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .robot-privacy-notice { font-size: .74rem; color: var(--muted); line-height: 1.5; }
+    .robot-toggle-row {
+      display: flex; align-items: center; gap: 10px; font-size: .82rem; font-weight: 700;
+      color: var(--ink); cursor: pointer;
+    }
+    .toggle-switch { position: relative; width: 38px; height: 22px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute; inset: 0; background: #cdd5df; border-radius: 999px;
+      cursor: pointer; transition: background .2s;
+    }
+    .toggle-track::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 16px; height: 16px; border-radius: 50%; background: #fff;
+      transition: transform .2s; box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+    .toggle-switch input:checked + .toggle-track { background: var(--blue); }
+    .toggle-switch input:checked + .toggle-track::after { transform: translateX(16px); }
+
+    .robot-chat { flex: 1; overflow-y: auto; padding: 24px 24px 8px; }
+    .robot-bubble {
+      background: var(--surface); border-radius: 0 16px 16px 16px;
+      padding: 14px 18px; font-size: .9rem; line-height: 1.65; color: var(--ink);
+      display: inline-block; max-width: 88%; border: 1px solid var(--line);
+    }
+    .robot-bubble strong { color: var(--blue-dark); }
+
+    .robot-answer { padding: 0 24px 20px; flex-shrink: 0; }
+    .robot-input {
+      width: 100%; padding: 11px 14px; border: 1.5px solid var(--line);
+      border-radius: 12px; font-family: inherit; font-size: .9rem; outline: none;
+      box-sizing: border-box; transition: border-color .15s;
+    }
+    .robot-input:focus { border-color: var(--blue); }
+    textarea.robot-input { min-height: 90px; resize: vertical; }
+    select.robot-input { height: 46px; background: #fff; }
+    .robot-action-row {
+      display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center;
+    }
+    .robot-btn {
+      padding: 7px 14px; border-radius: 9px; font-family: inherit; font-size: .78rem;
+      font-weight: 700; cursor: pointer; border: 1.5px solid; transition: all .15s; white-space: nowrap;
+    }
+    .robot-btn-mic  { background: rgba(42,109,184,.07); color: var(--blue); border-color: rgba(42,109,184,.25); }
+    .robot-btn-mic:hover { background: rgba(42,109,184,.15); }
+    .robot-btn-mic.listening { background: rgba(220,38,38,.07); color: #dc2626; border-color: #fca5a5; }
+    .robot-btn-llm  { background: rgba(56,168,181,.08); color: #1a7a86; border-color: rgba(56,168,181,.3); }
+    .robot-btn-llm:hover:not(:disabled) { background: rgba(56,168,181,.18); }
+    .robot-btn-llm:disabled { opacity: .4; cursor: not-allowed; }
+    .robot-btn-skip { background: none; border-color: transparent; color: var(--muted); padding-left: 0; }
+    .robot-btn-skip:hover { color: var(--ink); }
+    .robot-mic-info  { font-size: .72rem; color: var(--muted); margin-top: 6px; }
+    .robot-undo-row  { font-size: .74rem; color: var(--muted); margin-top: 6px; }
+    .robot-undo-row button { background: none; border: none; color: var(--blue); cursor: pointer; font-size: .74rem; text-decoration: underline; padding: 0; }
+    .robot-rpps-status { font-size: .74rem; color: var(--muted); margin-top: 6px; min-height: 16px; }
+    .robot-rpps-status.ok { color: #3d8a1a; }
+
+    .robot-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px 20px; border-top: 1.5px solid var(--line); flex-shrink: 0;
+    }
+    .robot-btn-back { background: #fff; color: var(--muted); border-color: var(--line); }
+    .robot-btn-back:hover { color: var(--ink); border-color: #cdd5df; }
+    .robot-btn-next {
+      background: var(--blue); color: #fff; border-color: var(--blue);
+      padding: 10px 22px; font-size: .88rem;
+    }
+    .robot-btn-next:hover { background: var(--blue-dark); border-color: var(--blue-dark); }
+
+    /* Shared address search dropdown (used inside robot too) */
     .address-search-wrap { position: relative; }
     .address-results {
       position: absolute; top: 100%; left: 0; right: 0; z-index: 10;
       background: #fff; border: 1.5px solid var(--blue); border-top: none;
-      border-radius: 0 0 9px 9px; overflow: hidden; display: none; box-shadow: 0 6px 18px rgba(23,54,95,.12);
+      border-radius: 0 0 9px 9px; overflow: hidden; display: none;
+      box-shadow: 0 6px 18px rgba(23,54,95,.12);
     }
     .address-results.show { display: block; }
-    .addr-item { padding: 10px 12px; font-size: 0.84rem; cursor: pointer; border-bottom: 1px solid var(--surface); }
+    .addr-item { padding: 10px 12px; font-size: .84rem; cursor: pointer; border-bottom: 1px solid var(--surface); }
     .addr-item:last-child { border-bottom: none; }
     .addr-item:hover { background: var(--surface); }
-    .rpps-status { font-size: 0.76rem; color: var(--muted); margin-top: 6px; min-height: 18px; }
-    .rpps-status.ok { color: #3d8a1a; }
-    .vars-overlay-bg { position: fixed; inset: 0; background: rgba(15,32,51,0.3); z-index: 140; display: none; }
-    .vars-overlay-bg.open { display: block; }
   </style>
 </head>
 <body>
@@ -246,20 +319,64 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- Overlay bg for vars panel -->
-  <div class="vars-overlay-bg" id="vars-overlay-bg" onclick="closeVarsPanel()"></div>
+  <!-- Robot interview modal -->
+  <div class="robot-overlay" id="robot-overlay">
+    <div class="robot-modal">
 
-  <!-- Variables slide-in panel -->
-  <aside class="vars-panel" id="vars-panel">
-    <div class="vars-panel-head">
-      <h2>✏️ Compléter le courrier</h2>
-      <p>Quelques informations sont nécessaires pour personnaliser ce modèle.</p>
+      <!-- En-tête -->
+      <div class="robot-header">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div class="robot-avatar">🤖</div>
+          <div style="flex:1">
+            <div style="font-weight:800;font-size:.95rem;color:var(--ink)">Assistant de rédaction</div>
+            <div style="font-size:.75rem;color:var(--muted)" id="robot-progress-label">Préparation…</div>
+          </div>
+          <div class="robot-dots" id="robot-dots"></div>
+        </div>
+        <!-- Bandeau confidentialité + toggle LLM -->
+        <div class="robot-privacy">
+          <div class="robot-privacy-notice">
+            🔒 <strong>Confidentialité :</strong> vos réponses restent locales et ne sont jamais envoyées sur Internet, sauf si vous activez la reformulation IA ci-dessous.
+          </div>
+          <label class="robot-toggle-row">
+            <span class="toggle-switch">
+              <input type="checkbox" id="robot-llm-toggle" onchange="robotUpdateLlm()">
+              <span class="toggle-track"></span>
+            </span>
+            Activer la reformulation IA (OpenAI GPT-4o-mini)
+          </label>
+        </div>
+      </div>
+
+      <!-- Zone chat -->
+      <div class="robot-chat" id="robot-chat"></div>
+
+      <!-- Zone réponse -->
+      <div class="robot-answer">
+        <div id="robot-input-wrap"></div>
+        <div class="robot-action-row">
+          <button class="robot-btn robot-btn-mic" id="robot-mic-btn" onclick="robotDictate()">🎤 Dicter</button>
+          <button class="robot-btn robot-btn-llm" id="robot-llm-btn" onclick="robotReformat()" disabled>✨ Reformuler avec l'IA</button>
+          <button class="robot-btn robot-btn-skip" onclick="robotSkip()">Passer</button>
+        </div>
+        <div class="robot-mic-info" id="robot-mic-info" style="display:none">
+          Compatible : <strong>Chrome</strong>, <strong>Edge</strong>, <strong>Safari</strong> (pas Firefox)
+        </div>
+        <div class="robot-rpps-status" id="robot-rpps-status"></div>
+        <div class="robot-undo-row" id="robot-undo-row" style="display:none">
+          Texte reformulé par l'IA. <button onclick="robotUndoReformat()">Annuler</button>
+        </div>
+      </div>
+
+      <!-- Pied -->
+      <div class="robot-footer">
+        <button class="robot-btn robot-btn-back" id="robot-back-btn" onclick="robotPrev()" style="display:none">← Retour</button>
+        <div></div>
+        <button class="robot-btn robot-btn-next" id="robot-next-btn" onclick="robotNext()">Suivant →</button>
+      </div>
+
     </div>
-    <div class="vars-panel-body" id="vars-fields"></div>
-    <div class="vars-panel-footer">
-      <button class="tool-btn primary" style="width:100%;padding:12px" onclick="applyVars()">Insérer et éditer le courrier →</button>
-    </div>
-  </aside>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -331,21 +448,341 @@
       ],
     };
 
-    // Config des champs du panel par variable name
+    // Config des champs du robot par variable name
+    // question: ce que le robot demande
+    // type: text | textarea | date | url | address | dept
+    // placeholder: exemple
+    // llm: prompt OpenAI pour reformulation (null = bouton désactivé)
     const VAR_CFG = {
-      adresse_cabinet: { label: 'Adresse du cabinet',          type: 'address',
-        hint: 'Votre adresse professionnelle (n° et rue, code postal, ville)' },
-      url_fiche:       { label: 'URL de la fiche Google',       type: 'url',
-        hint: 'URL complète de la fiche Google My Business (https://maps.app.goo.gl/…)' },
-      departement:     { label: 'Département de la CPAM',       type: 'dept',
-        hint: 'Déterminé automatiquement depuis votre code postal' },
-      date_notification: { label: 'Date de notification de la MAP', type: 'date',
-        hint: 'Date indiquée sur le courrier de mise sous accord préalable' },
-      objet_map:       { label: 'Objet de la mise sous accord préalable', type: 'text',
-        hint: 'Ex. : la prescription de kinésithérapie' },
-      motifs:          { label: 'Motifs de contestation',       type: 'textarea',
-        hint: 'Décrivez vos motifs (peut être complété après dans l\'éditeur)' },
+      // ── Identité / cabinet ──────────────────────────────────────────────────
+      adresse_cabinet: {
+        question: 'Quelle est l\'adresse complète de votre cabinet ?',
+        type: 'address', placeholder: '12 rue de la Paix, 75001 Paris',
+        llm: null,
+      },
+      // ── Google / RGPD ───────────────────────────────────────────────────────
+      url_fiche: {
+        question: 'Quelle est l\'URL de la fiche Google que vous souhaitez faire supprimer ?',
+        type: 'url', placeholder: 'https://maps.app.goo.gl/…',
+        llm: null,
+      },
+      nom_destinataire: {
+        question: 'Quel est le nom du responsable ou de l\'organisme destinataire ?',
+        type: 'text', placeholder: 'Délégué à la Protection des Données',
+        llm: null,
+      },
+      objet_demande: {
+        question: 'Quel est l\'objet précis de votre demande RGPD ?',
+        type: 'textarea', placeholder: 'Suppression des données personnelles inexactes publiées…',
+        llm: 'Tu es juriste spécialisé en droit numérique et RGPD. Reformule ce texte en termes formels et précis pour une demande officielle de droit à l\'effacement.',
+      },
+      reference_rgpd: {
+        question: 'Quelle référence ou numéro de dossier souhaitez-vous mentionner ? (laisser vide si aucun)',
+        type: 'text', placeholder: 'Ref. RGPD-2024-XXXXX',
+        llm: null,
+      },
+      // ── CPAM / Assurance maladie ────────────────────────────────────────────
+      departement: {
+        question: 'Dans quel département se situe votre CPAM ?',
+        type: 'dept', placeholder: '',
+        llm: null,
+      },
+      date_notification: {
+        question: 'Quelle est la date de notification indiquée sur le courrier de mise sous accord préalable ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      objet_map: {
+        question: 'Quel est l\'objet de la mise sous accord préalable (ex. : prescription de kinésithérapie) ?',
+        type: 'text', placeholder: 'la prescription de kinésithérapie',
+        llm: null,
+      },
+      motifs: {
+        question: 'Quels sont vos motifs de contestation ?',
+        type: 'textarea', placeholder: 'Décrivez les raisons médicales et réglementaires…',
+        llm: 'Tu es médecin généraliste et juriste en droit de la santé. Reformule ces motifs de contestation de manière structurée, professionnelle et convaincante pour un courrier officiel à la CPAM.',
+      },
+      numero_dossier: {
+        question: 'Quel est le numéro de dossier ou de référence mentionné par la CPAM ?',
+        type: 'text', placeholder: '2024-XXXXXXXXX',
+        llm: null,
+      },
+      reference_courrier: {
+        question: 'Quelle est la référence du courrier CPAM auquel vous répondez ?',
+        type: 'text', placeholder: 'Réf. : CPAM-75-2024-XXXXX',
+        llm: null,
+      },
+      date_controle: {
+        question: 'Quelle est la date du contrôle ou de la réclamation CPAM ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      nom_controleur: {
+        question: 'Quel est le nom du médecin-conseil ou contrôleur mentionné ?',
+        type: 'text', placeholder: 'Dr Dupont',
+        llm: null,
+      },
+      montant_reversement: {
+        question: 'Quel est le montant du reversement réclamé (en euros) ?',
+        type: 'text', placeholder: '1 250,00 €',
+        llm: null,
+      },
+      date_reversement: {
+        question: 'Quelle est la date limite de reversement indiquée ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      motif_reversement: {
+        question: 'Quel est le motif invoqué par la CPAM pour ce reversement ?',
+        type: 'textarea', placeholder: 'Prescription hors référentiel lors de la consultation du…',
+        llm: 'Tu es médecin. Résume en termes précis et neutres le motif de reversement CPAM tel qu\'il sera cité dans un courrier de contestation.',
+      },
+      // ── Patients ────────────────────────────────────────────────────────────
+      nom_patient: {
+        question: 'Quel est le nom et prénom du patient concerné ?',
+        type: 'text', placeholder: 'M. Jean DUPONT',
+        llm: null,
+      },
+      adresse_patient: {
+        question: 'Quelle est l\'adresse postale du patient ?',
+        type: 'address', placeholder: '5 rue des Lilas, 75020 Paris',
+        llm: null,
+      },
+      motif: {
+        question: 'Quel est le motif principal (fin de relation thérapeutique, impayé, etc.) ?',
+        type: 'textarea', placeholder: 'Défaut de paiement malgré relances, comportement agressif…',
+        llm: 'Tu es médecin rédigeant un courrier officiel à un patient. Reformule ce motif de manière factuelle, neutre et professionnelle.',
+      },
+      honoraires_dus: {
+        question: 'Quel est le montant des honoraires impayés (en euros) ?',
+        type: 'text', placeholder: '120,00 €',
+        llm: null,
+      },
+      date_derniere_consultation: {
+        question: 'Quelle est la date de la dernière consultation facturée impayée ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      date_mise_en_demeure: {
+        question: 'Quelle est la date de mise en demeure initiale (si déjà envoyée) ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      type_depassement: {
+        question: 'Quel type de dépassement pratiquez-vous (secteur 2, OPTAM, OPTAM-CO) ?',
+        type: 'text', placeholder: 'secteur 2 / OPTAM',
+        llm: null,
+      },
+      montant_depassement: {
+        question: 'Quel est le montant moyen de dépassement par consultation ?',
+        type: 'text', placeholder: '30 €',
+        llm: null,
+      },
+      taux_depassement: {
+        question: 'Quel est votre taux de dépassement habituel ?',
+        type: 'text', placeholder: '50 %',
+        llm: null,
+      },
+      // ── URSSAF ──────────────────────────────────────────────────────────────
+      numero_compte: {
+        question: 'Quel est votre numéro de compte URSSAF ou SIRET ?',
+        type: 'text', placeholder: '75 12345678901',
+        llm: null,
+      },
+      montant_redressement: {
+        question: 'Quel est le montant du redressement URSSAF notifié (en euros) ?',
+        type: 'text', placeholder: '4 800,00 €',
+        llm: null,
+      },
+      periode_controle: {
+        question: 'Quelle est la période concernée par le contrôle URSSAF ?',
+        type: 'text', placeholder: '2021-2023',
+        llm: null,
+      },
+      date_notification_urssaf: {
+        question: 'Quelle est la date de notification du redressement URSSAF ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      motifs_urssaf: {
+        question: 'Quels sont vos motifs de contestation du redressement URSSAF ?',
+        type: 'textarea', placeholder: 'Les heures comptabilisées ne correspondent pas à…',
+        llm: 'Tu es expert-comptable spécialisé libéral. Reformule ces motifs de contestation d\'un redressement URSSAF de manière structurée, argumentée et en droit social.',
+      },
+      montant_echeance: {
+        question: 'Quel montant proposez-vous par échéance de règlement (en euros) ?',
+        type: 'text', placeholder: '400,00 €',
+        llm: null,
+      },
+      nombre_echeances: {
+        question: 'Combien d\'échéances mensuelles proposez-vous ?',
+        type: 'text', placeholder: '12',
+        llm: null,
+      },
+      date_premier_echeance: {
+        question: 'Quelle est la date de la première échéance proposée ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      // ── Cabinet / Bail ──────────────────────────────────────────────────────
+      nom_bailleur: {
+        question: 'Quel est le nom du bailleur (propriétaire du local) ?',
+        type: 'text', placeholder: 'SCI Les Tilleuls / M. Bernard MARTIN',
+        llm: null,
+      },
+      adresse_bailleur: {
+        question: 'Quelle est l\'adresse postale du bailleur ?',
+        type: 'address', placeholder: '15 avenue du Général de Gaulle, 75016 Paris',
+        llm: null,
+      },
+      reference_bail: {
+        question: 'Quelle est la référence de votre bail professionnel ?',
+        type: 'text', placeholder: 'Bail du 01/09/2018',
+        llm: null,
+      },
+      date_bail: {
+        question: 'Quelle est la date de signature de votre bail actuel ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      description_travaux: {
+        question: 'Décrivez les travaux nécessaires dans votre cabinet',
+        type: 'textarea', placeholder: 'Fuite d\'eau au plafond de la salle d\'attente, peinture écaillée…',
+        llm: 'Tu es juriste en droit immobilier. Reformule cette description de travaux en termes techniques formels adaptés à un courrier de mise en demeure au bailleur, en précisant les obligations locatives.',
+      },
+      delai_travaux: {
+        question: 'Quel délai raisonnable accordez-vous au bailleur pour réaliser ces travaux ?',
+        type: 'text', placeholder: '30 jours',
+        llm: null,
+      },
+      montant_augmentation: {
+        question: 'De quel montant le bailleur souhaite-t-il augmenter le loyer ?',
+        type: 'text', placeholder: '200 € / mois',
+        llm: null,
+      },
+      taux_augmentation_prevu: {
+        question: 'Quel taux d\'augmentation est prévu (ILC ou autre) ?',
+        type: 'text', placeholder: 'ILC +8% soit 200€/mois',
+        llm: null,
+      },
+      date_resiliation: {
+        question: 'Quelle est la date de résiliation souhaitée ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      motif_resiliation: {
+        question: 'Quel est le motif de résiliation du bail ?',
+        type: 'textarea', placeholder: 'Cessation d\'activité / déménagement du cabinet…',
+        llm: 'Tu es juriste en droit immobilier. Reformule ce motif de résiliation de bail professionnel en termes formels et clairs.',
+      },
+      // ── Collaboration ────────────────────────────────────────────────────────
+      nom_confrere: {
+        question: 'Quel est le nom et prénom du confrère concerné ?',
+        type: 'text', placeholder: 'Dr Marie LAMBERT',
+        llm: null,
+      },
+      specialite_confrere: {
+        question: 'Quelle est la spécialité du confrère ?',
+        type: 'text', placeholder: 'Médecin généraliste',
+        llm: null,
+      },
+      conditions_proposees: {
+        question: 'Quelles sont les conditions de la collaboration proposée (rémunération, jours, durée) ?',
+        type: 'textarea', placeholder: 'Rétrocession de 40%, 2 jours/semaine, période d\'essai 3 mois…',
+        llm: 'Tu es juriste en droit médical. Reformule ces conditions de collaboration libérale en termes formels et précis, conformes à la réglementation.',
+      },
+      date_debut: {
+        question: 'Quelle est la date de début de la collaboration ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      nom_collaborateur: {
+        question: 'Quel est le nom complet du médecin collaborateur ?',
+        type: 'text', placeholder: 'Dr Sophie MARTIN',
+        llm: null,
+      },
+      date_fin: {
+        question: 'Quelle est la date de fin ou de préavis de la collaboration ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      // ── Défense / Contentieux ────────────────────────────────────────────────
+      nature_diffamation: {
+        question: 'Quelle est la nature des propos diffamatoires ou dénigrants ?',
+        type: 'textarea', placeholder: 'Avis Google mentionnant "incompétent", "dangereux"…',
+        llm: 'Tu es avocat spécialisé en droit de la presse. Reformule la description de ces propos diffamatoires de manière juridique précise, en qualifiant les faits.',
+      },
+      date_publication: {
+        question: 'Quelle est la date de publication des propos litigieux ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      support_publication: {
+        question: 'Sur quel support ont été publiés ces propos ?',
+        type: 'text', placeholder: 'Google Maps / Doctolib / réseau social',
+        llm: null,
+      },
+      description_incident: {
+        question: 'Décrivez l\'incident signalé (violences, menaces, etc.)',
+        type: 'textarea', placeholder: 'Le patient a proféré des menaces verbales puis…',
+        llm: 'Tu es juriste. Reformule cette description d\'incident en style factuel, neutre et chronologique, adapté à un signalement officiel ou un dépôt de plainte.',
+      },
+      nom_plaignant: {
+        question: 'Quel est le nom de la personne victime ou plaignante ?',
+        type: 'text', placeholder: 'Dr Jean DUPONT',
+        llm: null,
+      },
+      lien_parente: {
+        question: 'Quel est le lien de parenté ou la relation avec le patient ?',
+        type: 'text', placeholder: 'Conjoint / enfant mineur',
+        llm: null,
+      },
+      // ── Organismes / ARS ─────────────────────────────────────────────────────
+      date_installation: {
+        question: 'Quelle est la date prévue d\'installation ou d\'ouverture du cabinet ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      adresse_installation: {
+        question: 'Quelle est l\'adresse du futur cabinet ?',
+        type: 'address', placeholder: '3 rue des Acacia, 77000 Melun',
+        llm: null,
+      },
+      type_cabinet: {
+        question: 'Quel type de cabinet créez-vous ?',
+        type: 'text', placeholder: 'Cabinet libéral individuel / maison de santé pluriprofessionnelle',
+        llm: null,
+      },
+      commune_installation: {
+        question: 'Dans quelle commune vous installez-vous ?',
+        type: 'text', placeholder: 'Melun (77000)',
+        llm: null,
+      },
+      distance_autre_medecin: {
+        question: 'Quelle est la distance avec le médecin le plus proche (km) ?',
+        type: 'text', placeholder: '8 km',
+        llm: null,
+      },
+      // ── Doctolib ─────────────────────────────────────────────────────────────
+      date_resiliation_doctolib: {
+        question: 'Quelle est la date de résiliation de votre contrat Doctolib ?',
+        type: 'date', placeholder: '',
+        llm: null,
+      },
+      motif_resiliation_doctolib: {
+        question: 'Quel est le motif de résiliation Doctolib ?',
+        type: 'textarea', placeholder: 'Cessation d\'activité / tarif trop élevé / migration vers un autre outil…',
+        llm: 'Reformule ce motif de résiliation d\'un contrat Doctolib en termes formels et clairs pour un courrier officiel.',
+      },
     };
+
+    // ── État du robot ─────────────────────────────────────────────────────────
+    let robotVars   = [];   // liste des noms de variables à remplir
+    let robotStep   = 0;    // index de l'étape courante
+    let robotValues = {};   // valeurs collectées { varName: value }
+    let prevInputValue = null; // pour undo après reformulation
+    let llmEnabled  = false;
+    let recognition = null;
 
     // ── Utilitaires ───────────────────────────────────────────────────────────
     function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
@@ -452,95 +889,163 @@
       const rendered = renderDocument(currentTemplate, {});
       $('doc-body').innerHTML = textToHtml(rendered);
 
-      // Détecte les variables non remplies
+      // Détecte les variables non remplies → ouvre le robot
       const unknowns = detectUnknownVars(rendered);
       if (unknowns.length) {
-        openVarsPanel(unknowns);
+        openRobotPanel(unknowns);
       }
     }
 
-    // ── Panel variables ───────────────────────────────────────────────────────
-    function openVarsPanel(vars) {
-      const container = $('vars-fields');
-      container.innerHTML = '';
+    // ── Robot interview ───────────────────────────────────────────────────────
+    function openRobotPanel(vars) {
+      robotVars   = vars;
+      robotStep   = 0;
+      robotValues = {};
+      prevInputValue = null;
+      $('robot-overlay').classList.add('open');
+      renderRobotStep();
+
+      // Auto-lookup RPPS pour adresse_cabinet si dans la liste
+      if (vars.includes('adresse_cabinet') && membre?.rpps) {
+        // sera déclenché lors du rendu de l'étape adresse_cabinet
+      }
+    }
+
+    function renderRobotStep() {
+      const varName = robotVars[robotStep];
+      const cfg = VAR_CFG[varName] || { question: `Valeur pour : ${varName}`, type: 'text', placeholder: '', llm: null };
+      const total = robotVars.length;
       const deptCode = getDeptCodeFromCP(membre?.code_postal);
 
-      vars.forEach(varName => {
-        const cfg = VAR_CFG[varName] || { label: varName, type: 'text', hint: '' };
-        const group = document.createElement('div');
-        group.className = 'var-group';
+      // Progress
+      $('robot-progress-label').textContent = `Question ${robotStep + 1} sur ${total}`;
 
-        let inner = '';
-
-        if (varName === 'adresse_cabinet') {
-          inner = `
-            <label>Adresse du cabinet</label>
-            <div class="var-hint">${cfg.hint}</div>
-            <div class="address-search-wrap">
-              <input type="text" id="var-adresse_cabinet" placeholder="Commencez à taper pour rechercher…" autocomplete="off">
-              <div class="address-results" id="ban-results"></div>
-            </div>
-            <div class="rpps-status" id="rpps-status"></div>`;
-        } else if (varName === 'departement') {
-          const options = Object.entries(DEPT_MAP).map(([code, d]) =>
-            `<option value="${code}" ${code === deptCode ? 'selected' : ''}>${d.tpl} (${code})</option>`
-          ).join('');
-          inner = `
-            <label>Département de la CPAM</label>
-            <div class="var-hint">${cfg.hint}</div>
-            <select id="var-departement">${options}<option value="">Autre…</option></select>`;
-        } else if (cfg.type === 'textarea') {
-          inner = `
-            <label>${escapeHtml(cfg.label)}</label>
-            ${cfg.hint ? `<div class="var-hint">${escapeHtml(cfg.hint)}</div>` : ''}
-            <textarea id="var-${varName}" placeholder="${escapeHtml(cfg.hint || '')}"></textarea>`;
-        } else if (cfg.type === 'date') {
-          inner = `
-            <label>${escapeHtml(cfg.label)}</label>
-            ${cfg.hint ? `<div class="var-hint">${escapeHtml(cfg.hint)}</div>` : ''}
-            <input type="date" id="var-${varName}">`;
-        } else {
-          inner = `
-            <label>${escapeHtml(cfg.label)}</label>
-            ${cfg.hint ? `<div class="var-hint">${escapeHtml(cfg.hint)}</div>` : ''}
-            <input type="${cfg.type === 'url' ? 'url' : 'text'}" id="var-${varName}" placeholder="${escapeHtml(cfg.hint || '')}">`;
-        }
-        group.innerHTML = inner;
-        container.appendChild(group);
-      });
-
-      $('vars-panel').classList.add('open');
-      $('vars-overlay-bg').classList.add('open');
-
-      // Wires up address search after DOM insertion
-      const addrInput = $('var-adresse_cabinet');
-      if (addrInput) {
-        let banTimer = null;
-        addrInput.addEventListener('input', () => {
-          clearTimeout(banTimer);
-          banTimer = setTimeout(() => searchBAN(addrInput.value, $('ban-results'), addrInput), 300);
-        });
-        // Auto-search via RPPS if available
-        if (membre?.rpps) rppsLookup(membre.rpps, addrInput, $('rpps-status'));
+      // Dots
+      const dotsEl = $('robot-dots');
+      dotsEl.innerHTML = '';
+      const maxDots = Math.min(total, 8);
+      for (let i = 0; i < maxDots; i++) {
+        const d = document.createElement('div');
+        d.className = 'robot-dot' + (i < robotStep ? ' done' : i === robotStep ? ' current' : '');
+        dotsEl.appendChild(d);
       }
+
+      // Bubble
+      const chat = $('robot-chat');
+      chat.innerHTML = `<div class="robot-bubble"><strong>${escapeHtml(cfg.question)}</strong></div>`;
+
+      // Input
+      const wrap = $('robot-input-wrap');
+      prevInputValue = null;
+      $('robot-undo-row').style.display = 'none';
+      $('robot-rpps-status').textContent = '';
+      $('robot-mic-info').style.display = 'none';
+
+      const saved = robotValues[varName] || '';
+
+      if (varName === 'adresse_cabinet') {
+        wrap.innerHTML = `
+          <div class="address-search-wrap">
+            <input class="robot-input" type="text" id="robot-input-field"
+              placeholder="Commencez à taper pour rechercher…" autocomplete="off" value="${escapeHtml(saved)}">
+            <div class="address-results" id="robot-ban-results"></div>
+          </div>`;
+        const inp = $('robot-input-field');
+        let banTimer = null;
+        inp.addEventListener('input', () => {
+          clearTimeout(banTimer);
+          banTimer = setTimeout(() => searchBAN(inp.value, $('robot-ban-results'), inp), 300);
+        });
+        if (membre?.rpps && !saved) {
+          rppsLookup(membre.rpps, inp, $('robot-rpps-status'));
+        }
+
+      } else if (varName === 'departement') {
+        const options = Object.entries(DEPT_MAP).map(([code, d]) =>
+          `<option value="${code}" ${(saved || deptCode) === code ? 'selected' : ''}>${d.tpl} (${code})</option>`
+        ).join('');
+        wrap.innerHTML = `<select class="robot-input" id="robot-input-field">
+          ${options}<option value="">Autre département…</option></select>`;
+
+      } else if (cfg.type === 'textarea') {
+        wrap.innerHTML = `<textarea class="robot-input" id="robot-input-field"
+          placeholder="${escapeHtml(cfg.placeholder || '')}">${escapeHtml(saved)}</textarea>`;
+
+      } else if (cfg.type === 'date') {
+        wrap.innerHTML = `<input class="robot-input" type="date" id="robot-input-field" value="${escapeHtml(saved)}">`;
+
+      } else if (cfg.type === 'url') {
+        wrap.innerHTML = `<input class="robot-input" type="url" id="robot-input-field"
+          placeholder="${escapeHtml(cfg.placeholder || '')}" value="${escapeHtml(saved)}">`;
+
+      } else {
+        wrap.innerHTML = `<input class="robot-input" type="text" id="robot-input-field"
+          placeholder="${escapeHtml(cfg.placeholder || '')}" value="${escapeHtml(saved)}">`;
+      }
+
+      // Bouton LLM
+      const llmBtn = $('robot-llm-btn');
+      llmBtn.disabled = !llmEnabled || !cfg.llm;
+
+      // Bouton back
+      $('robot-back-btn').style.display = robotStep > 0 ? 'inline-flex' : 'none';
+
+      // Bouton next : dernier → "Terminer"
+      $('robot-next-btn').textContent = robotStep === total - 1 ? 'Terminer ✓' : 'Suivant →';
+
+      // Focus
+      setTimeout(() => { const f = $('robot-input-field'); if (f) f.focus(); }, 80);
     }
 
-    window.closeVarsPanel = function () {
-      $('vars-panel').classList.remove('open');
-      $('vars-overlay-bg').classList.remove('open');
+    function robotGetCurrentValue() {
+      const el = $('robot-input-field');
+      if (!el) return '';
+      return el.value.trim();
+    }
+
+    function robotSaveStep() {
+      const varName = robotVars[robotStep];
+      const val = robotGetCurrentValue();
+      if (val) robotValues[varName] = val;
+      else delete robotValues[varName];
+    }
+
+    window.robotNext = function () {
+      robotSaveStep();
+      if (robotStep < robotVars.length - 1) {
+        robotStep++;
+        renderRobotStep();
+      } else {
+        robotFinish();
+      }
     };
 
-    window.applyVars = function () {
+    window.robotPrev = function () {
+      robotSaveStep();
+      if (robotStep > 0) { robotStep--; renderRobotStep(); }
+    };
+
+    window.robotSkip = function () {
+      const varName = robotVars[robotStep];
+      delete robotValues[varName];
+      if (robotStep < robotVars.length - 1) {
+        robotStep++;
+        renderRobotStep();
+      } else {
+        robotFinish();
+      }
+    };
+
+    function robotFinish() {
+      $('robot-overlay').classList.remove('open');
+      applyVarsFromRobot(robotValues);
+    }
+
+    function applyVarsFromRobot(values) {
       const extra = {};
-      // Collect all var-* inputs
-      $('vars-fields').querySelectorAll('[id^="var-"]').forEach(el => {
-        const key = el.id.replace('var-', '');
-        let val = el.value.trim();
-        // Special: departement select → convert code to tpl string + update CPAM dest
+      Object.entries(values).forEach(([key, val]) => {
         if (key === 'departement' && val) {
-          const deptTpl = getDeptTplFromCode(val);
-          extra[key] = deptTpl;
-          // Update destinataire block with CPAM address
+          extra[key] = getDeptTplFromCode(val);
           if (CPAM_ADRESSES[val]) {
             $('doc-destinataire').innerHTML = `<div class="doc-label">Destinataire</div>` +
               CPAM_ADRESSES[val].split('\n').map(l => `<div>${escapeHtml(l)}</div>`).join('');
@@ -549,10 +1054,109 @@
           extra[key] = val;
         }
       });
-
       const rendered = renderDocument(currentTemplate, extra);
       $('doc-body').innerHTML = textToHtml(rendered);
-      closeVarsPanel();
+    }
+
+    // ── Dictée vocale ─────────────────────────────────────────────────────────
+    window.robotDictate = function () {
+      const btn = $('robot-mic-btn');
+      const infoEl = $('robot-mic-info');
+
+      if (recognition) {
+        recognition.stop(); recognition = null;
+        btn.textContent = '🎤 Dicter';
+        btn.classList.remove('listening');
+        return;
+      }
+
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) {
+        infoEl.style.display = 'block';
+        infoEl.innerHTML = '⚠️ Votre navigateur ne supporte pas la dictée. Compatible : <strong>Chrome</strong>, <strong>Edge</strong>, <strong>Safari</strong> (pas Firefox)';
+        return;
+      }
+
+      recognition = new SpeechRec();
+      recognition.lang = 'fr-FR';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        btn.textContent = '⏹ Arrêter';
+        btn.classList.add('listening');
+        infoEl.style.display = 'block';
+        infoEl.textContent = '🎙 Dictée en cours… parlez maintenant';
+      };
+      recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        const inp = $('robot-input-field');
+        if (inp) {
+          const tag = inp.tagName.toLowerCase();
+          if (tag === 'textarea') inp.value = (inp.value ? inp.value + ' ' : '') + transcript;
+          else inp.value = transcript;
+        }
+      };
+      recognition.onerror = () => {
+        btn.textContent = '🎤 Dicter'; btn.classList.remove('listening');
+        infoEl.textContent = '⚠️ Erreur de dictée. Réessayez.';
+        recognition = null;
+      };
+      recognition.onend = () => {
+        btn.textContent = '🎤 Dicter'; btn.classList.remove('listening');
+        infoEl.style.display = 'none';
+        recognition = null;
+      };
+      recognition.start();
+    };
+
+    // ── Reformulation LLM ─────────────────────────────────────────────────────
+    window.robotUpdateLlm = function () {
+      llmEnabled = $('robot-llm-toggle').checked;
+      const varName = robotVars[robotStep];
+      const cfg = VAR_CFG[varName];
+      $('robot-llm-btn').disabled = !llmEnabled || !cfg?.llm;
+    };
+
+    window.robotReformat = async function () {
+      const varName = robotVars[robotStep];
+      const cfg = VAR_CFG[varName];
+      if (!llmEnabled || !cfg?.llm) return;
+      const inp = $('robot-input-field');
+      if (!inp) return;
+      const text = inp.value.trim();
+      if (!text) { toast('Saisissez d\'abord du texte à reformuler', true); return; }
+
+      prevInputValue = text;
+      const btn = $('robot-llm-btn');
+      btn.disabled = true; btn.textContent = '⏳ Reformulation…';
+
+      try {
+        const res = await fetch('/.netlify/functions/reformuler-texte', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, fieldKey: varName }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || res.status);
+        inp.value = data.reformule;
+        $('robot-undo-row').style.display = 'block';
+        toast('Texte reformulé par l\'IA ✨');
+      } catch (e) {
+        toast('Erreur reformulation : ' + e.message, true);
+        prevInputValue = null;
+      } finally {
+        btn.disabled = false; btn.textContent = '✨ Reformuler avec l\'IA';
+        btn.disabled = !llmEnabled || !cfg?.llm;
+      }
+    };
+
+    window.robotUndoReformat = function () {
+      if (prevInputValue === null) return;
+      const inp = $('robot-input-field');
+      if (inp) inp.value = prevInputValue;
+      prevInputValue = null;
+      $('robot-undo-row').style.display = 'none';
     };
 
     // ── Recherche adresse BAN ─────────────────────────────────────────────────
