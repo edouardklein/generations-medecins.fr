@@ -75,11 +75,6 @@ DO $$ BEGIN
         UNIQUE (rpps, campagne_id);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
--- Index ref si pas encore UNIQUE
-DO $$ BEGIN
-    ALTER TABLE greve_declarations ADD CONSTRAINT greve_declarations_ref_key UNIQUE (ref);
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
-
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_gd_campagne ON greve_declarations(campagne_id);
 CREATE INDEX IF NOT EXISTS idx_gd_created  ON greve_declarations(created_at DESC);
