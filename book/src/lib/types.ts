@@ -266,9 +266,10 @@ export type BudgetProps = {
   eyebrow?: string
   title: string
   subtitle?: string
-  items: { label: string; detail?: string; amount: number }[]
+  items: { label: string; detail?: string; amount: number; secured?: number }[]
   currency?: string
   totalLabel?: string
+  securedLabel?: string
 }
 
 export type TestimonialItem = {

@@ -647,30 +647,36 @@ declare
         {
           "label": "Events mensuels",
           "detail": "4 000 € × 10 événements",
-          "amount": 40000
+          "amount": 40000,
+          "secured": 25
         },
         {
           "label": "Location de salle",
           "detail": "Lieux events + Big Event",
-          "amount": 5000
+          "amount": 5000,
+          "secured": 100
         },
         {
           "label": "Développement des modules",
           "detail": "Plateforme membre, SOS juridique, outils",
-          "amount": 50000
+          "amount": 50000,
+          "secured": 25
         },
         {
           "label": "Budget communication",
           "detail": "Production, réseaux, newsletter, design",
-          "amount": 25000
+          "amount": 25000,
+          "secured": 50
         },
         {
           "label": "Big Event annuel",
           "detail": "200 participants — ½ journée + soirée",
-          "amount": 30000
+          "amount": 30000,
+          "secured": 33
         }
       ],
-      "totalLabel": "Total annuel"
+      "totalLabel": "Total annuel",
+      "securedLabel": "Déjà sécurisé"
     }
   },
   {
@@ -689,7 +695,7 @@ declare
             "Mention dans la newsletter mensuelle",
             "2 posts dédiés sur nos réseaux sociaux",
             "Logo sur tous les events GM (10/an)",
-            "4 invitations par event mensuel",
+            "4 invitations aux events mensuels",
             "Point de contact dédié"
           ]
         },
@@ -699,10 +705,10 @@ declare
           "tagline": "L'allié privilégié — co-construction, visibilité événementielle",
           "features": [
             "✦ Inclut l'intégralité de l'Initiateur",
-            "Co-organisation de 2 events / an",
+            "Co-organisation complète de 2 events / an",
             "Webinaire co-brandé avec inscriptions et replay",
-            "Intervention de 10 min au Big Event",
-            "Module sponsorisé sur la plateforme",
+            "Intervention au Big Event",
+            "Affichage dédié sur la plateforme",
             "Reporting trimestriel détaillé"
           ]
         },
