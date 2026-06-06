@@ -186,15 +186,11 @@
       padding: 7px 14px; border-radius: 9px; font-family: inherit; font-size: .78rem;
       font-weight: 700; cursor: pointer; border: 1.5px solid; transition: all .15s; white-space: nowrap;
     }
-    .robot-btn-mic  { background: rgba(42,109,184,.07); color: var(--blue); border-color: rgba(42,109,184,.25); }
-    .robot-btn-mic:hover { background: rgba(42,109,184,.15); }
-    .robot-btn-mic.listening { background: rgba(220,38,38,.07); color: #dc2626; border-color: #fca5a5; }
     .robot-btn-llm  { background: rgba(56,168,181,.08); color: #1a7a86; border-color: rgba(56,168,181,.3); }
     .robot-btn-llm:hover:not(:disabled) { background: rgba(56,168,181,.18); }
     .robot-btn-llm:disabled { opacity: .4; cursor: not-allowed; }
     .robot-btn-skip { background: none; border-color: transparent; color: var(--muted); padding-left: 0; }
     .robot-btn-skip:hover { color: var(--ink); }
-    .robot-mic-info  { font-size: .72rem; color: var(--muted); margin-top: 6px; }
     .robot-llm-info  { font-size: .72rem; color: var(--muted); margin-top: 6px; font-style: italic; }
     .robot-undo-row  { font-size: .74rem; color: var(--muted); margin-top: 6px; }
     .robot-undo-row button { background: none; border: none; color: var(--blue); cursor: pointer; font-size: .74rem; text-decoration: underline; padding: 0; }
@@ -362,12 +358,8 @@
       <div class="robot-answer">
         <div id="robot-input-wrap"></div>
         <div class="robot-action-row">
-          <button class="robot-btn robot-btn-mic" id="robot-mic-btn" onclick="robotDictate()">🎤 Dicter</button>
           <button class="robot-btn robot-btn-llm" id="robot-llm-btn" onclick="robotReformat()" disabled>✨ Reformuler avec l'IA</button>
           <button class="robot-btn robot-btn-skip" onclick="robotSkip()">Passer</button>
-        </div>
-        <div class="robot-mic-info" id="robot-mic-info" style="display:none">
-          Compatible : <strong>Chrome</strong>, <strong>Edge</strong>, <strong>Safari</strong> (pas Firefox)
         </div>
         <div class="robot-llm-info" id="robot-llm-info" style="display:none"></div>
         <div class="robot-rpps-status" id="robot-rpps-status"></div>
@@ -751,7 +743,6 @@
     let robotValues = {};   // valeurs collectées { varName: value }
     let prevInputValue = null; // pour undo après reformulation
     let llmEnabled  = false;
-    let recognition = null;
 
     // ── Utilitaires ───────────────────────────────────────────────────────────
     function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
@@ -881,8 +872,6 @@
     }
 
     function renderRobotStep() {
-      // Stoppe une éventuelle dictée en cours avant de changer de champ
-      if (recognition) { try { recognition.stop(); } catch {} recognition = null; }
       const varName = robotVars[robotStep];
       const cfg = VAR_CFG[varName] || { question: `Valeur pour : ${varName}`, type: 'text', placeholder: '', llm: null };
       const total = robotVars.length;
@@ -910,7 +899,6 @@
       prevInputValue = null;
       $('robot-undo-row').style.display = 'none';
       $('robot-rpps-status').textContent = '';
-      $('robot-mic-info').style.display = 'none';
 
       const saved = robotValues[varName] || '';
 
@@ -1039,106 +1027,6 @@
       const rendered = renderDocument(currentTemplate, extra);
       $('doc-body').innerHTML = textToHtml(rendered);
     }
-
-    // ── Dictée vocale ─────────────────────────────────────────────────────────
-    window.robotDictate = async function () {
-      const btn = $('robot-mic-btn');
-      const infoEl = $('robot-mic-info');
-
-      // Toggle stop
-      if (recognition) {
-        try { recognition.stop(); } catch {}
-        return;
-      }
-
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) {
-        infoEl.style.display = 'block';
-        infoEl.innerHTML = '⚠️ Votre navigateur ne supporte pas la dictée. Compatible : <strong>Chrome</strong>, <strong>Edge</strong>, <strong>Safari</strong> (pas Firefox)';
-        return;
-      }
-
-      // HTTPS requis (sauf localhost)
-      if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-        infoEl.style.display = 'block';
-        infoEl.textContent = '⚠️ La dictée nécessite HTTPS.';
-        return;
-      }
-
-      // Demande explicite de permission micro (Chrome/Edge l'exigent sinon échec silencieux)
-      try {
-        if (navigator.mediaDevices?.getUserMedia) {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          stream.getTracks().forEach(t => t.stop()); // on libère, c'est l'API speech qui prend le relais
-        }
-      } catch (err) {
-        infoEl.style.display = 'block';
-        infoEl.textContent = '⚠️ Microphone refusé. Autorisez-le dans les paramètres du navigateur.';
-        return;
-      }
-
-      const inp = $('robot-input-field');
-      if (!inp) return;
-      const baseValue = inp.value;  // texte déjà saisi conservé
-      const isTextarea = inp.tagName.toLowerCase() === 'textarea';
-
-      recognition = new SpeechRec();
-      recognition.lang = 'fr-FR';
-      recognition.continuous = true;       // permet de parler longtemps
-      recognition.interimResults = true;   // affichage en temps réel
-      recognition.maxAlternatives = 1;
-
-      let finalTranscript = '';
-
-      recognition.onstart = () => {
-        btn.textContent = '⏹ Arrêter';
-        btn.classList.add('listening');
-        infoEl.style.display = 'block';
-        infoEl.textContent = '🎙 Dictée en cours… parlez maintenant (cliquez sur Arrêter quand terminé)';
-      };
-
-      recognition.onresult = (e) => {
-        let interim = '';
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-          const transcript = e.results[i][0].transcript;
-          if (e.results[i].isFinal) finalTranscript += transcript;
-          else interim += transcript;
-        }
-        const sep = baseValue && !baseValue.endsWith(' ') ? ' ' : '';
-        const combined = baseValue + sep + finalTranscript + interim;
-        if (isTextarea) {
-          inp.value = combined;
-        } else {
-          inp.value = (finalTranscript + interim).trim() || baseValue;
-        }
-      };
-
-      recognition.onerror = (e) => {
-        const msg = {
-          'no-speech':     'Aucune voix détectée. Réessayez en parlant plus fort.',
-          'audio-capture': 'Aucun microphone détecté.',
-          'not-allowed':   'Permission micro refusée. Autorisez-la dans les paramètres du navigateur.',
-          'network':       'Erreur réseau (la reconnaissance utilise un service Google).',
-          'aborted':       '',
-        }[e.error] || ('Erreur dictée : ' + e.error);
-        if (msg) { infoEl.style.display = 'block'; infoEl.textContent = '⚠️ ' + msg; }
-      };
-
-      recognition.onend = () => {
-        btn.textContent = '🎤 Dicter'; btn.classList.remove('listening');
-        // garde le message pendant 2 secondes pour permettre la lecture de l'erreur
-        setTimeout(() => { if (!recognition) infoEl.style.display = 'none'; }, 2000);
-        recognition = null;
-      };
-
-      try {
-        recognition.start();
-      } catch (err) {
-        infoEl.style.display = 'block';
-        infoEl.textContent = '⚠️ Impossible de démarrer la dictée : ' + err.message;
-        recognition = null;
-      }
-    };
 
     // ── Reformulation LLM ─────────────────────────────────────────────────────
     window.robotUpdateLlm = function () {

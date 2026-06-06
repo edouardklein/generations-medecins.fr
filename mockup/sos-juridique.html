@@ -23,20 +23,6 @@
       font-weight: 600; margin-bottom: 16px; transition: color .15s;
     }
     .back-link:hover { color: #fff; }
-
-    /* Bouton micro de dictée */
-    .mic-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-    .mic-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: #fff; color: var(--blue); border: 1.5px solid var(--line);
-      border-radius: 8px; padding: 8px 14px; font-family: inherit; font-size: .82rem;
-      font-weight: 700; cursor: pointer; transition: all .15s;
-    }
-    .mic-btn:hover { border-color: var(--blue); background: #f0f6ff; }
-    .mic-btn.listening { background: #fde8e8; color: #c0392b; border-color: #e8a0a0; animation: micpulse 1.2s ease-in-out infinite; }
-    @keyframes micpulse { 0%,100% { box-shadow: 0 0 0 0 rgba(192,57,43,.4); } 50% { box-shadow: 0 0 0 6px rgba(192,57,43,0); } }
-    .mic-info { font-size: .78rem; color: var(--muted); line-height: 1.5; display: none; }
-    .mic-info strong { color: var(--ink); }
     .consult-hero h1 { font-size: 1.7rem; font-weight: 800; margin-bottom: 8px; }
     .consult-hero p { font-size: .92rem; color: rgba(255,255,255,.8); line-height: 1.6; max-width: 600px; }
 
@@ -238,11 +224,7 @@
       <div style="margin-bottom:16px">
         <label class="form-label">Votre question juridique</label>
         <textarea class="form-field" id="question-input" placeholder="Décrivez votre situation et votre question : contexte, dates clés, problème rencontré…&#10;&#10;Ex. : Mon bailleur augmente mon loyer de 15% alors que je suis en bail professionnel. Quelles sont mes protections légales ?"></textarea>
-        <div class="mic-row">
-          <button type="button" class="mic-btn" id="mic-btn" onclick="dictate()">🎤 Dicter ma question</button>
-          <span class="mic-info" id="mic-info"></span>
-        </div>
-        <div class="form-hint">💡 Soyez précis sur le contexte. Vous pouvez mentionner des noms — ils seront automatiquement supprimés avant transmission.<br>🎤 La dictée fonctionne sur <strong>Chrome</strong>, <strong>Edge</strong> et <strong>Safari</strong> (pas Firefox). Le micro reste actif jusqu'à ce que vous recliquiez sur le bouton.</div>
+        <div class="form-hint">💡 Soyez précis sur le contexte. Vous pouvez mentionner des noms — ils seront automatiquement supprimés avant transmission.</div>
       </div>
 
       <div>
@@ -270,112 +252,6 @@
   </div>
 
   <div class="toast" id="toast"></div>
-
-  <!-- Dictée vocale — script indépendant de Supabase -->
-  <script>
-  (function () {
-    let recognition = null;
-    let isListening  = false;  // intention utilisateur (≠ état Chrome)
-    let gotResult    = false;  // a-t-on reçu au moins un résultat ?
-    let logLines = [];
-
-    function log(line) {
-      const infoEl = document.getElementById('mic-info');
-      const ts = new Date().toLocaleTimeString('fr-FR', { hour12:false });
-      logLines.push(`${ts} · ${line}`);
-      if (logLines.length > 8) logLines = logLines.slice(-8);
-      infoEl.style.display = 'block';
-      infoEl.innerHTML = logLines.map(l => '<div>'+l+'</div>').join('');
-    }
-
-    function startRecognition(SpeechRec, btn, inp) {
-      const baseCapture = inp.value;   // snapshot au lancement ou au redémarrage auto
-      let finalTranscript = '';
-
-      recognition = new SpeechRec();
-      recognition.lang = 'fr-FR';
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.maxAlternatives = 1;
-
-      recognition.onstart      = () => { log('▶️ onstart (écoute lancée)'); btn.textContent = '⏹ Arrêter la dictée'; btn.classList.add('listening'); };
-      recognition.onaudiostart = () => log('🔊 onaudiostart (capture audio OK)');
-      recognition.onsoundstart = () => log('🔉 onsoundstart (un son est capté)');
-      recognition.onspeechstart= () => log('🗣️ onspeechstart (voix détectée !)');
-      recognition.onspeechend  = () => log('🤫 onspeechend');
-      recognition.onsoundend   = () => log('🔇 onsoundend');
-      recognition.onaudioend   = () => log('⏸️ onaudioend');
-
-      recognition.onresult = (e) => {
-        gotResult = true;
-        let interim = '';
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-          const t = e.results[i][0].transcript;
-          if (e.results[i].isFinal) finalTranscript += t;
-          else interim += t;
-        }
-        const sep = baseCapture && !baseCapture.endsWith(' ') && !baseCapture.endsWith('\n') ? ' ' : '';
-        inp.value = baseCapture + sep + finalTranscript + interim;
-        log('✅ onresult: "' + (finalTranscript + interim).slice(-40) + '"');
-      };
-
-      recognition.onerror = (e) => {
-        log('❌ onerror: ' + e.error);
-        if (e.error === 'no-speech' || e.error === 'aborted') return; // relancé dans onend
-        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-          isListening = false;
-          log('⛔ Permission/Service micro refusé — STOP');
-        }
-      };
-
-      recognition.onend = () => {
-        log('⏹️ onend (isListening=' + isListening + ')');
-        recognition = null;
-        if (isListening) {
-          startRecognition(SpeechRec, btn, inp); // Chrome a coupé seul → on relance
-        } else {
-          btn.textContent = '🎤 Dicter ma question';
-          btn.classList.remove('listening');
-        }
-      };
-
-      try {
-        recognition.start();
-      } catch (err) {
-        isListening = false;
-        log('💥 start() exception: ' + err.message);
-        recognition = null;
-      }
-    }
-
-    window.dictate = function () {
-      const btn    = document.getElementById('mic-btn');
-      const inp    = document.getElementById('question-input');
-
-      // Toggle stop
-      if (isListening) {
-        isListening = false;
-        log('🛑 Arrêt demandé par l\'utilisateur');
-        if (recognition) { try { recognition.stop(); } catch {} }
-        return;
-      }
-
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) {
-        log('⚠️ API non supportée (Chrome/Edge/Safari uniquement, pas Firefox)');
-        return;
-      }
-      if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-        log('⚠️ HTTPS requis');
-        return;
-      }
-
-      logLines = []; gotResult = false; isListening = true;
-      log('🎬 Démarrage… (API ' + (window.SpeechRecognition ? 'standard' : 'webkit') + ')');
-      startRecognition(SpeechRec, btn, inp);
-    };
-  })();
-  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
