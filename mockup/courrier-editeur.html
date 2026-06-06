@@ -1242,7 +1242,22 @@
         docEl.querySelectorAll('[contenteditable]').forEach(el => el.setAttribute('contenteditable', 'true'));
 
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+        const pdfOpts = { unit: 'mm', format: 'a4', orientation: 'portrait' };
+
+        // Courrier signé → PDF infalsifiable : lecture/impression libres,
+        // modification verrouillée par un mot de passe propriétaire aléatoire
+        // (jamais affiché → le document ne peut plus être édité).
+        if (statut === 'signe') {
+          const ownerPwd = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36))
+            .replace(/-/g, '');
+          pdfOpts.encryption = {
+            userPassword: '',                  // pas de mot de passe pour lire
+            ownerPassword: ownerPwd,           // requis pour modifier (aléatoire = inviolable)
+            userPermissions: ['print', 'copy'] // autorisés sans mot de passe ; "modify"/"annot-forms" exclus
+          };
+        }
+
+        const pdf = new jsPDF(pdfOpts);
         const pageW = pdf.internal.pageSize.getWidth();
         const pageH = pdf.internal.pageSize.getHeight();
         const imgW  = pageW;
