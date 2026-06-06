@@ -107,16 +107,22 @@
       .doc-dest, .doc-lieu-date, .doc-signature { text-align: left; }
     }
 
-    /* ── Robot interview panel ── */
+    /* ── Robot interview panel : overlay latéral droit ── */
     .robot-overlay {
-      position: fixed; inset: 0; background: rgba(15,32,51,0.55);
-      z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px;
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 42%; min-width: 460px; max-width: 640px;
+      background: #fff; z-index: 200;
+      box-shadow: -16px 0 40px rgba(15,32,51,0.18);
+      transform: translateX(100%); transition: transform .25s ease-out;
+      display: flex; flex-direction: column;
     }
-    .robot-overlay.open { display: flex; }
+    .robot-overlay.open { transform: translateX(0); }
     .robot-modal {
-      background: #fff; border-radius: 20px; width: 100%; max-width: 560px;
-      max-height: 92vh; display: flex; flex-direction: column; overflow: hidden;
-      box-shadow: 0 28px 90px rgba(15,32,51,0.32);
+      flex: 1; display: flex; flex-direction: column;
+      width: 100%; height: 100%; overflow: hidden; background: #fff;
+    }
+    @media (max-width: 900px) {
+      .robot-overlay { width: 100%; min-width: 0; max-width: none; }
     }
     .robot-header {
       padding: 20px 24px 16px; border-bottom: 1.5px solid var(--line); flex-shrink: 0;
@@ -189,6 +195,7 @@
     .robot-btn-skip { background: none; border-color: transparent; color: var(--muted); padding-left: 0; }
     .robot-btn-skip:hover { color: var(--ink); }
     .robot-mic-info  { font-size: .72rem; color: var(--muted); margin-top: 6px; }
+    .robot-llm-info  { font-size: .72rem; color: var(--muted); margin-top: 6px; font-style: italic; }
     .robot-undo-row  { font-size: .74rem; color: var(--muted); margin-top: 6px; }
     .robot-undo-row button { background: none; border: none; color: var(--blue); cursor: pointer; font-size: .74rem; text-decoration: underline; padding: 0; }
     .robot-rpps-status { font-size: .74rem; color: var(--muted); margin-top: 6px; min-height: 16px; }
@@ -362,6 +369,7 @@
         <div class="robot-mic-info" id="robot-mic-info" style="display:none">
           Compatible : <strong>Chrome</strong>, <strong>Edge</strong>, <strong>Safari</strong> (pas Firefox)
         </div>
+        <div class="robot-llm-info" id="robot-llm-info" style="display:none"></div>
         <div class="robot-rpps-status" id="robot-rpps-status"></div>
         <div class="robot-undo-row" id="robot-undo-row" style="display:none">
           Texte reformulé par l'IA. <button onclick="robotUndoReformat()">Annuler</button>
@@ -912,6 +920,8 @@
     }
 
     function renderRobotStep() {
+      // Stoppe une éventuelle dictée en cours avant de changer de champ
+      if (recognition) { try { recognition.stop(); } catch {} recognition = null; }
       const varName = robotVars[robotStep];
       const cfg = VAR_CFG[varName] || { question: `Valeur pour : ${varName}`, type: 'text', placeholder: '', llm: null };
       const total = robotVars.length;
@@ -983,9 +993,20 @@
           placeholder="${escapeHtml(cfg.placeholder || '')}" value="${escapeHtml(saved)}">`;
       }
 
-      // Bouton LLM
-      const llmBtn = $('robot-llm-btn');
-      llmBtn.disabled = !llmEnabled || !cfg.llm;
+      // Bouton LLM + message explicatif
+      const llmBtn  = $('robot-llm-btn');
+      const llmInfo = $('robot-llm-info');
+      const canReformulate = !!cfg.llm;
+      llmBtn.disabled = !llmEnabled || !canReformulate;
+      if (!canReformulate) {
+        llmInfo.style.display = 'block';
+        llmInfo.textContent = '💡 Ce champ ne se prête pas à la reformulation IA (réponse précise attendue).';
+      } else if (!llmEnabled) {
+        llmInfo.style.display = 'block';
+        llmInfo.textContent = '💡 Activez le toggle "Reformulation IA" en haut pour utiliser ce bouton.';
+      } else {
+        llmInfo.style.display = 'none';
+      }
 
       // Bouton back
       $('robot-back-btn').style.display = robotStep > 0 ? 'inline-flex' : 'none';
@@ -1059,14 +1080,13 @@
     }
 
     // ── Dictée vocale ─────────────────────────────────────────────────────────
-    window.robotDictate = function () {
+    window.robotDictate = async function () {
       const btn = $('robot-mic-btn');
       const infoEl = $('robot-mic-info');
 
+      // Toggle stop
       if (recognition) {
-        recognition.stop(); recognition = null;
-        btn.textContent = '🎤 Dicter';
-        btn.classList.remove('listening');
+        try { recognition.stop(); } catch {}
         return;
       }
 
@@ -1077,45 +1097,108 @@
         return;
       }
 
+      // HTTPS requis (sauf localhost)
+      if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        infoEl.style.display = 'block';
+        infoEl.textContent = '⚠️ La dictée nécessite HTTPS.';
+        return;
+      }
+
+      // Demande explicite de permission micro (Chrome/Edge l'exigent sinon échec silencieux)
+      try {
+        if (navigator.mediaDevices?.getUserMedia) {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.getTracks().forEach(t => t.stop()); // on libère, c'est l'API speech qui prend le relais
+        }
+      } catch (err) {
+        infoEl.style.display = 'block';
+        infoEl.textContent = '⚠️ Microphone refusé. Autorisez-le dans les paramètres du navigateur.';
+        return;
+      }
+
+      const inp = $('robot-input-field');
+      if (!inp) return;
+      const baseValue = inp.value;  // texte déjà saisi conservé
+      const isTextarea = inp.tagName.toLowerCase() === 'textarea';
+
       recognition = new SpeechRec();
       recognition.lang = 'fr-FR';
-      recognition.continuous = false;
-      recognition.interimResults = false;
+      recognition.continuous = true;       // permet de parler longtemps
+      recognition.interimResults = true;   // affichage en temps réel
+      recognition.maxAlternatives = 1;
+
+      let finalTranscript = '';
 
       recognition.onstart = () => {
         btn.textContent = '⏹ Arrêter';
         btn.classList.add('listening');
         infoEl.style.display = 'block';
-        infoEl.textContent = '🎙 Dictée en cours… parlez maintenant';
+        infoEl.textContent = '🎙 Dictée en cours… parlez maintenant (cliquez sur Arrêter quand terminé)';
       };
+
       recognition.onresult = (e) => {
-        const transcript = e.results[0][0].transcript;
-        const inp = $('robot-input-field');
-        if (inp) {
-          const tag = inp.tagName.toLowerCase();
-          if (tag === 'textarea') inp.value = (inp.value ? inp.value + ' ' : '') + transcript;
-          else inp.value = transcript;
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const transcript = e.results[i][0].transcript;
+          if (e.results[i].isFinal) finalTranscript += transcript;
+          else interim += transcript;
+        }
+        const sep = baseValue && !baseValue.endsWith(' ') ? ' ' : '';
+        const combined = baseValue + sep + finalTranscript + interim;
+        if (isTextarea) {
+          inp.value = combined;
+        } else {
+          inp.value = (finalTranscript + interim).trim() || baseValue;
         }
       };
-      recognition.onerror = () => {
-        btn.textContent = '🎤 Dicter'; btn.classList.remove('listening');
-        infoEl.textContent = '⚠️ Erreur de dictée. Réessayez.';
-        recognition = null;
+
+      recognition.onerror = (e) => {
+        const msg = {
+          'no-speech':     'Aucune voix détectée. Réessayez en parlant plus fort.',
+          'audio-capture': 'Aucun microphone détecté.',
+          'not-allowed':   'Permission micro refusée. Autorisez-la dans les paramètres du navigateur.',
+          'network':       'Erreur réseau (la reconnaissance utilise un service Google).',
+          'aborted':       '',
+        }[e.error] || ('Erreur dictée : ' + e.error);
+        if (msg) { infoEl.style.display = 'block'; infoEl.textContent = '⚠️ ' + msg; }
       };
+
       recognition.onend = () => {
         btn.textContent = '🎤 Dicter'; btn.classList.remove('listening');
-        infoEl.style.display = 'none';
+        // garde le message pendant 2 secondes pour permettre la lecture de l'erreur
+        setTimeout(() => { if (!recognition) infoEl.style.display = 'none'; }, 2000);
         recognition = null;
       };
-      recognition.start();
+
+      try {
+        recognition.start();
+      } catch (err) {
+        infoEl.style.display = 'block';
+        infoEl.textContent = '⚠️ Impossible de démarrer la dictée : ' + err.message;
+        recognition = null;
+      }
     };
 
     // ── Reformulation LLM ─────────────────────────────────────────────────────
     window.robotUpdateLlm = function () {
       llmEnabled = $('robot-llm-toggle').checked;
+      renderRobotStep.refreshLlm && renderRobotStep.refreshLlm();
+      // Re-render minimal: update llm button + info message based on current step
       const varName = robotVars[robotStep];
       const cfg = VAR_CFG[varName];
-      $('robot-llm-btn').disabled = !llmEnabled || !cfg?.llm;
+      const canReformulate = !!cfg?.llm;
+      const llmBtn  = $('robot-llm-btn');
+      const llmInfo = $('robot-llm-info');
+      llmBtn.disabled = !llmEnabled || !canReformulate;
+      if (!canReformulate) {
+        llmInfo.style.display = 'block';
+        llmInfo.textContent = '💡 Ce champ ne se prête pas à la reformulation IA (réponse précise attendue).';
+      } else if (!llmEnabled) {
+        llmInfo.style.display = 'block';
+        llmInfo.textContent = '💡 Activez le toggle "Reformulation IA" en haut pour utiliser ce bouton.';
+      } else {
+        llmInfo.style.display = 'none';
+      }
     };
 
     window.robotReformat = async function () {
