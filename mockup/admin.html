@@ -775,9 +775,25 @@
 
       <!-- Section: Médecins en Grève -->
       <div id="section-greve" class="section-panel">
-        <div class="main-header">
-          <div class="main-title">✊ Médecins en Grève</div>
-          <div class="main-sub">Paramétrage de la mobilisation, statistiques et gestion des campagnes</div>
+        <div class="main-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+          <div>
+            <div class="main-title">✊ Médecins en Grève</div>
+            <div class="main-sub">Paramétrage de la mobilisation, statistiques et gestion des campagnes</div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;visibility:hidden" id="greve-actions">
+            <button class="g-btn g-btn-primary" onclick="greveSave()">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Enregistrer
+            </button>
+            <button class="g-btn g-btn-outline" onclick="greveExportCsv()">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export CSV
+            </button>
+            <button class="g-btn g-btn-danger" onclick="greveReset()">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              Nouvelle campagne
+            </button>
+          </div>
         </div>
 
         <div id="greve-loading" style="text-align:center;padding:48px;color:var(--muted)">Chargement…</div>
@@ -862,20 +878,6 @@
               <button class="g-btn-add" onclick="greveAddFaq()">+ Question</button>
             </div>
 
-            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);padding-top:18px">
-              <button class="g-btn g-btn-primary" onclick="greveSave()">
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                Enregistrer
-              </button>
-              <button class="g-btn g-btn-outline" onclick="greveExportCsv()">
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Export CSV
-              </button>
-              <button class="g-btn g-btn-danger" style="margin-left:auto" onclick="greveReset()">
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-                Nouvelle campagne
-              </button>
-            </div>
           </div>
 
           <!-- Déclarations récentes -->
@@ -3087,6 +3089,7 @@
   async function loadGreve() {
     document.getElementById('greve-loading').style.display = 'block';
     document.getElementById('greve-content').style.display = 'none';
+    document.getElementById('greve-actions').style.visibility = 'hidden';
 
     // Campagne active (sinon la plus récente)
     let { data: camps } = await sb.from('greve_campagnes').select('*').eq('actif', true).order('created_at', { ascending: false }).limit(1);
@@ -3112,6 +3115,7 @@
 
     document.getElementById('greve-loading').style.display = 'none';
     document.getElementById('greve-content').style.display = 'block';
+    document.getElementById('greve-actions').style.visibility = 'visible';
   }
 
   function fillGreveForm() {

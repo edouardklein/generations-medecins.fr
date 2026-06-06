@@ -487,24 +487,35 @@
       try {
         const { data: { session } } = await sb.auth.getSession();
         if (!session) return; // bannière non-connecté reste visible
+        const { data: membre } = await sb.from('membres')
+          .select('specialite, code_postal, mode_exercice, rpps, email')
+          .eq('user_id', session.user.id).single();
+
         $('prefill-banner').style.display = 'none';
-        const { data: profile } = await sb.from('profiles')
-          .select('specialite, cp, modes_exercice, rpps')
-          .eq('id', session.user.id).single();
-        if (!profile) return;
-        if (profile.specialite) $('f-specialite').value = profile.specialite;
-        if (profile.cp)         $('f-cp').value = profile.cp;
-        if (profile.rpps)       { $('f-rpps').value = profile.rpps; onRppsInput(); }
-        if (profile.modes_exercice && profile.modes_exercice.length) {
-          const first = Array.isArray(profile.modes_exercice) ? profile.modes_exercice[0] : profile.modes_exercice;
+        if (!membre) return;
+
+        if (membre.specialite)  $('f-specialite').value = membre.specialite;
+        if (membre.code_postal) $('f-cp').value = membre.code_postal;
+        if (membre.rpps)        { $('f-rpps').value = membre.rpps; onRppsInput(); }
+
+        // Mapping mode_exercice membre → pills de la page
+        const modeMap = {
+          liberal_seul:'liberal', liberal_groupe:'liberal',
+          salarie:'salarie', mixte:'mixte',
+        };
+        const pillMode = modeMap[membre.mode_exercice];
+        if (pillMode) {
           document.querySelectorAll('#mode-pills .pill').forEach(p => {
-            if (p.dataset.mode === first) { p.classList.add('sel'); selectedMode = first; }
+            if (p.dataset.mode === pillMode) { p.classList.add('sel'); selectedMode = pillMode; }
           });
         }
-        if (session.user.email) $('f-email').value = session.user.email;
+        if (membre.email || session.user.email) $('f-email').value = membre.email || session.user.email;
+
         $('prefill-success').style.display = 'flex';
         $('prefill-success-text').textContent = 'Formulaire pré-rempli depuis votre profil — vérifiez et validez.';
-      } catch { /* silencieux */ }
+      } catch (e) {
+        // En cas d'échec on laisse la bannière de connexion visible
+      }
     }
 
     function renderClosed() {
