@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200">
+  <defs>
+    <linearGradient id="g4" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="hsl(188,70%,52%)"/>
+      <stop offset="100%" stop-color="hsl(188,60%,32%)"/>
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="100" r="44" fill="url(#g4)"/>
+  <text x="60" y="115" font-family="Georgia, serif" font-size="44" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
+  <text x="120" y="92" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="#0a1730">Partenaire</text>
+  <text x="120" y="120" font-family="Inter, system-ui, sans-serif" font-size="12" letter-spacing="4" fill="#566fa6">DEMO • 4</text>
+</svg>

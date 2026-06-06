@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Outils — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .tool-card {
+      padding: 28px;
+      border-radius: var(--r);
+      background: white;
+      border: 1.5px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .tool-card:hover {
+      border-color: rgba(50,106,162,0.3);
+      box-shadow: 0 8px 32px rgba(50,106,162,0.09);
+      transform: translateY(-2px);
+    }
+
+    .tool-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .tool-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+    }
+
+    .tool-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.57;
+      flex: 1;
+    }
+
+    .tool-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .tool-cta {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--blue);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .pill-free    { background: rgba(137,200,106,0.12); color: #3d8a1a; }
+    .pill-soon    { background: rgba(245,158,11,0.1);   color: #b06c00; }
+    .pill-members { background: rgba(50,106,162,0.08);  color: var(--blue); }
+
+    .featured-tool {
+      grid-column: span 3;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      padding: 36px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--blue-dark), #2558a0);
+      border: none;
+      color: white;
+      align-items: center;
+    }
+    .featured-tool:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 48px rgba(23,54,95,0.2);
+      border-color: transparent;
+    }
+    .featured-tool .tool-name { color: white; font-size: 1.3rem; }
+    .featured-tool .tool-desc { color: rgba(255,255,255,0.75); font-size: 0.95rem; }
+    .featured-tool .tool-footer { border-color: rgba(255,255,255,0.15); }
+    .featured-tool .tool-cta { color: rgba(255,255,255,0.9); }
+
+    .simulator-preview {
+      background: rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .sim-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.83rem;
+    }
+    .sim-row:last-child { border: none; }
+    .sim-label { color: rgba(255,255,255,0.65); }
+    .sim-value { font-weight: 700; color: white; }
+    .sim-value.big { font-size: 1.3rem; font-weight: 900; color: #89c86a; }
+
+    @media (max-width: 900px) {
+      .tools-grid { grid-template-columns: 1fr 1fr; }
+      .featured-tool { grid-column: span 2; grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .tools-grid { grid-template-columns: 1fr; }
+      .featured-tool { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html" class="active">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <span class="badge badge-blue">🛠️ Outils pratiques</span>
+      <h1>Outils</h1>
+      <p>Ce que vous cherchez désespérément sur Google, enfin centralisé. Gratuit pour certains, réservé aux adhérents pour les fonctionnalités avancées.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="tools-grid">
+
+        <a href="courriers.html" class="tool-card">
+          <div class="tool-icon">📋</div>
+          <div class="tool-name">Bibliothèque de courriers</div>
+          <p class="tool-desc">Courriers CPAM, lettres de refus tiers payant, modèles RGPD, suppression fiche Google, contrats de collaboration. Générateur automatisé inclus.</p>
+          <div class="tool-footer">
+            <span class="pill pill-free">Gratuit</span>
+            <span class="tool-cta">Voir les courriers →</span>
+          </div>
+        </a>
+
+        <div class="tool-card" id="juridique">
+          <div class="tool-icon">🚨</div>
+          <div class="tool-name">SOS Juridique</div>
+          <p class="tool-desc">Décrivez votre situation. Un LLM l'analyse et vous oriente vers la bonne ressource ou un avocat partenaire. Délai de réponse garanti 48h.</p>
+          <div class="tool-footer">
+            <span class="pill pill-members">🔒 Adhérents</span>
+            <a href="adherer.html" class="tool-cta">Adhérer →</a>
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-icon">💰</div>
+          <div class="tool-name">Calculateur URSSAF / CARMF</div>
+          <p class="tool-desc">Pour les internes qui s'installent. Simulez vos cotisations sociales, retraite CARMF, prévoyance, selon vos revenus prévisionnels.</p>
+          <div class="tool-footer">
+            <span class="pill pill-free">Gratuit</span>
+            <span class="tool-cta">Bientôt →</span>
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-icon">🗺️</div>
+          <div class="tool-name">Carte des élus santé</div>
+          <p class="tool-desc">"Mon député, qu'a-t-il voté sur les sujets santé ?" Veille automatique des votes à l'Assemblée nationale. Redoutable en période électorale.</p>
+          <div class="tool-footer">
+            <span class="pill pill-free">Gratuit</span>
+            <span class="tool-cta">Bientôt →</span>
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-icon">📢</div>
+          <div class="tool-name">Petites annonces</div>
+          <p class="tool-desc">Remplacements, installations, cessions de cabinet entre adhérents. Réseau de confiance vérifié. Pas de Leboncoin médical — un vrai réseau pairs.</p>
+          <div class="tool-footer">
+            <span class="pill pill-members">🔒 Adhérents</span>
+            <a href="adherer.html" class="tool-cta">Adhérer →</a>
+          </div>
+        </div>
+
+        <a href="mobilisation.html" class="tool-card">
+          <div class="tool-icon">📣</div>
+          <div class="tool-name">Module Mobilisation</div>
+          <p class="tool-desc">Quand un sujet chaud arrive (grève, pétition), bandeau visible, formulaire de signature et partage social préformaté en un clic.</p>
+          <div class="tool-footer">
+            <span class="pill pill-soon">⏳ À venir</span>
+            <span class="tool-cta">En savoir plus →</span>
+          </div>
+        </a>
+
+        <a href="lanceur-alerte.html" class="tool-card">
+          <div class="tool-icon">🔒</div>
+          <div class="tool-name">Lanceur d'alerte</div>
+          <p class="tool-desc">Plateforme de dépôt de signalement avec anonymat garanti mais vérification d'identité. Pour les situations sensibles qui méritent d'être documentées.</p>
+          <div class="tool-footer">
+            <span class="pill pill-soon">⏳ À venir</span>
+            <span class="tool-cta">En savoir plus →</span>
+          </div>
+        </a>
+
+        <a href="cotation.html" class="tool-card">
+          <div class="tool-icon">📊</div>
+          <div class="tool-name">Aide à la cotation</div>
+          <p class="tool-desc">Retrouvez rapidement les codes CCAM et NGAP pour chaque acte. Associations autorisées, modificateurs, pièges fréquents et optimisation légale.</p>
+          <div class="tool-footer">
+            <span class="pill pill-free">Gratuit</span>
+            <span class="tool-cta">Accéder →</span>
+          </div>
+        </a>
+
+        <a href="installation.html" class="tool-card">
+          <div class="tool-icon">🏥</div>
+          <div class="tool-name">Aide à l'installation</div>
+          <p class="tool-desc">Le guide pas-à-pas pour s'installer : URSSAF, CPAM, OrdreM, logiciels, cabinet, assurances. Checklist interactive par étape.</p>
+          <div class="tool-footer">
+            <span class="pill pill-free">Gratuit</span>
+            <span class="tool-cta">Voir le guide →</span>
+          </div>
+        </a>
+
+        <a href="types-exercice.html" class="tool-card">
+          <div class="tool-icon">⚖️</div>
+          <div class="tool-name">Comparer les modes d'exercice</div>
+          <p class="tool-desc">S1, S2, OPTAM, MSP, SEL, salarié du privé, mixte — comprendre les différences concrètes en termes de revenus, charges et liberté.</p>
+          <div class="tool-footer">
+            <span class="pill pill-free">Gratuit</span>
+            <span class="tool-cta">Comparer →</span>
+          </div>
+        </a>
+
+        <a href="consultation.html" class="tool-card">
+          <div class="tool-icon">🗳️</div>
+          <div class="tool-name">Consultation des adhérents</div>
+          <p class="tool-desc">Un système de vote et de sondage intégré pour que chaque décision importante soit prise avec les adhérents, pas à leur place.</p>
+          <div class="tool-footer">
+            <span class="pill pill-members">🔒 Adhérents · À venir</span>
+            <span class="tool-cta">En savoir plus →</span>
+          </div>
+        </a>
+
+        <!-- Simulateur — featured, moved to bottom -->
+        <div class="tool-card featured-tool">
+          <div>
+            <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.55);margin-bottom:12px">Bientôt disponible</div>
+            <div class="tool-name">Simulateur de revenus</div>
+            <p class="tool-desc">Comparez libéral pur, SEL, salariat, mixte. Impact des dernières conventions inclus, charges sociales détaillées, évolution projetée sur 3 ans.</p>
+            <div class="tool-footer">
+              <span class="pill pill-free" style="background:rgba(137,200,106,0.2);color:#89c86a">Gratuit</span>
+              <span class="tool-cta">Être notifié à l'ouverture →</span>
+            </div>
+          </div>
+          <div class="simulator-preview">
+            <div class="sim-row">
+              <span class="sim-label">Spécialité</span>
+              <span class="sim-value">Généraliste · S1</span>
+            </div>
+            <div class="sim-row">
+              <span class="sim-label">Mode d'exercice</span>
+              <span class="sim-value">Libéral groupe</span>
+            </div>
+            <div class="sim-row">
+              <span class="sim-label">Actes / jour</span>
+              <span class="sim-value">28</span>
+            </div>
+            <div class="sim-row">
+              <span class="sim-label">Charges URSSAF</span>
+              <span class="sim-value">− 2 140 €/mois</span>
+            </div>
+            <div class="sim-row">
+              <span class="sim-label">Net mensuel estimé</span>
+              <span class="sim-value big">6 840 €</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Accédez à tous les outils.</h2>
+    <p>Les outils réservés aux adhérents sont conçus pour les situations où vous en avez le plus besoin. SOS Juridique, petites annonces, consultation — tout ça avec votre adhésion.</p>
+    <a href="adherer.html" class="btn btn-white btn-lg">Adhérer maintenant →</a>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="auth-header.js"></script>
+</body>
+</html>

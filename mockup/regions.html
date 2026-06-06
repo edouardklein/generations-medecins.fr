@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Régions — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .regions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .region-card {
+      padding: 28px;
+      border-radius: var(--r);
+      border: 1.5px solid var(--line);
+      background: white;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .region-card.active {
+      border-color: var(--blue);
+      box-shadow: 0 8px 32px rgba(42,109,184,0.12);
+    }
+
+    .region-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(42,109,184,0.1);
+    }
+
+    .region-card.active:hover {
+      box-shadow: 0 12px 40px rgba(42,109,184,0.18);
+    }
+
+    .region-card.coming-soon {
+      opacity: 0.65;
+      cursor: default;
+    }
+    .region-card.coming-soon:hover { transform: none; box-shadow: none; }
+
+    .region-accent {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--grad);
+    }
+
+    .region-flag {
+      font-size: 2rem;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .region-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin-bottom: 5px;
+    }
+
+    .region-dept {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .region-stats {
+      display: flex;
+      gap: 20px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .region-stat-value {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--blue-dark);
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+
+    .region-stat-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .region-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      margin-top: 12px;
+    }
+    .rb-active { background: rgba(98,192,64,0.12); color: #3d8a1a; }
+    .rb-soon   { background: rgba(245,158,11,0.1); color: #b06c00; }
+
+    /* IDF featured card */
+    .region-card.idf-featured {
+      grid-column: span 3;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 32px;
+      align-items: center;
+      padding: 36px;
+    }
+
+    .idf-main { }
+    .idf-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .idf-stat {
+      padding: 16px;
+      border-radius: 12px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+    .idf-stat .v { font-size: 1.4rem; font-weight: 900; color: var(--blue-dark); letter-spacing: -0.02em; }
+    .idf-stat .l { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+    .idf-bureau {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .bureau-mini {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--surface);
+      border-radius: 10px;
+    }
+    .bureau-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+    }
+    .bureau-name { font-size: 0.82rem; font-weight: 700; color: var(--ink); }
+    .bureau-role { font-size: 0.7rem; color: var(--muted); }
+
+    @media (max-width: 900px) {
+      .regions-grid { grid-template-columns: 1fr 1fr; }
+      .region-card.idf-featured {
+        grid-column: span 2;
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 520px) {
+      .regions-grid { grid-template-columns: 1fr; }
+      .region-card.idf-featured { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html" class="active">Régions</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <span class="badge badge-blue">🗺️ Implantation nationale</span>
+      <h1>Générations Médecins<br>en région</h1>
+      <p>Un mouvement qui s'ancre là où exercent les médecins. Né en Île-de-France, en cours de déploiement dans toute la France.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+
+      <div class="section-label" style="margin-bottom:16px">Régions actives</div>
+      <div class="regions-grid">
+
+        <!-- IDF — featured -->
+        <div class="region-card active idf-featured">
+          <div class="region-accent"></div>
+          <div class="idf-main">
+            <span class="region-flag">🏙️</span>
+            <div class="region-name" style="font-size:1.4rem">Île-de-France</div>
+            <div class="region-dept">Paris · Hauts-de-Seine · Seine-Saint-Denis · Val-de-Marne · Seine-et-Marne · Yvelines · Essonne · Val-d'Oise</div>
+            <span class="region-badge rb-active"><span style="width:6px;height:6px;border-radius:50%;background:#3d8a1a;display:inline-block"></span> Section active</span>
+          </div>
+
+          <div class="idf-stats-grid">
+            <div class="idf-stat">
+              <div class="v">3 000+</div>
+              <div class="l">Adhérents</div>
+            </div>
+            <div class="idf-stat">
+              <div class="v">12</div>
+              <div class="l">Dossiers portés</div>
+            </div>
+            <div class="idf-stat">
+              <div class="v">8</div>
+              <div class="l">Départements</div>
+            </div>
+            <div class="idf-stat">
+              <div class="v">2023</div>
+              <div class="l">Fondée en</div>
+            </div>
+          </div>
+
+          <div class="idf-bureau">
+            <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:4px">Bureau IDF</div>
+            <div class="bureau-mini">
+              <div class="bureau-avatar">AB</div>
+              <div><div class="bureau-name">Alexis BOURLA</div><div class="bureau-role">Président</div></div>
+            </div>
+            <div class="bureau-mini">
+              <div class="bureau-avatar">PH</div>
+              <div><div class="bureau-name">Pierre Hamann</div><div class="bureau-role">Vice-président</div></div>
+            </div>
+            <div class="bureau-mini">
+              <div class="bureau-avatar">MHT</div>
+              <div><div class="bureau-name">Minh-Hanh Ta</div><div class="bureau-role">Secrétaire générale</div></div>
+            </div>
+            <a href="bureau.html" style="font-size:0.8rem;font-weight:700;color:var(--blue);text-decoration:none;padding:8px 12px">Voir le bureau complet →</a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="section-label" style="margin-bottom:16px;margin-top:56px">En cours de déploiement</div>
+      <div class="regions-grid">
+
+        <div class="region-card coming-soon">
+          <span class="region-flag">🌊</span>
+          <div class="region-name">PACA</div>
+          <div class="region-dept">Bouches-du-Rhône · Var · Alpes-Maritimes · Vaucluse · Alpes-de-Haute-Provence · Hautes-Alpes</div>
+          <span class="region-badge rb-soon">⏳ En cours de structuration</span>
+        </div>
+
+        <div class="region-card coming-soon">
+          <span class="region-flag">🌻</span>
+          <div class="region-name">Occitanie</div>
+          <div class="region-dept">Hérault · Haute-Garonne · Gard · Hérault · Tarn · Aveyron · Lot · et 6 autres</div>
+          <span class="region-badge rb-soon">⏳ En cours de structuration</span>
+        </div>
+
+        <div class="region-card coming-soon">
+          <span class="region-flag">🍷</span>
+          <div class="region-name">Auvergne-Rhône-Alpes</div>
+          <div class="region-dept">Rhône · Isère · Ain · Loire · Haute-Savoie · Savoie · Puy-de-Dôme · et 5 autres</div>
+          <span class="region-badge rb-soon">⏳ En cours de structuration</span>
+        </div>
+
+        <div class="region-card coming-soon">
+          <span class="region-flag">🌾</span>
+          <div class="region-name">Nouvelle-Aquitaine</div>
+          <div class="region-dept">Gironde · Charente-Maritime · Dordogne · Lot-et-Garonne · Pyrénées-Atlantiques · et 7 autres</div>
+          <span class="region-badge rb-soon">⏳ En cours de structuration</span>
+        </div>
+
+        <div class="region-card coming-soon">
+          <span class="region-flag">🏰</span>
+          <div class="region-name">Grand Est</div>
+          <div class="region-dept">Bas-Rhin · Haut-Rhin · Moselle · Meurthe-et-Moselle · Meuse · Vosges · Marne · et 3 autres</div>
+          <span class="region-badge rb-soon">⏳ En cours de structuration</span>
+        </div>
+
+        <div class="region-card coming-soon">
+          <span class="region-flag">🌊</span>
+          <div class="region-name">Bretagne</div>
+          <div class="region-dept">Finistère · Morbihan · Côtes-d'Armor · Ille-et-Vilaine</div>
+          <span class="region-badge rb-soon">⏳ En cours de structuration</span>
+        </div>
+
+        <div class="region-card coming-soon">
+          <span class="region-flag">🧀</span>
+          <div class="region-name">Normandie</div>
+          <div class="region-dept">Seine-Maritime · Calvados · Manche · Orne · Eure</div>
+          <span class="region-badge rb-soon">⏳ En cours de structuration</span>
+        </div>
+
+        <div class="region-card coming-soon">
+          <span class="region-flag">🏭</span>
+          <div class="region-name">Hauts-de-France</div>
+          <div class="region-dept">Nord · Pas-de-Calais · Somme · Aisne · Oise</div>
+          <span class="region-badge rb-soon">⏳ En cours de structuration</span>
+        </div>
+
+        <div class="region-card coming-soon">
+          <span class="region-flag">🌺</span>
+          <div class="region-name">DOM-TOM</div>
+          <div class="region-dept">Martinique · Guadeloupe · Réunion · Guyane · Mayotte · Polynésie française</div>
+          <span class="region-badge rb-soon">⏳ À venir</span>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Portez GM dans votre région.</h2>
+    <p>Vous souhaitez créer ou rejoindre la section GM de votre région ? Contactez-nous — nous accompagnons les médecins qui veulent structurer une section locale.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a href="adherer.html" class="btn btn-white btn-lg">Adhérer →</a>
+      <a href="#" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:white;border:1.5px solid rgba(255,255,255,0.3)">Créer une section →</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="regions.html">Régions</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="auth-header.js"></script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plaidoyer — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    .tracker-list { display: grid; gap: 16px; }
+
+    .tracker-item {
+      display: grid;
+      grid-template-columns: 1fr 160px;
+      gap: 32px;
+      align-items: center;
+      padding: 26px 28px;
+      border-radius: var(--r);
+      border: 1.5px solid var(--line);
+      background: white;
+      transition: border-color 0.2s;
+    }
+    .tracker-item:hover { border-color: rgba(50,106,162,0.3); }
+
+    .tracker-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 7px;
+    }
+    .tracker-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .tracker-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+      line-height: 1.55;
+    }
+    .progress-wrap {
+      width: 100%;
+      height: 8px;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .progress-bar {
+      height: 100%;
+      border-radius: 999px;
+    }
+    .bar-green { background: linear-gradient(90deg, var(--teal), var(--green)); }
+    .bar-blue  { background: linear-gradient(90deg, var(--blue), var(--teal)); }
+    .bar-orange{ background: linear-gradient(90deg, #f59e0b, #f97316); }
+    .bar-gray  { background: var(--muted); }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.73rem;
+      color: var(--muted);
+    }
+
+    .tracker-status { text-align: center; }
+    .t-status-pill {
+      display: inline-block;
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .s-active   { background: rgba(137,200,106,0.13); color: #3d8a1a; }
+    .s-progress { background: rgba(50,106,162,0.09);  color: var(--blue); }
+    .s-watch    { background: rgba(245,158,11,0.1);   color: #b06c00; }
+    .s-done     { background: rgba(88,170,179,0.12);  color: #2a7a83; }
+
+    .tracker-date { font-size: 0.72rem; color: var(--muted); }
+
+    .chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .chip-blue { background: rgba(50,106,162,0.08); color: var(--blue); }
+
+    .quarter-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin-bottom: 20px;
+      margin-top: 44px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .quarter-title:first-of-type { margin-top: 0; }
+
+    @media (max-width: 620px) {
+      .tracker-item { grid-template-columns: 1fr; }
+      .tracker-status { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html" class="active">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <span class="badge badge-teal">⚖️ Roadmap publique</span>
+      <h1>Plaidoyer</h1>
+      <p>Tous les dossiers que nous portons, leur état d'avancement, en temps réel. La transparence n'est pas une option — c'est notre fonctionnement.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+
+      <div id="plaidoyer-content">
+        <div style="text-align:center;padding:40px;color:var(--muted);font-size:0.9rem">Chargement…</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Participez au plaidoyer.</h2>
+    <p>En adhérant, vous contribuez directement à la force des dossiers que nous portons. Plus nous sommes nombreux, plus nous sommes entendus.</p>
+    <a href="adherer.html" class="btn btn-white btn-lg">Adhérer et peser →</a>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+<script>
+(function () {
+  const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  const STATUT = {
+    actif:      { cls: 's-active',   label: '● Actif' },
+    en_cours:   { cls: 's-progress', label: '↗ En cours' },
+    veille:     { cls: 's-watch',    label: '👁 Veille' },
+    obtenu:     { cls: 's-done',     label: '✓ Obtenu' },
+    suspendu:   { cls: 's-watch',    label: '⏸ Suspendu' },
+    abandonne:  { cls: 's-watch',    label: '✕ Abandonné' },
+  };
+
+  function barClass(s) {
+    if (s === 'actif')   return 'bar-green';
+    if (s === 'obtenu')  return 'bar-green';
+    if (s === 'veille')  return 'bar-orange';
+    return 'bar-blue';
+  }
+
+  function pctColor(s) {
+    if (s === 'actif' || s === 'obtenu') return '#3d8a1a';
+    if (s === 'veille') return '#b06c00';
+    return 'var(--blue)';
+  }
+
+  function fmt(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function itemHTML(d) {
+    const st = STATUT[d.statut] || { cls: 's-progress', label: d.statut };
+    const opacity = d.statut === 'obtenu' || d.statut === 'abandonne' ? 'opacity:0.75;' : '';
+    return `
+      <div class="tracker-item" style="${opacity}">
+        <div>
+          <div class="tracker-top">
+            <div class="tracker-name">${d.titre}</div>
+          </div>
+          <p class="tracker-desc">${d.description || ''}</p>
+          <div class="progress-wrap">
+            <div class="progress-bar ${barClass(d.statut)}" style="width:${d.progression}%"></div>
+          </div>
+          <div class="progress-meta">
+            <span>${d.meta || ''}</span>
+            <span style="font-weight:700;color:${pctColor(d.statut)}">${d.progression}%</span>
+          </div>
+        </div>
+        <div class="tracker-status">
+          <div class="t-status-pill ${st.cls}">${st.label}</div>
+          <div class="tracker-date">Màj : ${fmt(d.updated_at)}</div>
+        </div>
+      </div>`;
+  }
+
+  async function load() {
+    const wrap = document.getElementById('plaidoyer-content');
+    const { data, error } = await sb
+      .from('plaidoyer_dossiers')
+      .select('*')
+      .order('ordre', { ascending: true });
+
+    if (error || !data || data.length === 0) {
+      wrap.innerHTML = '<p style="text-align:center;color:var(--muted);padding:40px">Aucun dossier pour le moment.</p>';
+      return;
+    }
+
+    // Grouper par trimestre
+    const groups = {};
+    data.forEach(d => {
+      const k = d.trimestre || 'Autres';
+      if (!groups[k]) groups[k] = [];
+      groups[k].push(d);
+    });
+
+    let html = '';
+    for (const [trimestre, dossiers] of Object.entries(groups)) {
+      const actifs = dossiers.filter(d => ['actif','en_cours','veille'].includes(d.statut)).length;
+      const obtenus = dossiers.filter(d => d.statut === 'obtenu').length;
+      const isClosed = dossiers.every(d => ['obtenu','abandonne','suspendu'].includes(d.statut));
+      const badge = isClosed
+        ? `<span class="chip" style="background:rgba(88,170,179,0.1);color:#2a7a83">${obtenus} obtenu${obtenus > 1 ? 's' : ''}</span>`
+        : `<span class="chip chip-blue">${actifs} actif${actifs > 1 ? 's' : ''}</span>`;
+
+      html += `
+        <div class="quarter-title" style="${isClosed ? 'margin-top:60px' : ''}">
+          <span>${trimestre}${isClosed ? ' — Dossiers clôturés' : ' — Dossiers en cours'}</span>
+          ${badge}
+        </div>
+        <div class="tracker-list">
+          ${dossiers.map(itemHTML).join('')}
+        </div>`;
+    }
+    wrap.innerHTML = html;
+  }
+
+  load();
+})();
+</script>
+  <script src="auth-header.js"></script>
+</body>
+</html>

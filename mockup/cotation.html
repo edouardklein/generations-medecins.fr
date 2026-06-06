@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aide à la cotation — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .search-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: 1.5px solid var(--line);
+      background: white;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--blue); }
+    .search-input::placeholder { color: var(--muted); }
+
+    .search-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 36px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pieges-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .piege-card {
+      padding: 24px;
+      border-radius: var(--r);
+      background: white;
+      border: 1.5px solid var(--line);
+      transition: all 0.2s;
+    }
+    .piege-card:hover {
+      border-color: rgba(42,109,184,0.3);
+      box-shadow: 0 8px 32px rgba(42,109,184,0.09);
+      transform: translateY(-2px);
+    }
+
+    .piege-card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .piege-card-title-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(42,109,184,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .piege-card p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .ressources-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .ressource-card {
+      padding: 20px 24px;
+      border-radius: var(--r);
+      background: white;
+      border: 1.5px solid var(--line);
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: all 0.2s;
+    }
+    .ressource-card:hover {
+      border-color: var(--blue);
+      box-shadow: 0 4px 18px rgba(42,109,184,0.1);
+      transform: translateY(-1px);
+    }
+
+    .ressource-card-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 2px;
+    }
+
+    .ressource-card-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .ressource-card-arrow {
+      font-size: 1.1rem;
+      color: var(--blue);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 900px) {
+      .pieges-grid { grid-template-columns: 1fr; }
+      .ressources-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 520px) {
+      .ressources-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html" class="active">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <span class="badge badge-blue">🏷️ CCAM · NGAP</span>
+      <h1>Aide à la cotation</h1>
+      <p>Trouvez rapidement le bon code pour chaque acte. Associations autorisées, modificateurs, cas particuliers — sans passer 20 minutes sur Ameli.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+
+      <!-- Recherche rapide -->
+      <div class="section-label" style="margin-bottom:16px">Recherche rapide</div>
+
+      <div class="search-bar">
+        <input class="search-input" type="text" placeholder="Chercher un acte ou un code... ex : consultation longue, fond d'œil, ECG">
+      </div>
+      <p class="search-note">⚙️ Fonctionnalité en cours de développement — le moteur de recherche sera connecté à la base officielle CCAM.</p>
+
+      <!-- Pièges fréquents -->
+      <div class="section-label" style="margin-bottom:16px; margin-top:48px">Pièges fréquents</div>
+      <div class="pieges-grid" style="margin-bottom:48px">
+
+        <div class="piege-card">
+          <div class="piege-card-title">
+            <div class="piege-card-title-icon">⚠️</div>
+            Consultation longue (COE / C)
+          </div>
+          <p>Le code COE nécessite une durée ≥ 30 min ET une problématique complexe. Utiliser C à la place est la première cause de mise sous accord préalable.</p>
+        </div>
+
+        <div class="piege-card">
+          <div class="piege-card-title">
+            <div class="piege-card-title-icon">🔗</div>
+            Associations d'actes
+          </div>
+          <p>Règle du coefficient 1 + 0.5 : seul le premier acte est facturé à 100%. Exceptions pour certaines associations radios/anesthésie.</p>
+        </div>
+
+        <div class="piege-card">
+          <div class="piege-card-title">
+            <div class="piege-card-title-icon">🕐</div>
+            Modificateurs oubliés
+          </div>
+          <p>MU (urgence), F (enfant &lt;6 ans), MEG/MSO (nuit, dimanche) — oubliés dans 30% des gardes selon nos données.</p>
+        </div>
+
+        <div class="piege-card">
+          <div class="piege-card-title">
+            <div class="piege-card-title-icon">📋</div>
+            Actes NGAP vs CCAM
+          </div>
+          <p>Les spécialistes facturent en CCAM, les généralistes en NGAP pour les actes de base. Mélanger les deux est une erreur fréquente chez les remplaçants.</p>
+        </div>
+
+      </div>
+
+      <!-- Ressources officielles -->
+      <div class="section-label" style="margin-bottom:16px">Ressources officielles</div>
+      <div class="ressources-grid" style="margin-bottom:48px">
+
+        <a href="#" class="ressource-card">
+          <div>
+            <div class="ressource-card-name">Base CCAM Ameli</div>
+            <div class="ressource-card-label">ameli.fr · Nomenclature officielle</div>
+          </div>
+          <span class="ressource-card-arrow">↗</span>
+        </a>
+
+        <a href="#" class="ressource-card">
+          <div>
+            <div class="ressource-card-name">Nomenclature NGAP</div>
+            <div class="ressource-card-label">ameli.fr · Actes de base</div>
+          </div>
+          <span class="ressource-card-arrow">↗</span>
+        </a>
+
+        <a href="#" class="ressource-card">
+          <div>
+            <div class="ressource-card-name">Simulateur de facturation CPAM</div>
+            <div class="ressource-card-label">cpam.fr · Calcul honoraires</div>
+          </div>
+          <span class="ressource-card-arrow">↗</span>
+        </a>
+
+      </div>
+
+      <!-- Coming soon -->
+      <div class="coming-soon-block">
+        <strong>Moteur de recherche intégré en développement.</strong> Sera connecté à la base officielle CCAM avec mise à jour automatique. Les adhérents seront notifiés à l'ouverture.
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Accédez aux outils en avant-première.</h2>
+    <p>Soyez notifié dès l'ouverture du moteur de cotation intégré. Fonctionnalité réservée aux adhérents.</p>
+    <a href="adherer.html" class="btn btn-white btn-lg">Adhérer maintenant →</a>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="auth-header.js"></script>
+</body>
+</html>

@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Générations Médecins Île-de-France</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ——— HERO ——— */
+    .hero {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 88px 24px 104px;
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      gap: 56px;
+      align-items: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 5.5vw, 4.4rem);
+      font-weight: 900;
+      color: var(--blue-dark);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--teal);
+    }
+
+    .hero-sub {
+      font-size: 1.12rem;
+      color: var(--muted);
+      max-width: 42ch;
+      margin-bottom: 40px;
+      line-height: 1.68;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 36px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+    }
+
+    .stat-value {
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: var(--blue-dark);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 500;
+      margin-top: 3px;
+    }
+
+    /* ——— CARD STACK ——— */
+    .card-stack {
+      position: relative;
+      height: 520px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stack-card {
+      position: absolute;
+      width: 300px;
+      background: white;
+      border-radius: 20px;
+      padding: 0;
+      overflow: hidden;
+      box-shadow:
+        0 4px 8px rgba(26,74,128,0.08),
+        0 16px 40px rgba(26,74,128,0.14),
+        0 36px 80px rgba(26,74,128,0.1);
+      border: 1px solid rgba(220,234,245,0.8);
+    }
+
+    .card-accent {
+      height: 5px;
+      width: 100%;
+    }
+    .card-accent-blue  { background: linear-gradient(90deg, #2a6db8, #38a8b5); }
+    .card-accent-teal  { background: linear-gradient(90deg, #38a8b5, #62c040); }
+    .card-accent-green { background: var(--grad); }
+
+    .card-inner { padding: 20px 22px 22px; }
+
+    .stack-card:nth-child(1) {
+      transform: rotate(-9deg) translate(-90px, 70px);
+      z-index: 1;
+      animation: float1 6s ease-in-out infinite;
+      opacity: 0.92;
+    }
+    .stack-card:nth-child(2) {
+      transform: rotate(-3deg) translate(-44px, 28px);
+      z-index: 2;
+      animation: float2 6s ease-in-out infinite 1s;
+      opacity: 0.96;
+    }
+    .stack-card:nth-child(3) {
+      transform: rotate(2deg) translate(20px, -16px);
+      z-index: 3;
+      animation: float3 6s ease-in-out infinite 2s;
+    }
+
+    @keyframes float1 {
+      0%,100% { transform: rotate(-9deg) translate(-90px, 70px); opacity: 0.92; }
+      50%      { transform: rotate(-8deg) translate(-90px, 58px); opacity: 0.92; }
+    }
+    @keyframes float2 {
+      0%,100% { transform: rotate(-3deg) translate(-44px, 28px); opacity: 0.96; }
+      50%      { transform: rotate(-2.5deg) translate(-44px, 18px); opacity: 0.96; }
+    }
+    @keyframes float3 {
+      0%,100% { transform: rotate(2deg) translate(20px, -16px); }
+      50%      { transform: rotate(1.5deg) translate(20px, -28px); }
+    }
+
+    .card-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 14px;
+    }
+    .tag-blue { background: rgba(50,106,162,0.09); color: var(--blue); }
+    .tag-teal { background: rgba(88,170,179,0.1); color: #2a7a83; }
+    .tag-green { background: rgba(137,200,106,0.13); color: #3d8a1a; }
+
+    .card-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 9px;
+      line-height: 1.35;
+    }
+    .card-body-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .chip {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .chip-green { background: rgba(137,200,106,0.14); color: #3d8a1a; }
+    .chip-orange { background: rgba(245,158,11,0.12); color: #b06c00; }
+
+    .mini-progress {
+      width: 100%;
+      height: 6px;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .mini-progress-bar {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--blue), var(--teal));
+    }
+    .mini-progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    /* ——— FEATURES GRID ——— */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .feature-card {
+      padding: 28px 26px;
+      border-radius: var(--r);
+      border: 1.5px solid var(--line);
+      background: white;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .feature-card:hover {
+      border-color: rgba(50,106,162,0.35);
+      box-shadow: 0 8px 32px rgba(50,106,162,0.09);
+      transform: translateY(-3px);
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .feature-name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .feature-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.56;
+      margin-bottom: 16px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .pill-live { background: rgba(137,200,106,0.13); color: #3d8a1a; }
+    .pill-soon { background: rgba(245,158,11,0.1); color: #b06c00; }
+    .pill-members { background: rgba(50,106,162,0.08); color: var(--blue); }
+
+    /* ——— ARTICLES ——— */
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .article-card {
+      border-radius: var(--r);
+      border: 1px solid var(--line);
+      background: white;
+      overflow: hidden;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .article-card:hover {
+      box-shadow: 0 8px 32px rgba(50,106,162,0.1);
+      transform: translateY(-2px);
+    }
+
+    .article-top {
+      height: 108px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: flex-end;
+    }
+    .article-cat {
+      padding: 3px 10px;
+      background: rgba(255,255,255,0.22);
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      backdrop-filter: blur(4px);
+    }
+    .article-body { padding: 18px 20px; }
+    .article-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 8px;
+      line-height: 1.38;
+    }
+    .article-excerpt {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+    .article-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    /* ——— TRACKER ——— */
+    .tracker-list { display: grid; gap: 14px; }
+
+    .tracker-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: center;
+      padding: 22px 26px;
+      border-radius: var(--r);
+      border: 1.5px solid var(--line);
+      background: white;
+      transition: border-color 0.2s;
+    }
+    .tracker-item:hover { border-color: rgba(50,106,162,0.3); }
+
+    .tracker-name {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 5px;
+    }
+    .tracker-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+    .tracker-progress {
+      width: 100%;
+      height: 7px;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .tracker-bar {
+      height: 100%;
+      border-radius: 999px;
+    }
+    .bar-green { background: linear-gradient(90deg, var(--teal), var(--green)); }
+    .bar-blue { background: linear-gradient(90deg, var(--blue), var(--teal)); }
+    .bar-orange { background: linear-gradient(90deg, #f59e0b, #f97316); }
+
+    .tracker-status { text-align: center; min-width: 120px; }
+    .t-status-pill {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .s-active { background: rgba(137,200,106,0.13); color: #3d8a1a; }
+    .s-progress { background: rgba(50,106,162,0.09); color: var(--blue); }
+    .s-watch { background: rgba(245,158,11,0.1); color: #b06c00; }
+
+    /* ——— OUTILS ——— */
+    .outils-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .outil-card {
+      padding: 24px;
+      border-radius: var(--r);
+      background: white;
+      border: 1.5px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+    .outil-card:hover {
+      border-color: rgba(50,106,162,0.3);
+      box-shadow: 0 8px 32px rgba(50,106,162,0.08);
+    }
+    .outil-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    .outil-name {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .outil-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.52;
+      flex: 1;
+    }
+    .outil-link {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    /* ——— RESPONSIVE ——— */
+    @media (max-width: 1020px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 60px 20px 72px;
+      }
+      .card-stack { display: none; }
+    }
+
+    @media (max-width: 760px) {
+      .features-grid,
+      .articles-grid,
+      .outils-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 520px) {
+      .features-grid,
+      .articles-grid,
+      .outils-grid { grid-template-columns: 1fr; }
+      .hero-stats { gap: 20px; }
+      .tracker-item { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section>
+    <div class="hero">
+      <div>
+        <div class="hero-eyebrow">Collectif · Île-de-France</div>
+        <h1>Redonner une <em>voix</em><br>aux médecins.</h1>
+        <p class="hero-sub">Un mouvement indépendant qui traduit l'actualité médicale en impact concret sur votre pratique, défend vos intérêts et vous donne les outils pour exercer sereinement.</p>
+        <div class="hero-actions">
+          <a href="adherer.html" class="btn btn-primary btn-lg">Adhérer maintenant →</a>
+          <a href="#outils" class="btn btn-outline btn-lg">Découvrir nos outils</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="stat-value">3 000+</div>
+            <div class="stat-label">Adhérents actifs</div>
+          </div>
+          <div>
+            <div class="stat-value">12</div>
+            <div class="stat-label">Dossiers portés</div>
+          </div>
+          <div>
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Indépendant</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Stack -->
+      <div class="card-stack">
+
+        <!-- Card 1 : Décrypteur -->
+        <div class="stack-card">
+          <div class="card-accent card-accent-blue"></div>
+          <div class="card-inner">
+            <div class="card-tag tag-blue">📰 Décrypteur</div>
+            <div class="card-title">Avenant n°9 : ce qui change pour vous</div>
+            <div class="card-body-text">Généraliste secteur 1 : +18% sur les consultations longues. Nouveau forfait patientèle à partir du 1er juillet.</div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span class="chip chip-green">✓ Vérifié</span>
+              <span style="font-size:0.72rem;color:var(--muted)">Il y a 2 jours</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 : Simulateur -->
+        <div class="stack-card">
+          <div class="card-accent card-accent-green"></div>
+          <div class="card-inner">
+            <div class="card-tag tag-green">🧮 Simulateur</div>
+            <div class="card-title">Revenus nets estimés</div>
+            <div class="card-body-text">Généraliste · Secteur 1 · Libéral · 28 actes/j</div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end">
+              <div>
+                <div style="font-size:0.7rem;color:var(--muted);margin-bottom:3px">Net mensuel estimé</div>
+                <div style="font-size:1.5rem;font-weight:900;color:var(--blue-dark);letter-spacing:-0.02em">6 840 €</div>
+              </div>
+              <span class="chip chip-green">↑ +12% vs 2024</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 : Plaidoyer (front) -->
+        <div class="stack-card">
+          <div class="card-accent card-accent-teal"></div>
+          <div class="card-inner">
+            <div class="card-tag tag-teal">⚖️ Plaidoyer</div>
+            <div class="card-title">Revalorisation des gardes hospitalières</div>
+            <div class="mini-progress">
+              <div class="mini-progress-bar" style="width:72%"></div>
+            </div>
+            <div class="mini-progress-labels">
+              <span>Dossier déposé · En attente réponse</span>
+              <span style="font-weight:700;color:var(--blue)">72%</span>
+            </div>
+            <div style="margin-top:12px;font-size:0.72rem;color:var(--muted)">1 240 signatures · Réponse attendue 15 juin</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PILIERS -->
+  <section class="section" id="features">
+    <div class="section-inner">
+      <div class="section-label">Ce que nous proposons</div>
+      <h2 class="section-title">Tout ce dont vous avez besoin,<br>en un seul endroit.</h2>
+      <p class="section-sub">Des outils concrets, une veille automatisée, une communauté active et un plaidoyer entièrement transparent.</p>
+
+      <div class="features-grid">
+        <a href="decrypteurs.html" class="feature-card">
+          <span class="feature-icon">📰</span>
+          <div class="feature-name">Les Décrypteurs</div>
+          <p class="feature-desc">Chaque actu majeure (avenant, PLFSS, décret) traduite en impact concret sur votre pratique. Sélecteur par spécialité et mode d'exercice.</p>
+          <span class="status-pill pill-live"><span class="dot-green"></span> Disponible</span>
+        </a>
+
+        <a href="observatoire.html" class="feature-card">
+          <span class="feature-icon">📊</span>
+          <div class="feature-name">Observatoire</div>
+          <p class="feature-desc">Cartographie des déserts médicaux, évolution des honoraires, démographie. Des données ouvertes citées par les journalistes et les politiques.</p>
+          <span class="status-pill pill-soon">⏳ À venir</span>
+        </a>
+
+        <a href="plaidoyer.html" class="feature-card">
+          <span class="feature-icon">⚖️</span>
+          <div class="feature-name">Plaidoyer</div>
+          <p class="feature-desc">Tracker en temps réel de tous les dossiers portés ce trimestre. La transparence qui donne envie de rejoindre.</p>
+          <span class="status-pill pill-live"><span class="dot-green"></span> Disponible</span>
+        </a>
+
+        <a href="outils.html" class="feature-card">
+          <span class="feature-icon">🛠️</span>
+          <div class="feature-name">Outils</div>
+          <p class="feature-desc">Simulateur de revenus, calculateur URSSAF/CARMF, bibliothèque de courriers CPAM, SOS Juridique avec LLM. Ce que vous cherchez sur Google, enfin centralisé.</p>
+          <span class="status-pill pill-soon">⏳ À venir</span>
+        </a>
+
+        <a href="communaute.html" class="feature-card">
+          <span class="feature-icon">👥</span>
+          <div class="feature-name">Communauté</div>
+          <p class="feature-desc">Espace réservé aux adhérents. Canaux par spécialité, par région, par sujet. Petites annonces entre pairs (remplacement, cession, installation).</p>
+          <span class="status-pill pill-members">🔒 Adhérents · À venir</span>
+        </a>
+
+        <a href="outils.html#juridique" class="feature-card">
+          <span class="feature-icon">🚨</span>
+          <div class="feature-name">SOS Juridique</div>
+          <p class="feature-desc">Formulaire intelligent avec LLM intégré. Analyse votre situation et route vers un avocat partenaire avec délai de réponse garanti sous 48h.</p>
+          <span class="status-pill pill-members">🔒 Adhérents · À venir</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- DÉCRYPTEURS -->
+  <section class="section section-alt" id="decrypteurs">
+    <div class="section-inner">
+      <div class="section-label">Les Décrypteurs</div>
+      <h2 class="section-title">L'actu médicale traduite<br>en impact concret.</h2>
+      <p class="section-sub">Pas de jargon juridique. Concrètement, qu'est-ce que ça change pour vous — selon votre spécialité, votre secteur, votre mode d'exercice.</p>
+
+      <div class="articles-grid">
+        <a href="decrypteurs.html" class="article-card">
+          <div class="article-top" style="background:linear-gradient(135deg,#17365f,#326aa2)">
+            <span class="article-cat">Convention</span>
+          </div>
+          <div class="article-body">
+            <div class="article-title">Avenant n°9 : ce qui change concrètement selon votre profil</div>
+            <p class="article-excerpt">Généraliste S1, spécialiste S2, interne, remplaçant... On décrypte l'impact réel pour chaque situation.</p>
+            <div class="article-meta">
+              <span>26 mai 2025</span>
+              <span class="chip chip-green">✓ Vérifié</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="decrypteurs.html" class="article-card">
+          <div class="article-top" style="background:linear-gradient(135deg,#1a5c5c,#58aab3)">
+            <span class="article-cat">PLFSS 2026</span>
+          </div>
+          <div class="article-body">
+            <div class="article-title">PLFSS 2026 : les 3 mesures qui vont impacter votre cabinet</div>
+            <p class="article-excerpt">Analyse des impacts sur la T2A, la permanence de soins et les dépassements d'honoraires.</p>
+            <div class="article-meta">
+              <span>18 mai 2025</span>
+              <span class="chip chip-orange">⏳ En analyse</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="decrypteurs.html" class="article-card">
+          <div class="article-top" style="background:linear-gradient(135deg,#3b1f6e,#6b42b3)">
+            <span class="article-cat">Décret</span>
+          </div>
+          <div class="article-body">
+            <div class="article-title">Téléconsultation : nouvelles obligations avant le 1er septembre</div>
+            <p class="article-excerpt">Ce que vous devez faire maintenant. Checklist complète et modèle de consentement patient inclus.</p>
+            <div class="article-meta">
+              <span>10 mai 2025</span>
+              <span class="chip chip-green">✓ Vérifié</span>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div style="text-align:center;margin-top:40px">
+        <a href="decrypteurs.html" class="btn btn-outline">Voir tous les décrypteurs →</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PLAIDOYER -->
+  <section class="section" id="plaidoyer">
+    <div class="section-inner">
+      <div class="section-label">Plaidoyer</div>
+      <h2 class="section-title">Nos combats en cours.<br>En toute transparence.</h2>
+      <p class="section-sub">Les dossiers que nous portons ce trimestre. L'état d'avancement, en temps réel.</p>
+
+      <div class="tracker-list">
+        <div class="tracker-item">
+          <div>
+            <div class="tracker-name">Revalorisation des gardes hospitalières</div>
+            <p class="tracker-desc">Courrier envoyé au Ministère. Réponse attendue avant le 15 juin. Pétition : 1 240 signatures collectées.</p>
+            <div class="tracker-progress">
+              <div class="tracker-bar bar-green" style="width:72%"></div>
+            </div>
+          </div>
+          <div class="tracker-status">
+            <div class="t-status-pill s-active">● Actif</div>
+            <div style="font-size:0.73rem;color:var(--muted);margin-top:6px">72% avancement</div>
+          </div>
+        </div>
+
+        <div class="tracker-item">
+          <div>
+            <div class="tracker-name">Accès au DMP pour les médecins remplaçants</div>
+            <p class="tracker-desc">Rencontre avec la DSS le 3 juin. Préparation du dossier technique en cours avec le bureau.</p>
+            <div class="tracker-progress">
+              <div class="tracker-bar bar-blue" style="width:40%"></div>
+            </div>
+          </div>
+          <div class="tracker-status">
+            <div class="t-status-pill s-progress">↗ En cours</div>
+            <div style="font-size:0.73rem;color:var(--muted);margin-top:6px">40% avancement</div>
+          </div>
+        </div>
+
+        <div class="tracker-item">
+          <div>
+            <div class="tracker-name">Simplification des obligations RGPD en cabinet</div>
+            <p class="tracker-desc">Veille législative active. Proposition de simplification en cours de rédaction avec nos juristes partenaires.</p>
+            <div class="tracker-progress">
+              <div class="tracker-bar bar-orange" style="width:20%"></div>
+            </div>
+          </div>
+          <div class="tracker-status">
+            <div class="t-status-pill s-watch">👁 Veille</div>
+            <div style="font-size:0.73rem;color:var(--muted);margin-top:6px">20% avancement</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:40px">
+        <a href="plaidoyer.html" class="btn btn-outline">Voir tous les dossiers →</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- OUTILS -->
+  <section class="section section-alt" id="outils">
+    <div class="section-inner">
+      <div class="section-label">Outils</div>
+      <h2 class="section-title">Ce que vous cherchez partout<br>sur Google, enfin ici.</h2>
+      <p class="section-sub">Des outils gratuits pour tous, des fonctionnalités avancées réservées aux adhérents.</p>
+
+      <div class="outils-grid">
+        <div class="outil-card">
+          <div class="outil-icon-wrap">🧮</div>
+          <div class="outil-name">Simulateur de revenus</div>
+          <p class="outil-desc">Libéral pur, SEL, salariat, mixte. Impact des dernières conventions inclus. Comparaison par mode d'exercice.</p>
+          <a href="outils.html" class="outil-link">Bientôt disponible →</a>
+        </div>
+
+        <div class="outil-card">
+          <div class="outil-icon-wrap">📋</div>
+          <div class="outil-name">Bibliothèque de courriers</div>
+          <p class="outil-desc">Courriers CPAM, lettres de refus tiers payant, modèles RGPD, suppression fiche Google, contrats de collaboration.</p>
+          <a href="outils.html" class="outil-link">Bientôt disponible →</a>
+        </div>
+
+        <div class="outil-card">
+          <div class="outil-icon-wrap">🚨</div>
+          <div class="outil-name">SOS Juridique</div>
+          <p class="outil-desc">LLM intégré qui analyse votre situation et route vers un avocat partenaire. Délai de réponse garanti 48h. Réservé adhérents.</p>
+          <a href="adherer.html" class="outil-link">Réservé adhérents →</a>
+        </div>
+
+        <div class="outil-card">
+          <div class="outil-icon-wrap">🗺️</div>
+          <div class="outil-name">Carte des élus santé</div>
+          <p class="outil-desc">"Mon député, qu'a-t-il voté sur les sujets santé ?" Veille automatique des votes à l'Assemblée nationale.</p>
+          <a href="outils.html" class="outil-link">Bientôt disponible →</a>
+        </div>
+
+        <div class="outil-card">
+          <div class="outil-icon-wrap">💰</div>
+          <div class="outil-name">Calculateur URSSAF/CARMF</div>
+          <p class="outil-desc">Pour les internes qui s'installent. Simulez vos charges sociales, cotisations retraite, avant de vous lancer.</p>
+          <a href="outils.html" class="outil-link">Bientôt disponible →</a>
+        </div>
+
+        <div class="outil-card">
+          <div class="outil-icon-wrap">📢</div>
+          <div class="outil-name">Petites annonces</div>
+          <p class="outil-desc">Remplacements, installations, cessions de cabinet entre adhérents. Un réseau de confiance, vérifié.</p>
+          <a href="adherer.html" class="outil-link">Réservé adhérents →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2>Rejoignez le mouvement.</h2>
+    <p>Plus de 3 000 médecins ont choisi un mouvement qui leur ressemble. Participez à une représentation qui vous représente vraiment.</p>
+    <a href="adherer.html" class="btn btn-white btn-lg">Adhérer maintenant →</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+        <a href="#">Mentions légales</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="auth-header.js"></script>
+</body>
+</html>

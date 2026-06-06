@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adhérer — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    .adherer-grid {
+      display: grid;
+      grid-template-columns: 1fr 460px;
+      gap: 56px;
+      align-items: start;
+    }
+    .signup-card {
+      padding: 36px;
+      border-radius: 20px;
+      border: 2px solid var(--blue);
+      background: white;
+      position: sticky;
+      top: 88px;
+      box-shadow: 0 8px 40px rgba(50,106,162,0.12);
+    }
+    .signup-card h2 {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--blue-dark);
+      margin-bottom: 6px;
+    }
+    .signup-card .subtitle {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 5px;
+    }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1.5px solid var(--line);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      color: var(--ink);
+      background: white;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+      appearance: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus { outline: none; border-color: var(--blue); }
+    .form-group input.error { border-color: #dc2626; }
+    .form-hint {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .form-error {
+      font-size: 0.72rem;
+      color: #dc2626;
+      margin-top: 4px;
+      display: none;
+    }
+    .form-error.show { display: block; }
+    .cgu-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 16px 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .cgu-row input[type=checkbox] { flex-shrink: 0; margin-top: 2px; width: 16px; height: 16px; cursor: pointer; }
+    .btn-submit {
+      width: 100%;
+      padding: 13px;
+      background: var(--grad);
+      color: white;
+      border: none;
+      border-radius: 11px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn-submit:hover { opacity: 0.92; transform: translateY(-1px); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .alert {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.83rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .alert.show { display: block; }
+    .alert-success { background: rgba(98,192,64,0.1); color: #2d6b10; border: 1px solid rgba(98,192,64,0.3); }
+    .alert-error   { background: rgba(220,38,38,0.08); color: #b91c1c; border: 1px solid rgba(220,38,38,0.2); }
+    .already-member {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+    .already-member a { color: var(--blue); font-weight: 700; text-decoration: none; }
+
+    .benefits-list { display: grid; gap: 20px; }
+    .benefit { display: flex; gap: 18px; align-items: flex-start; }
+    .benefit-icon {
+      font-size: 1.5rem; flex-shrink: 0;
+      width: 48px; height: 48px; border-radius: 14px;
+      background: var(--surface);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .benefit-title { font-size: 0.95rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .benefit-desc  { font-size: 0.83rem; color: var(--muted); line-height: 1.55; }
+    .testimonial {
+      padding: 24px; border-radius: var(--r);
+      background: var(--surface); border: 1px solid var(--line); margin-top: 36px;
+    }
+    .testimonial-text  { font-size: 0.92rem; color: var(--ink); line-height: 1.6; font-style: italic; margin-bottom: 14px; }
+    .testimonial-author{ font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+
+    /* Toggle interne */
+    .toggle-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 14px; padding: 12px 14px;
+      background: var(--surface); border-radius: 10px; border: 1.5px solid var(--line);
+      transition: border-color 0.2s;
+    }
+    .toggle-row.active { border-color: var(--blue); background: rgba(42,109,184,0.04); }
+    .toggle-label { font-size: 0.85rem; font-weight: 700; color: var(--ink); cursor: pointer; user-select: none; }
+    .toggle-sub { font-size: 0.72rem; color: var(--muted); }
+    .toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0; cursor: pointer;
+      background: var(--line); border-radius: 22px; transition: 0.2s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute;
+      width: 16px; height: 16px; left: 3px; bottom: 3px;
+      background: white; border-radius: 50%; transition: 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--blue); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+    /* RPPS désactivé */
+    .form-group input:disabled {
+      background: var(--surface); color: var(--muted);
+      border-color: var(--line); cursor: not-allowed; opacity: 0.6;
+    }
+
+    /* Checkbox pills mode d'exercice */
+    .check-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+    .check-pill { display: inline-flex; }
+    .check-pill input[type=checkbox] { display: none; }
+    .check-pill span {
+      display: inline-flex; align-items: center; padding: 6px 14px;
+      border: 1.5px solid var(--line); border-radius: 999px;
+      font-size: 0.8rem; font-weight: 600; color: var(--muted);
+      cursor: pointer; transition: all 0.15s; background: white; user-select: none;
+    }
+    .check-pill input:checked + span {
+      background: rgba(42,109,184,0.08); border-color: var(--blue);
+      color: var(--blue); font-weight: 700;
+    }
+    .check-pill span:hover { border-color: rgba(42,109,184,0.4); color: var(--blue); }
+
+    @media (max-width: 900px) {
+      .adherer-grid { grid-template-columns: 1fr; }
+      .signup-card { position: static; }
+    }
+    @media (max-width: 520px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <span class="badge badge-green"><span class="dot-green"></span> Adhésion gratuite</span>
+      <h1>Rejoindre<br>Générations Médecins</h1>
+      <p>Inscription en 2 minutes. Accès immédiat aux outils, décrypteurs et à la communauté.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="adherer-grid">
+
+        <!-- Bénéfices -->
+        <div>
+          <h2 class="section-title" style="margin-bottom:36px">Ce que vous obtenez</h2>
+          <div class="benefits-list">
+            <div class="benefit">
+              <div class="benefit-icon">📰</div>
+              <div>
+                <div class="benefit-title">Décrypteurs — veille personnalisée</div>
+                <div class="benefit-desc">Alertes dès qu'une nouvelle règle impacte votre spécialité. Reformulation en impact concret, pas en jargon juridique.</div>
+              </div>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">🚨</div>
+              <div>
+                <div class="benefit-title">SOS Juridique — délai garanti 48h</div>
+                <div class="benefit-desc">Décrivez votre situation. Un LLM l'analyse et vous route vers un avocat partenaire avec réponse garantie sous 48h.</div>
+              </div>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">📋</div>
+              <div>
+                <div class="benefit-title">Bibliothèque de courriers complète</div>
+                <div class="benefit-desc">Accès à tous les modèles : CPAM, RGPD, patients, contrats. Générateur IA inclus.</div>
+              </div>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">🗳️</div>
+              <div>
+                <div class="benefit-title">Droit de vote et de consultation</div>
+                <div class="benefit-desc">Participez aux votes avant chaque prise de position. Votre voix compte dans chaque dossier porté.</div>
+              </div>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">👥</div>
+              <div>
+                <div class="benefit-title">Accès à la Communauté</div>
+                <div class="benefit-desc">Canaux par spécialité et région, petites annonces vérifiées (remplacements, cessions).</div>
+              </div>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">🛠️</div>
+              <div>
+                <div class="benefit-title">Tous les outils pratiques</div>
+                <div class="benefit-desc">Cotation, installation, types d'exercice, simulateur de revenus — centralisés et à jour.</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial">
+            <p class="testimonial-text">"Enfin un mouvement qui répond à mes questions en 24h et qui me dit clairement ce qui change pour moi. La bibliothèque de courriers m'a déjà sauvé deux fois."</p>
+            <div class="testimonial-author">— Dr. M.T., Généraliste S1, Val-de-Marne</div>
+          </div>
+        </div>
+
+        <!-- Formulaire d'inscription -->
+        <div class="signup-card">
+          <h2>Créer mon compte</h2>
+          <p class="subtitle">Adhésion gratuite · Accès immédiat · Données sécurisées</p>
+
+          <div id="alert-success" class="alert alert-success">
+            ✅ Inscription réussie ! Bienvenue dans Générations Médecins. Vous allez être redirigé vers votre espace membre…
+          </div>
+          <div id="alert-error" class="alert alert-error"></div>
+
+          <form id="signup-form" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="prenom">Prénom *</label>
+                <input type="text" id="prenom" name="prenom" placeholder="Marie" required>
+              </div>
+              <div class="form-group">
+                <label for="nom">Nom *</label>
+                <input type="text" id="nom" name="nom" placeholder="Dupont" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email professionnel *</label>
+              <input type="email" id="email" name="email" placeholder="m.dupont@cabinet.fr" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="password">Mot de passe *</label>
+                <input type="password" id="password" name="password" placeholder="8 caractères min." required minlength="8">
+              </div>
+              <div class="form-group">
+                <label for="password2">Confirmer *</label>
+                <input type="password" id="password2" name="password2" placeholder="Même mot de passe" required>
+              </div>
+            </div>
+
+            <!-- Toggle interne -->
+            <div class="toggle-row" id="toggle-interne-row">
+              <label class="toggle-switch">
+                <input type="checkbox" id="est_interne" name="est_interne">
+                <span class="toggle-slider"></span>
+              </label>
+              <div>
+                <div class="toggle-label" for="est_interne">Je suis interne / faisant fonction</div>
+                <div class="toggle-sub">Le RPPS ne sera pas requis</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="rpps">Numéro RPPS <span id="rpps-required-marker">*</span></label>
+              <input type="text" id="rpps" name="rpps" placeholder="11 chiffres" maxlength="11" pattern="[0-9]{11}" required>
+              <p class="form-hint">Votre identifiant unique à 11 chiffres (visible sur votre carte CPS)</p>
+              <p class="form-error" id="rpps-error">Le numéro RPPS doit contenir exactement 11 chiffres.</p>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="telephone">Téléphone</label>
+                <input type="tel" id="telephone" name="telephone" placeholder="06 12 34 56 78">
+              </div>
+              <div class="form-group">
+                <label for="code_postal">Code postal d'exercice</label>
+                <input type="text" id="code_postal" name="code_postal" placeholder="75001" maxlength="5" pattern="[0-9]{5}">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="specialite">Spécialité *</label>
+              <select id="specialite" name="specialite" required>
+                <option value="">Sélectionner…</option>
+                <optgroup label="── Disciplines médicales">
+                  <option>Allergologie</option>
+                  <option>Anatomie et cytologie pathologique</option>
+                  <option>Anesthésie-réanimation</option>
+                  <option>Cardiologie</option>
+                  <option>Dermatologie</option>
+                  <option>Endocrinologie - Nutrition</option>
+                  <option>Génétique médicale</option>
+                  <option>Gériatrie</option>
+                  <option>Gynécologie médicale</option>
+                  <option>Hématologie</option>
+                  <option>Hépato-gastro-entérologie</option>
+                  <option>Maladies infectieuses et tropicales</option>
+                  <option>Médecine du travail</option>
+                  <option>Médecine générale</option>
+                  <option>Médecine interne</option>
+                  <option>Médecine nucléaire</option>
+                  <option>Médecine physique et réadaptation</option>
+                  <option>Médecine d'urgence</option>
+                  <option>Néphrologie</option>
+                  <option>Neurologie</option>
+                  <option>Oncologie</option>
+                  <option>Pédiatrie</option>
+                  <option>Pneumologie</option>
+                  <option>Psychiatrie</option>
+                  <option>Radiologie</option>
+                  <option>Réanimation médicale</option>
+                  <option>Rhumatologie</option>
+                  <option>Santé publique</option>
+                </optgroup>
+                <optgroup label="── Disciplines chirurgicales">
+                  <option>Chirurgie esthétique, plastique et reconstructrice</option>
+                  <option>Chirurgie maxillo-faciale et stomatologie</option>
+                  <option>Chirurgie pédiatrique</option>
+                  <option>Chirurgie thoracique et cardiovasculaire</option>
+                  <option>Chirurgie vasculaire</option>
+                  <option>Chirurgie viscérale et digestive</option>
+                  <option>Gynécologie-obstétrique</option>
+                  <option>Médecine légale et expertise médicale</option>
+                  <option>Neurochirurgie</option>
+                  <option>Ophtalmologie</option>
+                  <option>ORL et chirurgie cervico-faciale</option>
+                  <option>Orthopédie-traumatologie</option>
+                  <option>Urologie</option>
+                </optgroup>
+                <optgroup label="── Biologie">
+                  <option>Biologie médicale</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Mode d'exercice <span style="font-weight:400;color:var(--muted)">(plusieurs choix possibles)</span></label>
+              <div class="check-pills" id="modes-exercice-pills">
+                <label class="check-pill"><input type="checkbox" name="modes_exercice" value="liberal_seul"><span>Libéral seul</span></label>
+                <label class="check-pill"><input type="checkbox" name="modes_exercice" value="liberal_groupe"><span>Libéral groupe / MSP</span></label>
+                <label class="check-pill"><input type="checkbox" name="modes_exercice" value="salarie"><span>Salarié</span></label>
+                <label class="check-pill"><input type="checkbox" name="modes_exercice" value="mixte"><span>Mixte</span></label>
+                <label class="check-pill"><input type="checkbox" name="modes_exercice" value="remplacant"><span>Remplaçant</span></label>
+                <label class="check-pill" id="pill-interne"><input type="checkbox" name="modes_exercice" value="interne"><span>Interne</span></label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="secteur">Secteur</label>
+              <select id="secteur" name="secteur">
+                <option value="">Sélectionner…</option>
+                <option value="S1">Secteur 1</option>
+                <option value="S2">Secteur 2</option>
+                <option value="S3">Secteur 3 / non conventionné</option>
+                <option value="non_applicable">Non applicable</option>
+              </select>
+            </div>
+
+            <div class="cgu-row">
+              <input type="checkbox" id="cgu" name="cgu" required>
+              <label for="cgu">J'accepte les <a href="#" style="color:var(--blue)">conditions d'utilisation</a> et la <a href="#" style="color:var(--blue)">politique de confidentialité</a> de Générations Médecins.</label>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submit-btn">
+              Créer mon compte →
+            </button>
+          </form>
+
+          <p class="already-member">
+            Déjà membre ? <a href="connexion.html">Se connecter →</a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+<script>
+(function () {
+  const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  const form    = document.getElementById('signup-form');
+  const btnSub  = document.getElementById('submit-btn');
+  const errBox  = document.getElementById('alert-error');
+  const okBox   = document.getElementById('alert-success');
+  const rppsInput   = document.getElementById('rpps');
+  const interneToggle = document.getElementById('est_interne');
+  const interneRow    = document.getElementById('toggle-interne-row');
+  const rppsMarker    = document.getElementById('rpps-required-marker');
+  const pillInterne   = document.getElementById('pill-interne');
+
+  // Toggle interne : grise RPPS, coche la pill "Interne"
+  interneToggle.addEventListener('change', function () {
+    const on = this.checked;
+    rppsInput.disabled  = on;
+    rppsInput.required  = !on;
+    rppsMarker.textContent = on ? '' : '*';
+    interneRow.classList.toggle('active', on);
+    pillInterne.querySelector('input').checked = on;
+    if (on) rppsInput.value = '';
+  });
+
+  function showError(msg) {
+    errBox.textContent = '⚠️ ' + msg;
+    errBox.classList.add('show');
+    okBox.classList.remove('show');
+    btnSub.disabled = false;
+    btnSub.textContent = 'Créer mon compte →';
+  }
+
+  function clearAlerts() {
+    errBox.classList.remove('show');
+    okBox.classList.remove('show');
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    clearAlerts();
+
+    const prenom       = form.prenom.value.trim();
+    const nom          = form.nom.value.trim();
+    const email        = form.email.value.trim();
+    const password     = form.password.value;
+    const password2    = form.password2.value;
+    const rpps         = rppsInput.value.trim();
+    const estInterne   = interneToggle.checked;
+    const telephone    = form.telephone.value.trim() || null;
+    const codePostal   = form.code_postal.value.trim() || null;
+    const specialite   = form.specialite.value;
+    const secteur      = form.secteur.value || null;
+    const cgu          = form.cgu.checked;
+
+    // Modes d'exercice (cases cochées)
+    const modesChecked = [...form.querySelectorAll('input[name="modes_exercice"]:checked')].map(cb => cb.value);
+    const modeExercice = modesChecked.length ? modesChecked.join(',') : null;
+
+    // Validations
+    if (!prenom || !nom) return showError('Prénom et nom obligatoires.');
+    if (!email)          return showError('Email obligatoire.');
+    if (password.length < 8) return showError('Mot de passe : 8 caractères minimum.');
+    if (password !== password2) return showError('Les mots de passe ne correspondent pas.');
+    if (!estInterne) {
+      if (!/^\d{11}$/.test(rpps)) {
+        document.getElementById('rpps-error').classList.add('show');
+        return showError('Numéro RPPS invalide (11 chiffres).');
+      }
+      document.getElementById('rpps-error').classList.remove('show');
+    }
+    if (!specialite) return showError('Veuillez sélectionner votre spécialité.');
+    if (!cgu)        return showError('Vous devez accepter les conditions d\'utilisation.');
+
+    btnSub.disabled = true;
+    btnSub.textContent = 'Inscription en cours…';
+
+    // 1. Créer le compte auth
+    const { data, error: authError } = await sb.auth.signUp({ email, password });
+    if (authError) {
+      if (authError.message.includes('already registered')) return showError('Un compte existe déjà avec cet email.');
+      return showError(authError.message);
+    }
+
+    const userId = data.user?.id;
+    if (!userId) return showError('Erreur lors de la création du compte. Réessayez.');
+
+    if (!data.session) return showError('Configuration requise : désactivez la confirmation email dans Supabase Auth.');
+
+    // 2. Créer le profil membre
+    const { error: memberError } = await sb.from('membres').insert({
+      user_id:       userId,
+      email,
+      prenom,
+      nom,
+      rpps:          estInterne ? null : rpps,
+      est_interne:   estInterne,
+      telephone,
+      code_postal:   codePostal,
+      specialite,
+      mode_exercice: modeExercice,
+      secteur,
+      statut:        'en_attente'
+    });
+
+    if (memberError) {
+      if (memberError.code === '23505') return showError('Un compte existe déjà avec cet email ou ce RPPS.');
+      return showError('Erreur profil : ' + memberError.message);
+    }
+
+    // 3. Succès
+    okBox.classList.add('show');
+    form.style.display = 'none';
+    setTimeout(() => { window.location.href = 'espace-membre.html'; }, 2500);
+  });
+})();
+</script>
+</body>
+</html>

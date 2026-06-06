@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aide à l'installation — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .etapes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .etape-card {
+      padding: 28px 32px;
+      border-radius: var(--r);
+      background: white;
+      border: 1.5px solid var(--line);
+      display: flex;
+      gap: 24px;
+      transition: all 0.2s;
+    }
+    .etape-card:hover {
+      border-color: rgba(42,109,184,0.25);
+      box-shadow: 0 8px 32px rgba(42,109,184,0.07);
+    }
+
+    .etape-num {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--grad);
+      color: white;
+      font-size: 1.25rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .etape-body {
+      flex: 1;
+    }
+
+    .etape-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .etape-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .etape-badge {
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: rgba(42,109,184,0.08);
+      color: var(--blue);
+    }
+
+    .etape-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .etape-list li {
+      font-size: 0.875rem;
+      color: var(--muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.5;
+    }
+
+    .etape-list li::before {
+      content: "✓";
+      color: var(--green);
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .etape-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      font-size: 0.83rem;
+      font-weight: 700;
+      color: var(--blue);
+      text-decoration: none;
+    }
+    .etape-link:hover { text-decoration: underline; }
+
+    /* Colour variants per step */
+    .etape-card:nth-child(1) .etape-num { background: linear-gradient(135deg, #2a6db8, #3a82cc); }
+    .etape-card:nth-child(2) .etape-num { background: linear-gradient(135deg, #2e7bbf, #38a8b5); }
+    .etape-card:nth-child(3) .etape-num { background: linear-gradient(135deg, #38a8b5, #4dbcaa); }
+    .etape-card:nth-child(4) .etape-num { background: linear-gradient(135deg, #4dbcaa, #62c040); }
+    .etape-card:nth-child(5) .etape-num { background: linear-gradient(135deg, #62c040, #4aa82e); }
+
+    .etape-card:nth-child(2) .etape-badge { background: rgba(56,168,181,0.1); color: var(--teal); }
+    .etape-card:nth-child(3) .etape-badge { background: rgba(56,168,181,0.1); color: var(--teal); }
+    .etape-card:nth-child(4) .etape-badge { background: rgba(98,192,64,0.1); color: #3d8a1a; }
+    .etape-card:nth-child(5) .etape-badge { background: rgba(98,192,64,0.1); color: #3d8a1a; }
+
+    @media (max-width: 640px) {
+      .etape-card { flex-direction: column; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html" class="active">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <span class="badge badge-teal">🏥 Guide pratique</span>
+      <h1>Aide à l'installation</h1>
+      <p>Du statut d'interne à votre cabinet : les étapes dans l'ordre, sans rien oublier.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+
+      <div class="section-label" style="margin-bottom:24px">Checklist en 5 étapes</div>
+
+      <div class="etapes-list">
+
+        <!-- Étape 1 -->
+        <div class="etape-card">
+          <div class="etape-num">1</div>
+          <div class="etape-body">
+            <div class="etape-header">
+              <span class="etape-title">Choisir son mode d'exercice</span>
+              <span class="etape-badge">Point de départ</span>
+            </div>
+            <ul class="etape-list">
+              <li>Libéral seul, cabinet de groupe, MSP, SEL ou salarié : chaque mode a ses implications fiscales, sociales et pratiques.</li>
+              <li>La structure juridique (entreprise individuelle, société d'exercice) conditionne votre fiscalité dès le premier euro.</li>
+              <li>Le secteur conventionnel (S1, S2, S3) se choisit à l'installation — il est difficile à modifier ensuite.</li>
+            </ul>
+            <a href="types-exercice.html" class="etape-link">Comparer les modes d'exercice →</a>
+          </div>
+        </div>
+
+        <!-- Étape 2 -->
+        <div class="etape-card">
+          <div class="etape-num">2</div>
+          <div class="etape-body">
+            <div class="etape-header">
+              <span class="etape-title">Démarches administratives</span>
+              <span class="etape-badge">2–4 semaines</span>
+            </div>
+            <ul class="etape-list">
+              <li>Inscription à l'Ordre des Médecins (CNOM) — obligatoire avant tout exercice.</li>
+              <li>Obtenir son numéro RPPS actif (si pas encore attribué ou suspendu).</li>
+              <li>Inscription URSSAF Professions Libérales (déclaration d'activité).</li>
+              <li>Ouverture d'un compte bancaire professionnel dédié.</li>
+              <li>Souscription à une assurance RC Professionnelle (obligatoire).</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Étape 3 -->
+        <div class="etape-card">
+          <div class="etape-num">3</div>
+          <div class="etape-body">
+            <div class="etape-header">
+              <span class="etape-title">Conventionnement CPAM</span>
+              <span class="etape-badge">3–6 semaines</span>
+            </div>
+            <ul class="etape-list">
+              <li>Demande de conventionnement — choisir secteur 1, 2 ou 3 selon votre spécialité et votre projet.</li>
+              <li>Si secteur 2 : choisir ou non OPTAM / OPTAM-CO (engagement 3 ans, avantage complémentaire).</li>
+              <li>Signature de la convention médicale nationale avec votre CPAM locale.</li>
+              <li>Vérifier que votre carte CPS est active et valide (renouvellement si besoin).</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Étape 4 -->
+        <div class="etape-card">
+          <div class="etape-num">4</div>
+          <div class="etape-body">
+            <div class="etape-header">
+              <span class="etape-title">Équipement et logiciels</span>
+              <span class="etape-badge">Avant ouverture</span>
+            </div>
+            <ul class="etape-list">
+              <li>Logiciel médical certifié HAS : Doctolib Médecin, Mediboard, Axisanté, Crossway, etc.</li>
+              <li>Connexion au DMP (Dossier Médical Partagé) et Mon Espace Santé.</li>
+              <li>Mise en place de la télétransmission Sesam-Vitale (lecteur + TPE si nécessaire).</li>
+              <li>Ordonnancier sécurisé (obligatoire pour les stupéfiants et certains médicaments).</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Étape 5 -->
+        <div class="etape-card">
+          <div class="etape-num">5</div>
+          <div class="etape-body">
+            <div class="etape-header">
+              <span class="etape-title">Ouverture</span>
+              <span class="etape-badge">J-0</span>
+            </div>
+            <ul class="etape-list">
+              <li>Déclaration de début d'activité définitive à l'URSSAF.</li>
+              <li>Réaliser une première facturation test pour valider la télétransmission.</li>
+              <li>Déclaration CNIL si traitement de données de santé (registre des activités de traitement).</li>
+              <li>Inscription sur l'annuaire santé Ameli pour être référencé par les patients.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Coming soon -->
+      <div class="coming-soon-block" style="margin-top:40px">
+        <strong>Checklist téléchargeable et rappels automatiques à venir</strong> pour les adhérents. Recevez une notification à chaque échéance importante de votre installation.
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>On vous accompagne pas à pas.</h2>
+    <p>Les adhérents Générations Médecins reçoivent un suivi personnalisé à l'installation et accèdent aux outils avant tout le monde.</p>
+    <a href="adherer.html" class="btn btn-white btn-lg">Adhérer maintenant →</a>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="auth-header.js"></script>
+</body>
+</html>
