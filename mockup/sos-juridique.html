@@ -275,32 +275,10 @@
   <script>
   (function () {
     let recognition = null;
+    let isListening  = false;  // intention utilisateur (≠ état Chrome)
 
-    window.dictate = async function () {
-      const btn    = document.getElementById('mic-btn');
-      const infoEl = document.getElementById('mic-info');
-      const inp    = document.getElementById('question-input');
-
-      // Toggle stop
-      if (recognition) {
-        try { recognition.stop(); } catch {}
-        return;
-      }
-
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) {
-        infoEl.style.display = 'block';
-        infoEl.innerHTML = '⚠️ Dictée non supportée. Compatible : <strong>Chrome</strong>, <strong>Edge</strong>, <strong>Safari</strong> (pas Firefox).';
-        return;
-      }
-
-      if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-        infoEl.style.display = 'block';
-        infoEl.textContent = '⚠️ La dictée nécessite HTTPS.';
-        return;
-      }
-
-      const baseValue = inp.value;
+    function startRecognition(SpeechRec, btn, infoEl, inp) {
+      const baseCapture = inp.value;   // snapshot au lancement ou au redémarrage auto
       let finalTranscript = '';
 
       recognition = new SpeechRec();
@@ -323,35 +301,71 @@
           if (e.results[i].isFinal) finalTranscript += t;
           else interim += t;
         }
-        const sep = baseValue && !baseValue.endsWith(' ') && !baseValue.endsWith('\n') ? ' ' : '';
-        inp.value = baseValue + sep + finalTranscript + interim;
+        const sep = baseCapture && !baseCapture.endsWith(' ') && !baseCapture.endsWith('\n') ? ' ' : '';
+        inp.value = baseCapture + sep + finalTranscript + interim;
       };
 
       recognition.onerror = (e) => {
+        // no-speech est ignoré : on redémarre dans onend automatiquement
+        if (e.error === 'no-speech' || e.error === 'aborted') return;
         const msg = {
-          'no-speech':     'Aucune voix détectée. Réessayez en parlant plus fort.',
           'audio-capture': 'Aucun microphone détecté.',
           'not-allowed':   'Permission micro refusée.',
           'network':       'Erreur réseau (service Google requis).',
-          'aborted':       '',
         }[e.error] || 'Erreur dictée : ' + e.error;
+        isListening = false;
         if (msg) { infoEl.style.display = 'block'; infoEl.textContent = '⚠️ ' + msg; }
       };
 
       recognition.onend = () => {
-        btn.textContent = '🎤 Dicter ma question';
-        btn.classList.remove('listening');
-        setTimeout(() => { if (!recognition) infoEl.style.display = 'none'; }, 2000);
         recognition = null;
+        if (isListening) {
+          // Chrome a stoppé tout seul (no-speech, timeout…) → on relance silencieusement
+          startRecognition(SpeechRec, btn, infoEl, inp);
+        } else {
+          btn.textContent = '🎤 Dicter ma question';
+          btn.classList.remove('listening');
+          setTimeout(() => infoEl.style.display = 'none', 2000);
+        }
       };
 
       try {
         recognition.start();
       } catch (err) {
+        isListening = false;
         infoEl.style.display = 'block';
         infoEl.textContent = '⚠️ Impossible de démarrer : ' + err.message;
         recognition = null;
       }
+    }
+
+    window.dictate = function () {
+      const btn    = document.getElementById('mic-btn');
+      const infoEl = document.getElementById('mic-info');
+      const inp    = document.getElementById('question-input');
+
+      // Toggle stop
+      if (isListening) {
+        isListening = false;
+        if (recognition) { try { recognition.stop(); } catch {} }
+        return;
+      }
+
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) {
+        infoEl.style.display = 'block';
+        infoEl.innerHTML = '⚠️ Dictée non supportée. Compatible : <strong>Chrome</strong>, <strong>Edge</strong>, <strong>Safari</strong> (pas Firefox).';
+        return;
+      }
+
+      if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        infoEl.style.display = 'block';
+        infoEl.textContent = '⚠️ La dictée nécessite HTTPS.';
+        return;
+      }
+
+      isListening = true;
+      startRecognition(SpeechRec, btn, infoEl, inp);
     };
   })();
   </script>
