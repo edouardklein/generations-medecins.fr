@@ -266,9 +266,10 @@ export type BudgetProps = {
   eyebrow?: string
   title: string
   subtitle?: string
-  items: { label: string; detail?: string; amount: number }[]
+  items: { label: string; detail?: string; amount: number; secured?: number }[]
   currency?: string
   totalLabel?: string
+  securedLabel?: string
 }
 
 export type TestimonialItem = {
@@ -285,22 +286,17 @@ export type TestimonialsProps = {
   testimonials: TestimonialItem[]
 }
 
-export type MediaItem = {
+export type MediaTile = {
+  kicker?: string
   name: string
   caption?: string
-  logo?: string
-  image?: string
-}
-export type MediaSection = {
-  kicker: string
-  glyph?: string
-  items: MediaItem[]
+  image: string
 }
 export type MediaProps = {
   eyebrow?: string
   title: string
   subtitle?: string
-  sections: MediaSection[]
+  tiles: MediaTile[]
   footnote?: string
 }
 
