@@ -1233,7 +1233,7 @@
         docEl.querySelectorAll('[contenteditable]').forEach(el => el.setAttribute('contenteditable', 'false'));
 
         const canvas = await html2canvas(docEl, {
-          scale: 2,
+          scale: 1.5,
           useCORS: true,
           logging: false,
           backgroundColor: '#ffffff',
@@ -1247,7 +1247,7 @@
         const pageH = pdf.internal.pageSize.getHeight();
         const imgW  = pageW;
         const imgH  = (canvas.height * pageW) / canvas.width;
-        const imgData = canvas.toDataURL('image/png');
+        const imgData = canvas.toDataURL('image/jpeg', 0.85);
 
         let y = 0;
         let remaining = imgH;
@@ -1256,7 +1256,7 @@
           if (page > 0) pdf.addPage();
           // Clip portion visible on this page
           const sliceH = Math.min(pageH, remaining);
-          pdf.addImage(imgData, 'PNG', 0, -y, imgW, imgH);
+          pdf.addImage(imgData, 'JPEG', 0, -y, imgW, imgH);
           y += pageH;
           remaining -= pageH;
           page++;
