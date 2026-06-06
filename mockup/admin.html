@@ -380,7 +380,7 @@
 
       <div class="sidebar-section-label">Juridique</div>
       <button class="sidebar-link" onclick="showSection('doctrine')" id="nav-doctrine">
-        <span class="icon">⚖️</span><span>Consultations Doctrine</span>
+        <span class="icon">🚨</span><span>SOS Juridique</span>
       </button>
 
       <div class="sidebar-section-label">Navigation</div>
@@ -712,8 +712,8 @@
       <!-- Section: Doctrine (consultations juridiques) -->
       <div id="section-doctrine" class="section-panel">
         <div class="main-header">
-          <div class="main-title">Consultations juridiques Doctrine</div>
-          <div class="main-sub">File de traitement des questions envoyées par les adhérents — réponses via Doctrine.fr</div>
+          <div class="main-title">SOS Juridique</div>
+          <div class="main-sub">File de traitement des questions des adhérents — réponses via Doctrine.fr, escalade possible vers SPI Avocats</div>
         </div>
 
         <!-- Filtres & stats -->
@@ -2662,6 +2662,7 @@
               <span style="font-size:.78rem;color:var(--muted)">${esc(m.prenom||'')} ${esc(m.nom||'')} — ${date}</span>
               ${c.question_reformulee ? '<span style="font-size:.72rem;background:#f0fdf4;color:#16a34a;padding:2px 8px;border-radius:10px;font-weight:700">✓ Reformulée</span>' : ''}
               ${c.pdf_url ? '<span style="font-size:.72rem;background:#eff6ff;color:#2563eb;padding:2px 8px;border-radius:10px;font-weight:700">PDF prêt</span>' : ''}
+              ${c.escalade_spi ? '<span style="font-size:.72rem;background:#f0faf5;color:#0d6e3f;padding:2px 8px;border-radius:10px;font-weight:700">🧑‍⚖️ Escalade SPI</span>' : ''}
             </div>
             <div style="font-size:.88rem;color:var(--ink);line-height:1.5">${esc(qShort)}</div>
           </div>
@@ -2732,6 +2733,14 @@
         <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:6px">Synthèse IA</div>
         <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;font-size:.85rem;line-height:1.7;white-space:pre-wrap">${esc(c.synthese)}</div>
         ${c.pdf_url ? `<div style="margin-top:8px"><button onclick="doctrineOpenDoc('${esc(c.pdf_url)}')" class="btn-action btn-primary" style="font-size:.78rem">📥 Télécharger le PDF</button></div>` : ''}
+      </div>` : ''}
+
+      ${c.escalade_spi ? `
+      <div style="margin-top:18px;padding:14px;background:#f0faf5;border:1px solid #b8e8d0;border-radius:10px">
+        <div style="font-size:.84rem;color:#0d6e3f;line-height:1.5">
+          🧑‍⚖️ <strong>Escalade SPI Avocats demandée</strong> le ${c.escalade_spi_le ? new Date(c.escalade_spi_le).toLocaleDateString('fr-FR') : ''}.
+          À transmettre à <a href="https://spi-avocats.com/" target="_blank" style="color:#0d6e3f;font-weight:700">SPI Avocats</a> (question + synthèse).
+        </div>
       </div>` : ''}
 
       <!-- Note opérateur -->

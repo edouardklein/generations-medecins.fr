@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS consultations_juridiques (
     pdf_url              TEXT,
     statut               TEXT        DEFAULT 'recue',
     note_operateur       TEXT,
+    escalade_spi         BOOLEAN     DEFAULT false,
+    escalade_spi_le      TIMESTAMPTZ,
     created_at           TIMESTAMPTZ DEFAULT NOW(),
     updated_at           TIMESTAMPTZ DEFAULT NOW()
 );
@@ -31,6 +33,8 @@ ALTER TABLE consultations_juridiques ADD COLUMN IF NOT EXISTS synthese          
 ALTER TABLE consultations_juridiques ADD COLUMN IF NOT EXISTS pdf_url              TEXT;
 ALTER TABLE consultations_juridiques ADD COLUMN IF NOT EXISTS statut               TEXT        DEFAULT 'recue';
 ALTER TABLE consultations_juridiques ADD COLUMN IF NOT EXISTS note_operateur       TEXT;
+ALTER TABLE consultations_juridiques ADD COLUMN IF NOT EXISTS escalade_spi         BOOLEAN     DEFAULT false;
+ALTER TABLE consultations_juridiques ADD COLUMN IF NOT EXISTS escalade_spi_le      TIMESTAMPTZ;
 ALTER TABLE consultations_juridiques ADD COLUMN IF NOT EXISTS created_at           TIMESTAMPTZ DEFAULT NOW();
 ALTER TABLE consultations_juridiques ADD COLUMN IF NOT EXISTS updated_at           TIMESTAMPTZ DEFAULT NOW();
 
@@ -74,6 +78,16 @@ DROP POLICY IF EXISTS "cj: mise a jour admin" ON consultations_juridiques;
 CREATE POLICY "cj: mise a jour admin"
     ON consultations_juridiques FOR UPDATE
     USING (is_admin());
+
+-- Le membre peut mettre à jour SES propres dossiers (sert à demander l'escalade SPI).
+-- USING + WITH CHECK = membre_id : l'empêche de réaffecter le dossier à un tiers.
+-- ⚠️ MVP : RLS ne fait pas de restriction colonne par colonne ; le membre ne peut
+--    toucher que ses propres lignes (impact limité à ses propres données).
+DROP POLICY IF EXISTS "cj: mise a jour membre" ON consultations_juridiques;
+CREATE POLICY "cj: mise a jour membre"
+    ON consultations_juridiques FOR UPDATE
+    USING (membre_id = mon_membre_id())
+    WITH CHECK (membre_id = mon_membre_id());
 
 -- Force le rechargement du cache de schéma PostgREST
 SELECT pg_notify('pgrst', 'reload schema');

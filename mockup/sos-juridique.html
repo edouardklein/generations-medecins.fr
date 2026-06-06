@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Consultations juridiques — Générations Médecins</title>
+  <title>SOS Juridique — Générations Médecins</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
@@ -164,8 +164,8 @@
   <!-- Header -->
   <div class="consult-hero">
     <div class="consult-hero-inner">
-      <h1>⚖️ Consultations juridiques</h1>
-      <p>Posez vos questions de droit médical. Nos équipes les transmettent à <strong>Doctrine.fr</strong> — la base de données juridique de référence — et vous transmettent une synthèse claire avec les points clés.</p>
+      <h1>🚨 SOS Juridique</h1>
+      <p>Posez vos questions de droit médical. Elles sont analysées via <strong>Doctrine.fr</strong> — la base de données juridique de référence — et vous recevez une synthèse claire avec les points clés. Pour les cas complexes, possibilité d'escalade vers notre avocat partenaire <strong>SPI Avocats</strong>.</p>
     </div>
   </div>
 
@@ -417,6 +417,20 @@
                    ${c.pdf_url ? `<button onclick="openDoc('${esc(c.pdf_url)}')" class="btn-dl">📥 Télécharger le PDF complet</button>` : ''}`
                 : '<div style="color:var(--muted);font-size:.85rem">La synthèse sera disponible ici dès que prête.</div>'
               }
+            </div>
+
+            <!-- Escalade SPI Avocats -->
+            <div class="consult-body-section">
+              ${c.escalade_spi
+                ? `<div style="display:flex;align-items:center;gap:10px;padding:12px;background:#f0faf5;border-radius:10px;border:1px solid #b8e8d0">
+                     <div style="font-size:1.3rem">🧑‍⚖️</div>
+                     <div style="font-size:.84rem;color:#0d6e3f;line-height:1.5"><strong>Escalade demandée.</strong> Le syndicat transmet votre dossier à <strong>SPI Avocats</strong>. Vous serez recontacté(e) par l'avocat partenaire.</div>
+                   </div>`
+                : `<div style="border:1px solid var(--line);border-radius:10px;padding:14px">
+                     <div style="font-size:.84rem;color:var(--ink);line-height:1.5;margin-bottom:10px">Cette synthèse ne suffit pas ? Pour les situations complexes, demandez un avis personnalisé à notre avocat partenaire <strong>SPI Avocats</strong>.</div>
+                     <button class="btn-dl" style="background:#0d6e3f" onclick="escaladeSpi('${c.id}')">🧑‍⚖️ Demander un avis à SPI Avocats</button>
+                   </div>`
+              }
             </div>` : `
             <div class="consult-body-section">
               <div style="display:flex;align-items:center;gap:10px;padding:12px;background:#fffbeb;border-radius:10px;border:1px solid #fde68a">
@@ -444,6 +458,17 @@
     window.toggleConsult = function(id) {
       const body = $('consult-body-' + id);
       body.style.display = body.style.display === 'none' ? 'block' : 'none';
+    };
+
+    // Demande d'escalade vers l'avocat partenaire SPI Avocats
+    window.escaladeSpi = async function(id) {
+      if (!confirm('Demander un avis personnalisé à SPI Avocats ?\n\nVotre dossier (question + synthèse) sera transmis par le syndicat à l\'avocat partenaire, qui vous recontactera.')) return;
+      const { error } = await sb.from('consultations_juridiques')
+        .update({ escalade_spi: true, escalade_spi_le: new Date().toISOString() })
+        .eq('id', id);
+      if (error) { toast('Erreur : ' + error.message, true); return; }
+      toast('✓ Demande transmise. SPI Avocats vous recontactera.');
+      await loadConsultations();
     };
 
     // Ouvre un fichier du bucket privé via URL signée temporaire (5 min)
