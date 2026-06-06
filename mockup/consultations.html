@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consultations juridiques — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background: #e9eef3; }
+
+    /* Hero bandeau */
+    .consult-hero {
+      background: linear-gradient(135deg, #17365f, #326aa2, #2d8f9a);
+      color: #fff; padding: 40px 0 32px;
+    }
+    .consult-hero-inner { max-width: 820px; margin: 0 auto; padding: 0 24px; }
+    .consult-hero h1 { font-size: 1.7rem; font-weight: 800; margin-bottom: 8px; }
+    .consult-hero p { font-size: .92rem; color: rgba(255,255,255,.8); line-height: 1.6; max-width: 600px; }
+
+    /* Bandeau confidentialité */
+    .privacy-bar {
+      background: #fff; border-bottom: 1.5px solid var(--line);
+      padding: 12px 0;
+    }
+    .privacy-bar-inner {
+      max-width: 820px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; gap: 10px; font-size: .82rem; color: var(--muted);
+    }
+    .privacy-bar strong { color: var(--ink); }
+
+    /* Contenu */
+    .page-inner { max-width: 820px; margin: 0 auto; padding: 32px 24px 80px; }
+
+    /* Formulaire */
+    .ask-card {
+      background: #fff; border-radius: 16px; padding: 28px 28px 24px;
+      box-shadow: 0 2px 12px rgba(15,32,51,.07); margin-bottom: 32px;
+    }
+    .ask-card h2 { font-size: 1.05rem; font-weight: 800; margin-bottom: 4px; color: var(--ink); }
+    .ask-card .sub { font-size: .82rem; color: var(--muted); margin-bottom: 20px; }
+    .form-label { font-size: .78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; display: block; }
+    .form-field {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--line);
+      border-radius: 10px; font-family: inherit; font-size: .9rem; outline: none;
+      transition: border-color .15s; box-sizing: border-box;
+    }
+    .form-field:focus { border-color: var(--blue); }
+    textarea.form-field { min-height: 130px; resize: vertical; line-height: 1.6; }
+    .form-hint { font-size: .76rem; color: var(--muted); margin-top: 5px; line-height: 1.5; }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed var(--line); border-radius: 10px;
+      padding: 20px; text-align: center; cursor: pointer;
+      transition: all .15s; position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag { border-color: var(--blue); background: #f0f6ff; }
+    .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .upload-zone .icon { font-size: 1.8rem; margin-bottom: 6px; }
+    .upload-zone .txt { font-size: .82rem; color: var(--muted); }
+    .upload-zone .txt strong { color: var(--blue); }
+    .upload-files-list { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .upload-file-chip {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+      padding: 4px 10px; font-size: .76rem; display: flex; align-items: center; gap: 6px;
+    }
+    .upload-file-chip button { background: none; border: none; cursor: pointer; color: var(--muted); font-size: .9rem; padding: 0; line-height: 1; }
+
+    .btn-submit {
+      background: var(--blue); color: #fff; border: none; border-radius: 10px;
+      padding: 13px 28px; font-family: inherit; font-size: .92rem; font-weight: 700;
+      cursor: pointer; transition: background .15s; margin-top: 20px; width: 100%;
+    }
+    .btn-submit:hover { background: var(--blue-dark); }
+    .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* Statut pipeline */
+    .pipeline {
+      display: flex; gap: 0; margin-bottom: 32px;
+      background: #fff; border-radius: 12px; overflow: hidden;
+      border: 1.5px solid var(--line); box-shadow: 0 2px 8px rgba(15,32,51,.04);
+    }
+    .pipeline-step {
+      flex: 1; padding: 14px 10px; text-align: center; font-size: .72rem;
+      border-right: 1.5px solid var(--line); position: relative;
+    }
+    .pipeline-step:last-child { border-right: none; }
+    .pipeline-step .ps-icon { font-size: 1.3rem; margin-bottom: 4px; }
+    .pipeline-step .ps-label { font-weight: 700; color: var(--muted); }
+    .pipeline-step .ps-desc { color: var(--muted); font-size: .68rem; margin-top: 2px; }
+    .pipeline-step.active .ps-label { color: var(--blue); }
+    .pipeline-step.done .ps-label { color: var(--teal); }
+    .pipeline-step.done::after {
+      content: '✓'; position: absolute; top: 8px; right: 8px;
+      font-size: .65rem; color: var(--teal); font-weight: 800;
+    }
+
+    /* Liste consultations */
+    .consults-section h2 { font-size: 1.05rem; font-weight: 800; color: var(--ink); margin-bottom: 16px; }
+    .consult-card {
+      background: #fff; border-radius: 14px; border: 1.5px solid var(--line);
+      margin-bottom: 12px; overflow: hidden; box-shadow: 0 1px 6px rgba(15,32,51,.04);
+    }
+    .consult-head {
+      padding: 16px 18px; display: flex; align-items: flex-start;
+      gap: 14px; cursor: pointer;
+    }
+    .consult-head:hover { background: var(--surface); }
+    .status-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+    }
+    .consult-meta { flex: 1; min-width: 0; }
+    .consult-date { font-size: .76rem; color: var(--muted); margin-bottom: 3px; }
+    .consult-q { font-size: .88rem; color: var(--ink); line-height: 1.5;
+      overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .status-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: .72rem; font-weight: 700; white-space: nowrap;
+    }
+    .consult-body { padding: 0 18px 18px; border-top: 1.5px solid var(--line); }
+    .consult-body-section { margin-top: 14px; }
+    .section-label-sm {
+      font-size: .7rem; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted); font-weight: 700; margin-bottom: 6px;
+    }
+    .synthese-box {
+      background: #f0f6ff; border: 1px solid #bfdbfe; border-radius: 10px;
+      padding: 14px; font-size: .85rem; line-height: 1.75; white-space: pre-wrap;
+    }
+    .btn-dl {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--blue); color: #fff; border: none; border-radius: 8px;
+      padding: 9px 16px; font-family: inherit; font-size: .82rem; font-weight: 700;
+      cursor: pointer; text-decoration: none; margin-top: 10px; transition: background .15s;
+    }
+    .btn-dl:hover { background: var(--blue-dark); }
+
+    .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
+    .empty-state .icon { font-size: 2.8rem; margin-bottom: 12px; }
+    .empty-state p { font-size: .88rem; line-height: 1.6; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--ink); color: #fff; padding: 12px 22px; border-radius: 10px;
+      font-size: .86rem; font-weight: 600; z-index: 300; opacity: 0;
+      transition: opacity .25s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+    .toast.error { background: #c0392b; }
+
+    @media (max-width: 600px) {
+      .pipeline { flex-direction: column; }
+      .pipeline-step { border-right: none; border-bottom: 1.5px solid var(--line); }
+      .pipeline-step:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="consult-hero">
+    <div class="consult-hero-inner">
+      <h1>⚖️ Consultations juridiques</h1>
+      <p>Posez vos questions de droit médical. Nos équipes les transmettent à <strong>Doctrine.fr</strong> — la base de données juridique de référence — et vous transmettent une synthèse claire avec les points clés.</p>
+    </div>
+  </div>
+
+  <!-- Confidentialité -->
+  <div class="privacy-bar">
+    <div class="privacy-bar-inner">
+      🔒 <strong>Confidentialité :</strong> votre question est anonymisée avant transmission (noms, adresses et identifiants supprimés). Seul le syndicat accède aux données complètes.
+      &nbsp;·&nbsp; Ce service est réservé aux adhérents à jour de cotisation.
+      &nbsp;·&nbsp; Les réponses sont indicatives et ne remplacent pas un conseil juridique personnalisé.
+    </div>
+  </div>
+
+  <div class="page-inner">
+
+    <!-- Pipeline visuel -->
+    <div class="pipeline" id="pipeline" style="margin-bottom:32px">
+      <div class="pipeline-step active">
+        <div class="ps-icon">✍️</div>
+        <div class="ps-label">Question</div>
+        <div class="ps-desc">Vous posez votre question</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="ps-icon">🔒</div>
+        <div class="ps-label">Anonymisation</div>
+        <div class="ps-desc">Retrait des données perso</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="ps-icon">⚖️</div>
+        <div class="ps-label">Doctrine</div>
+        <div class="ps-desc">Recherche dans la base juridique</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="ps-icon">✨</div>
+        <div class="ps-label">Synthèse IA</div>
+        <div class="ps-desc">Résumé clair + recommandations</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="ps-icon">📥</div>
+        <div class="ps-label">Réponse PDF</div>
+        <div class="ps-desc">Téléchargement dans votre espace</div>
+      </div>
+    </div>
+
+    <!-- Formulaire nouvelle question -->
+    <div class="ask-card" id="ask-card">
+      <h2>Poser une nouvelle question</h2>
+      <div class="sub">Délai de réponse habituel : <strong>3 à 5 jours ouvrés</strong>. Maximum 3 consultations actives simultanées.</div>
+
+      <div style="margin-bottom:16px">
+        <label class="form-label">Votre question juridique</label>
+        <textarea class="form-field" id="question-input" placeholder="Décrivez votre situation et votre question : contexte, dates clés, problème rencontré…&#10;&#10;Ex. : Mon bailleur augmente mon loyer de 15% alors que je suis en bail professionnel. Quelles sont mes protections légales ?"></textarea>
+        <div class="form-hint">💡 Soyez précis sur le contexte. Vous pouvez mentionner des noms — ils seront automatiquement supprimés avant transmission.</div>
+      </div>
+
+      <div>
+        <label class="form-label">Documents joints <span style="font-weight:400;text-transform:none;letter-spacing:0">(facultatif — max 3 fichiers, 10 Mo chacun)</span></label>
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="handleFiles(this.files)">
+          <div class="ps-icon">📎</div>
+          <div class="txt">Glissez vos fichiers ici ou <strong>cliquez pour choisir</strong></div>
+          <div class="txt" style="font-size:.72rem;margin-top:2px">PDF, Word, images acceptés</div>
+        </div>
+        <div class="upload-files-list" id="files-list"></div>
+      </div>
+
+      <button class="btn-submit" id="btn-submit" onclick="submitQuestion()">Envoyer ma question →</button>
+    </div>
+
+    <!-- Mes consultations -->
+    <div class="consults-section">
+      <h2>Mes consultations</h2>
+      <div id="consults-list">
+        <div style="text-align:center;padding:32px;color:var(--muted);font-size:.88rem">Chargement…</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+  (function() {
+    const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    let membre = null;
+    let pendingFiles = [];
+
+    const $ = id => document.getElementById(id);
+    function toast(msg, isErr) {
+      const t = $('toast');
+      t.textContent = msg; t.className = 'toast show' + (isErr ? ' error' : '');
+      setTimeout(() => t.className = 'toast', 2800);
+    }
+
+    const STATUT_CFG = {
+      recue:            { label: 'Reçue',           color: '#6b7a8d', bg: '#f5f7fb', dot: '#94a3b8' },
+      prete:            { label: 'En file',          color: '#1a7a86', bg: '#e8f7f8', dot: '#38a8b5' },
+      en_cours:         { label: 'En cours',         color: '#d97706', bg: '#fef3c7', dot: '#f59e0b' },
+      doctrine_repondu: { label: 'Réponse reçue',   color: '#2563eb', bg: '#eff6ff', dot: '#3b82f6' },
+      terminee:         { label: 'Terminée ✓',      color: '#16a34a', bg: '#f0fdf4', dot: '#22c55e' },
+      archivee:         { label: 'Archivée',         color: '#94a3b8', bg: '#f8fafc', dot: '#cbd5e1' },
+    };
+
+    function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+    // ── Init ─────────────────────────────────────────────────────────────────
+    async function init() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) {
+        location.href = 'connexion.html?next=' + encodeURIComponent(location.pathname);
+        return;
+      }
+      const { data: m } = await sb.from('membres').select('*').eq('user_id', session.user.id).single();
+      membre = m;
+      await loadConsultations();
+    }
+
+    // ── Upload fichiers ───────────────────────────────────────────────────────
+    window.handleFiles = function(files) {
+      Array.from(files).forEach(f => {
+        if (pendingFiles.length >= 3) { toast('Maximum 3 fichiers', true); return; }
+        if (f.size > 10 * 1024 * 1024) { toast(`${f.name} dépasse 10 Mo`, true); return; }
+        if (!pendingFiles.find(p => p.name === f.name)) pendingFiles.push(f);
+      });
+      renderFilesList();
+    };
+
+    function renderFilesList() {
+      $('files-list').innerHTML = pendingFiles.map((f, i) => `
+        <div class="upload-file-chip">
+          📎 ${esc(f.name)}
+          <span style="color:var(--muted);font-size:.7rem">(${(f.size/1024).toFixed(0)} Ko)</span>
+          <button onclick="removeFile(${i})" title="Supprimer">✕</button>
+        </div>`).join('');
+    }
+    window.removeFile = function(i) { pendingFiles.splice(i, 1); renderFilesList(); };
+
+    // Drag & drop
+    const zone = $('upload-zone');
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault(); zone.classList.remove('drag');
+      handleFiles(e.dataTransfer.files);
+    });
+
+    // ── Soumission question ───────────────────────────────────────────────────
+    window.submitQuestion = async function() {
+      const question = $('question-input').value.trim();
+      if (!question || question.length < 30) {
+        toast('Veuillez rédiger une question d\'au moins 30 caractères', true); return;
+      }
+      if (!membre) { toast('Profil non chargé', true); return; }
+
+      const btn = $('btn-submit');
+      btn.disabled = true; btn.textContent = '⏳ Envoi en cours…';
+
+      try {
+        // Upload des fichiers éventuels
+        const docsJson = [];
+        for (const file of pendingFiles) {
+          const path = `${membre.id}/${Date.now()}-${file.name}`;
+          const { error: upErr } = await sb.storage.from('consultations').upload(path, file, { upsert: true });
+          if (upErr) { toast(`Erreur upload ${file.name} : ${upErr.message}`, true); continue; }
+          const { data: { publicUrl } } = sb.storage.from('consultations').getPublicUrl(path);
+          docsJson.push({ name: file.name, url: publicUrl, size: file.size });
+        }
+
+        // Création de la consultation
+        const { data: consult, error: insErr } = await sb.from('consultations_juridiques').insert({
+          membre_id: membre.id,
+          question,
+          documents: docsJson,
+          statut: 'recue',
+        }).select('id').single();
+
+        if (insErr) throw new Error(insErr.message);
+
+        // Déclenche la reformulation en arrière-plan
+        const { data: { session } } = await sb.auth.getSession();
+        fetch('/.netlify/functions/reformuler-question', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question, membreId: membre.id, consultationId: consult.id }),
+        }).catch(() => {}); // fire and forget
+
+        toast('✓ Question envoyée ! Vous recevrez une réponse sous 3 à 5 jours ouvrés.');
+        $('question-input').value = '';
+        pendingFiles = [];
+        renderFilesList();
+        await loadConsultations();
+      } catch(e) {
+        toast('Erreur : ' + e.message, true);
+      } finally {
+        btn.disabled = false; btn.textContent = 'Envoyer ma question →';
+      }
+    };
+
+    // ── Chargement consultations ──────────────────────────────────────────────
+    async function loadConsultations() {
+      if (!membre) return;
+      const { data, error } = await sb.from('consultations_juridiques')
+        .select('*').eq('membre_id', membre.id)
+        .order('created_at', { ascending: false });
+
+      const list = $('consults-list');
+      if (error) { list.innerHTML = `<div style="color:red">${esc(error.message)}</div>`; return; }
+      if (!data?.length) {
+        list.innerHTML = `<div class="empty-state">
+          <div class="icon">⚖️</div>
+          <p>Vous n'avez pas encore posé de question.<br>Utilisez le formulaire ci-dessus pour commencer.</p>
+        </div>`;
+        return;
+      }
+
+      list.innerHTML = data.map(c => {
+        const s = STATUT_CFG[c.statut] || STATUT_CFG.recue;
+        const date = new Date(c.created_at).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+        const qShort = (c.question || '').substring(0, 200) + ((c.question||'').length > 200 ? '…' : '');
+        const docs = c.documents || [];
+        return `
+        <div class="consult-card">
+          <div class="consult-head" onclick="toggleConsult('${c.id}')">
+            <div class="status-dot" style="background:${s.dot}"></div>
+            <div class="consult-meta">
+              <div class="consult-date">${date}</div>
+              <div class="consult-q">${esc(qShort)}</div>
+            </div>
+            <span class="status-badge" style="color:${s.color};background:${s.bg}">${s.label}</span>
+          </div>
+          <div class="consult-body" id="consult-body-${c.id}" style="display:none">
+
+            ${docs.length ? `<div class="consult-body-section">
+              <div class="section-label-sm">Documents joints</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                ${docs.map(d => `<a href="${esc(d.url)}" target="_blank" style="font-size:.76rem;color:var(--blue);border:1px solid var(--line);border-radius:6px;padding:4px 10px;text-decoration:none">📎 ${esc(d.name)}</a>`).join('')}
+              </div>
+            </div>` : ''}
+
+            ${c.statut === 'terminee' || c.synthese ? `
+            <div class="consult-body-section">
+              <div class="section-label-sm">Synthèse de la réponse</div>
+              ${c.synthese
+                ? `<div class="synthese-box">${esc(c.synthese)}</div>
+                   ${c.pdf_url ? `<a href="${esc(c.pdf_url)}" target="_blank" class="btn-dl">📥 Télécharger le PDF complet</a>` : ''}`
+                : '<div style="color:var(--muted);font-size:.85rem">La synthèse sera disponible ici dès que prête.</div>'
+              }
+            </div>` : `
+            <div class="consult-body-section">
+              <div style="display:flex;align-items:center;gap:10px;padding:12px;background:#fffbeb;border-radius:10px;border:1px solid #fde68a">
+                <div style="font-size:1.4rem">${statusEmoji(c.statut)}</div>
+                <div style="font-size:.84rem;color:#92400e;line-height:1.5">${statusMessage(c.statut)}</div>
+              </div>
+            </div>`}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function statusEmoji(s) {
+      return { recue:'📬', prete:'🔍', en_cours:'⚖️', doctrine_repondu:'✍️' }[s] || '⏳';
+    }
+    function statusMessage(s) {
+      return {
+        recue:            'Votre question a bien été reçue. Nous allons l\'anonymiser et la transmettre à Doctrine.fr.',
+        prete:            'Question anonymisée et mise en file. Un opérateur va la traiter prochainement.',
+        en_cours:         'Votre question est en cours de traitement sur Doctrine.fr.',
+        doctrine_repondu: 'La réponse Doctrine a été reçue. Notre IA prépare la synthèse…',
+      }[s] || 'En cours de traitement…';
+    }
+
+    window.toggleConsult = function(id) {
+      const body = $('consult-body-' + id);
+      body.style.display = body.style.display === 'none' ? 'block' : 'none';
+    };
+
+    init();
+  })();
+  </script>
+  <script src="auth-header.js"></script>
+</body>
+</html>

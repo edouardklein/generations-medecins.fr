@@ -378,6 +378,11 @@
         <span class="icon">📨</span><span>Communication</span>
       </button>
 
+      <div class="sidebar-section-label">Juridique</div>
+      <button class="sidebar-link" onclick="showSection('doctrine')" id="nav-doctrine">
+        <span class="icon">⚖️</span><span>Consultations Doctrine</span>
+      </button>
+
       <div class="sidebar-section-label">Navigation</div>
       <a class="sidebar-link" href="espace-membre.html">
         <span class="icon">👤</span><span>Mon espace</span>
@@ -701,6 +706,35 @@
           <div style="font-size:2.4rem;margin-bottom:12px">📭</div>
           <div style="font-weight:700;font-size:1rem;margin-bottom:6px">Aucun courrier en mass-mailing</div>
           <div style="font-size:0.82rem">Les adhérents basculent leurs courriers depuis l'éditeur (bouton 📣).</div>
+        </div>
+      </div>
+
+      <!-- Section: Doctrine (consultations juridiques) -->
+      <div id="section-doctrine" class="section-panel">
+        <div class="main-header">
+          <div class="main-title">Consultations juridiques Doctrine</div>
+          <div class="main-sub">File de traitement des questions envoyées par les adhérents — réponses via Doctrine.fr</div>
+        </div>
+
+        <!-- Filtres & stats -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap">
+          <select id="doctrine-filter" class="filter-select" onchange="loadDoctrine()">
+            <option value="">Toutes</option>
+            <option value="recue">Reçues</option>
+            <option value="prete">Prêtes (à traiter)</option>
+            <option value="en_cours">En cours</option>
+            <option value="doctrine_repondu">Réponse reçue</option>
+            <option value="terminee">Terminées</option>
+          </select>
+          <button class="btn-csv" onclick="loadDoctrine()">↻ Actualiser</button>
+          <div id="doctrine-stats" style="margin-left:auto;font-size:.82rem;color:var(--muted)"></div>
+        </div>
+
+        <div id="doctrine-list" style="display:flex;flex-direction:column;gap:16px"></div>
+        <div id="doctrine-empty" style="display:none;text-align:center;padding:64px;color:var(--muted)">
+          <div style="font-size:2.4rem;margin-bottom:12px">⚖️</div>
+          <div style="font-weight:700;font-size:1rem;margin-bottom:6px">Aucune consultation</div>
+          <div style="font-size:0.82rem">Les adhérents posent leurs questions depuis leur espace membre.</div>
         </div>
       </div>
 
@@ -1235,6 +1269,7 @@
     if (id === 'communication') { loadBrevoLists(); initNlPreview(); }
     if (id === 'veille') { loadVeille(); }
     if (id === 'mass-mailing') { loadMassMailing(); }
+    if (id === 'doctrine') { loadDoctrine(); }
   };
 
   // ── Logout ──────────────────────────────────────────────────
@@ -2570,6 +2605,311 @@
     if (error) { toast('Erreur : ' + error.message, 'error'); return; }
     toast('Courrier retiré du mass-mailing');
     loadMassMailing();
+  };
+
+  // ── Consultations Doctrine ─────────────────────────────────────
+
+  const DOCTRINE_STATUT_LABELS = {
+    recue:            { label: 'Reçue',            color: '#6b7a8d', bg: '#f5f7fb' },
+    prete:            { label: 'Prête à traiter',  color: '#1a7a86', bg: '#e8f7f8' },
+    en_cours:         { label: 'En cours',          color: '#d97706', bg: '#fef3c7' },
+    doctrine_repondu: { label: 'Réponse reçue',    color: '#2563eb', bg: '#eff6ff' },
+    terminee:         { label: 'Terminée',          color: '#16a34a', bg: '#f0fdf4' },
+    archivee:         { label: 'Archivée',          color: '#94a3b8', bg: '#f8fafc' },
+  };
+
+  function doctrineStatutBadge(s) {
+    const d = DOCTRINE_STATUT_LABELS[s] || { label: s, color: '#6b7a8d', bg: '#f5f7fb' };
+    return `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;color:${d.color};background:${d.bg}">${d.label}</span>`;
+  }
+
+  async function loadDoctrine() {
+    const list  = document.getElementById('doctrine-list');
+    const empty = document.getElementById('doctrine-empty');
+    const stats = document.getElementById('doctrine-stats');
+    const filtre = document.getElementById('doctrine-filter').value;
+
+    list.innerHTML = '<div style="color:var(--muted);padding:24px">Chargement…</div>';
+
+    let q = sb.from('consultations_juridiques')
+      .select('*, membre:membre_id(prenom,nom,email)')
+      .order('created_at', { ascending: false });
+    if (filtre) q = q.eq('statut', filtre);
+
+    const { data, error } = await q;
+    if (error) { list.innerHTML = `<div style="color:red">${esc(error.message)}</div>`; return; }
+
+    const all = data || [];
+    const counts = {};
+    all.forEach(c => { counts[c.statut] = (counts[c.statut] || 0) + 1; });
+    stats.textContent = `Total : ${all.length} | ` +
+      Object.entries(counts).map(([s, n]) => `${DOCTRINE_STATUT_LABELS[s]?.label || s} : ${n}`).join(' · ');
+
+    if (!all.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+
+    list.innerHTML = all.map(c => {
+      const m = c.membre || {};
+      const date = new Date(c.created_at).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' });
+      const qShort = (c.question || '').substring(0, 180) + ((c.question || '').length > 180 ? '…' : '');
+      return `
+      <div class="card" id="doctrine-card-${c.id}" style="padding:0;overflow:visible">
+        <div style="padding:18px 20px;display:flex;align-items:flex-start;gap:14px;cursor:pointer"
+             onclick="toggleDoctrineCard('${c.id}')">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+              ${doctrineStatutBadge(c.statut)}
+              <span style="font-size:.78rem;color:var(--muted)">${esc(m.prenom||'')} ${esc(m.nom||'')} — ${date}</span>
+              ${c.question_reformulee ? '<span style="font-size:.72rem;background:#f0fdf4;color:#16a34a;padding:2px 8px;border-radius:10px;font-weight:700">✓ Reformulée</span>' : ''}
+              ${c.pdf_url ? '<span style="font-size:.72rem;background:#eff6ff;color:#2563eb;padding:2px 8px;border-radius:10px;font-weight:700">PDF prêt</span>' : ''}
+            </div>
+            <div style="font-size:.88rem;color:var(--ink);line-height:1.5">${esc(qShort)}</div>
+          </div>
+          <div style="font-size:1.2rem;color:var(--muted);flex-shrink:0" id="doctrine-arrow-${c.id}">▸</div>
+        </div>
+        <div id="doctrine-detail-${c.id}" style="display:none;border-top:1.5px solid var(--line);padding:20px">
+          ${renderDoctrineDetail(c)}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderDoctrineDetail(c) {
+    const m = c.membre || {};
+    const docs = (c.documents || []);
+    return `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:6px">Adhérent</div>
+          <div style="font-size:.88rem">${esc(m.prenom||'')} ${esc(m.nom||'')} — <a href="mailto:${esc(m.email||'')}" style="color:var(--blue)">${esc(m.email||'')}</a></div>
+        </div>
+        <div>
+          <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:6px">Statut</div>
+          <select onchange="doctrineSetStatut('${c.id}', this.value)" style="border:1.5px solid var(--line);border-radius:8px;padding:5px 10px;font-size:.82rem;font-family:inherit">
+            ${Object.entries(DOCTRINE_STATUT_LABELS).map(([v,l]) =>
+              `<option value="${v}" ${c.statut===v?'selected':''}>${l.label}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <!-- Question originale -->
+      <div style="margin-top:18px">
+        <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:6px">Question originale</div>
+        <div style="background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:14px;font-size:.88rem;line-height:1.6;white-space:pre-wrap">${esc(c.question||'')}</div>
+        ${docs.length ? `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">${docs.map(d=>`<a href="${esc(d.url)}" target="_blank" style="font-size:.76rem;color:var(--blue);border:1px solid var(--line);border-radius:6px;padding:3px 8px">📎 ${esc(d.name)}</a>`).join('')}</div>` : ''}
+      </div>
+
+      <!-- Question reformulée -->
+      <div style="margin-top:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700">Requête pour Doctrine (anonymisée)</div>
+          ${c.question_reformulee ? '' : `<button class="btn-action" onclick="doctrineReformuler('${c.id}')" style="font-size:.75rem;padding:4px 10px">⚡ Reformuler maintenant</button>`}
+        </div>
+        ${c.question_reformulee
+          ? `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;font-size:.88rem;line-height:1.6;white-space:pre-wrap" id="doctrine-reformulee-${c.id}">${esc(c.question_reformulee)}</div>
+             <div style="display:flex;gap:8px;margin-top:8px">
+               <button class="btn-action" onclick="doctrineCopier('${c.id}')" style="font-size:.78rem">📋 Copier pour Doctrine</button>
+               <a href="https://www.doctrine.fr" target="_blank" class="btn-action" style="font-size:.78rem;text-decoration:none">→ Ouvrir Doctrine.fr</a>
+             </div>`
+          : `<div style="color:var(--muted);font-size:.84rem;font-style:italic">Non encore reformulée. Cliquez sur "Reformuler maintenant" ci-dessus.</div>`}
+      </div>
+
+      <!-- Réponse Doctrine -->
+      <div style="margin-top:18px">
+        <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:6px">Réponse Doctrine (à coller ici)</div>
+        <textarea id="doctrine-reponse-${c.id}" rows="8"
+          style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px;font-family:inherit;font-size:.85rem;line-height:1.6;resize:vertical;outline:none"
+          placeholder="Collez ici la réponse copiée depuis Doctrine.fr…">${esc(c.reponse_doctrine||'')}</textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn-action btn-primary" onclick="doctrineSynthetiser('${c.id}')" style="font-size:.82rem">✨ Synthétiser + générer PDF</button>
+          <button class="btn-action" onclick="doctrineEnCours('${c.id}')" style="font-size:.78rem">⏳ Marquer "en cours"</button>
+        </div>
+      </div>
+
+      <!-- Synthèse générée -->
+      ${c.synthese ? `
+      <div style="margin-top:18px">
+        <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:6px">Synthèse IA</div>
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;font-size:.85rem;line-height:1.7;white-space:pre-wrap">${esc(c.synthese)}</div>
+        ${c.pdf_url ? `<div style="margin-top:8px"><a href="${esc(c.pdf_url)}" target="_blank" class="btn-action btn-primary" style="font-size:.78rem;text-decoration:none">📥 Télécharger le PDF</a></div>` : ''}
+      </div>` : ''}
+
+      <!-- Note opérateur -->
+      <div style="margin-top:18px">
+        <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:6px">Note interne (opérateur)</div>
+        <textarea id="doctrine-note-${c.id}" rows="2"
+          style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px;font-family:inherit;font-size:.82rem;resize:vertical;outline:none"
+          placeholder="Note pour vous seul, non visible par l'adhérent…">${esc(c.note_operateur||'')}</textarea>
+        <button class="btn-action" onclick="doctrineNoteEnregistrer('${c.id}')" style="font-size:.76rem;margin-top:6px">💾 Enregistrer la note</button>
+      </div>`;
+  }
+
+  window.toggleDoctrineCard = function(id) {
+    const det = document.getElementById('doctrine-detail-' + id);
+    const arr = document.getElementById('doctrine-arrow-' + id);
+    const open = det.style.display !== 'none';
+    det.style.display = open ? 'none' : 'block';
+    arr.textContent = open ? '▸' : '▾';
+  };
+
+  window.doctrineSetStatut = async function(id, statut) {
+    const { error } = await sb.from('consultations_juridiques').update({ statut }).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Statut mis à jour');
+  };
+
+  window.doctrineEnCours = async function(id) {
+    const reponse = document.getElementById('doctrine-reponse-' + id)?.value.trim();
+    const upd = { statut: 'en_cours' };
+    if (reponse) upd.reponse_doctrine = reponse;
+    const { error } = await sb.from('consultations_juridiques').update(upd).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Marqué en cours');
+  };
+
+  window.doctrineCopier = function(id) {
+    const el = document.getElementById('doctrine-reformulee-' + id);
+    if (!el) return;
+    navigator.clipboard.writeText(el.textContent);
+    toast('✓ Requête copiée dans le presse-papiers');
+  };
+
+  window.doctrineReformuler = async function(id) {
+    const { data: c, error: loadErr } = await sb.from('consultations_juridiques')
+      .select('id, question, membre_id').eq('id', id).single();
+    if (loadErr || !c) { toast('Consultation introuvable', 'error'); return; }
+    toast('Reformulation en cours…');
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const res = await fetch('/.netlify/functions/reformuler-question', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: c.question, membreId: c.membre_id, consultationId: c.id }),
+      });
+      const out = await res.json();
+      if (!res.ok) throw new Error(out.error || res.status);
+      toast('✓ Question reformulée');
+      loadDoctrine();
+    } catch(e) { toast('Erreur : ' + e.message, 'error'); }
+  };
+
+  window.doctrineSynthetiser = async function(id) {
+    const repEl = document.getElementById('doctrine-reponse-' + id);
+    const reponse = repEl?.value.trim();
+    if (!reponse) { toast('Collez d\'abord la réponse Doctrine ci-dessus', 'error'); return; }
+    toast('Synthèse en cours… (peut prendre 15-20 secondes)');
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const res = await fetch('/.netlify/functions/synthetiser-doctrine', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ consultationId: id, reponseDoctrine: reponse }),
+      });
+      const out = await res.json();
+      if (!res.ok) throw new Error(out.error || res.status);
+      toast('✓ Synthèse générée — génération du PDF…');
+      // PDF côté client
+      await doctrineGenererPdf(id, out.synthese);
+      loadDoctrine();
+    } catch(e) { toast('Erreur : ' + e.message, 'error'); }
+  };
+
+  async function doctrineGenererPdf(consultationId, synthese) {
+    if (!window.jspdf) {
+      // Charge jsPDF si pas déjà présent
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        s.onload = res; s.onerror = rej; document.head.appendChild(s);
+      });
+    }
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4' });
+    const margin = 20;
+    const pageW = pdf.internal.pageSize.getWidth();
+    const maxW = pageW - margin * 2;
+
+    // En-tête
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(16);
+    pdf.setTextColor(26, 74, 128);
+    pdf.text('Générations Médecins Île-de-France', margin, margin);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(10);
+    pdf.setTextColor(107, 122, 141);
+    pdf.text('Consultation juridique — Doctrine.fr', margin, margin + 7);
+    pdf.text(`Générée le ${new Date().toLocaleDateString('fr-FR')}`, margin, margin + 13);
+
+    pdf.setDrawColor(232, 237, 244);
+    pdf.line(margin, margin + 17, pageW - margin, margin + 17);
+
+    // Corps
+    pdf.setFontSize(11);
+    pdf.setTextColor(26, 35, 50);
+    pdf.setFont('helvetica', 'normal');
+    let y = margin + 24;
+
+    const lines = synthese.split('\n');
+    lines.forEach(line => {
+      if (y > 270) { pdf.addPage(); y = margin; }
+      if (line.startsWith('## ')) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(12);
+        pdf.setTextColor(26, 74, 128);
+        const wrapped = pdf.splitTextToSize(line.replace('## ', ''), maxW);
+        pdf.text(wrapped, margin, y);
+        y += wrapped.length * 6 + 3;
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(11);
+        pdf.setTextColor(26, 35, 50);
+      } else if (line.startsWith('- ') || line.startsWith('• ')) {
+        const wrapped = pdf.splitTextToSize('• ' + line.replace(/^[-•]\s*/, ''), maxW - 5);
+        wrapped.forEach((l, i) => {
+          if (y > 270) { pdf.addPage(); y = margin; }
+          pdf.text(l, margin + (i === 0 ? 0 : 4), y);
+          y += 5.5;
+        });
+      } else if (line.trim()) {
+        const wrapped = pdf.splitTextToSize(line, maxW);
+        wrapped.forEach(l => {
+          if (y > 270) { pdf.addPage(); y = margin; }
+          pdf.text(l, margin, y);
+          y += 5.5;
+        });
+        y += 2;
+      } else { y += 3; }
+    });
+
+    // Bas de page
+    const totalPages = pdf.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(8); pdf.setTextColor(180, 180, 180);
+      pdf.text(`Ce document est fourni à titre indicatif et ne constitue pas un avis juridique — ${i}/${totalPages}`, margin, 290);
+    }
+
+    const blob = pdf.output('blob');
+    // Upload dans Supabase Storage
+    const path = `doctrine/${consultationId}.pdf`;
+    const { data: upd, error: upErr } = await sb.storage.from('consultations').upload(path, blob, {
+      contentType: 'application/pdf', upsert: true,
+    });
+    if (upErr) { toast('PDF généré mais erreur upload : ' + upErr.message, 'error'); return; }
+    const { data: { publicUrl } } = sb.storage.from('consultations').getPublicUrl(path);
+    await sb.from('consultations_juridiques').update({ pdf_url: publicUrl }).eq('id', consultationId);
+    toast('✓ PDF généré et sauvegardé');
+    // Téléchargement direct
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `consultation-${consultationId.slice(0,8)}.pdf`;
+    a.click();
+  }
+
+  window.doctrineNoteEnregistrer = async function(id) {
+    const note = document.getElementById('doctrine-note-' + id)?.value.trim();
+    const { error } = await sb.from('consultations_juridiques').update({ note_operateur: note }).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('Note enregistrée');
   };
 
   // ── Veille automatisée ──────────────────────────────────────────
