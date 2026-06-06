@@ -12,54 +12,79 @@
   <style>
     body { background: #eef3f8; }
 
-    /* Hero */
+    /* ── Hero bleu ──────────────────────────────────────────────────────────── */
     .greve-hero {
-      background: linear-gradient(135deg, #7a1420, #b91c1c, #dc2626);
+      background: linear-gradient(150deg, #0d1b4b 0%, #1a3a8a 55%, #2563eb 100%);
       color: #fff; padding: 54px 0 46px; text-align: center; position: relative; overflow: hidden;
     }
-    .greve-hero::after {
-      content:''; position:absolute; inset:0;
-      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.12), transparent 60%);
+    .greve-hero::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0px, rgba(255,255,255,.03) 1px, transparent 1px, transparent 60px),
+        radial-gradient(ellipse at 70% 0%, rgba(96,165,250,.25) 0%, transparent 60%),
+        radial-gradient(ellipse at 10% 100%, rgba(30,64,175,.4) 0%, transparent 50%);
     }
     .greve-hero-inner { max-width: 760px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
-    .greve-hero h1 { font-size: 2.5rem; font-weight: 900; letter-spacing: -.03em; margin-bottom: 10px; }
-    .greve-hero .accroche { font-size: 1rem; color: rgba(255,255,255,.9); line-height: 1.6; max-width: 600px; margin: 0 auto 26px; }
-    .greve-dates { display:inline-block; font-size:.82rem; font-weight:700; background:rgba(255,255,255,.15); padding:6px 16px; border-radius:999px; margin-bottom:24px; }
+    .greve-hero h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: -.035em; margin-bottom: 10px; }
+    .greve-hero .accroche { font-size: 1rem; color: rgba(255,255,255,.88); line-height: 1.6; max-width: 600px; margin: 0 auto 26px; }
+    .greve-dates { display:inline-block; font-size:.82rem; font-weight:700; background:rgba(255,255,255,.12); padding:6px 16px; border-radius:999px; margin-bottom:24px; border:1px solid rgba(255,255,255,.18); }
 
     /* Compteur */
     .counter-box { display:flex; flex-direction:column; align-items:center; gap:6px; margin-bottom:8px; }
-    .counter-num { font-size: 3.6rem; font-weight: 900; letter-spacing: -.04em; line-height: 1; }
-    .counter-label { font-size: .9rem; color: rgba(255,255,255,.85); font-weight: 600; }
+    .counter-num { font-size: 3.8rem; font-weight: 900; letter-spacing: -.04em; line-height: 1; }
+    .counter-label { font-size: .9rem; color: rgba(255,255,255,.8); font-weight: 600; }
     .progress-wrap { max-width: 460px; margin: 18px auto 0; }
-    .progress-track { height: 12px; background: rgba(255,255,255,.2); border-radius: 999px; overflow: hidden; }
-    .progress-fill { height: 100%; background: #fff; border-radius: 999px; transition: width 1s ease-out; width: 0; }
-    .progress-meta { display:flex; justify-content:space-between; font-size:.74rem; color:rgba(255,255,255,.8); margin-top:6px; }
+    .progress-track { height: 10px; background: rgba(255,255,255,.18); border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg,#60a5fa,#fff); border-radius: 999px; transition: width 1.2s cubic-bezier(.22,.61,.36,1); width: 0; }
+    .progress-meta { display:flex; justify-content:space-between; font-size:.74rem; color:rgba(255,255,255,.7); margin-top:6px; }
 
     .hero-cta-row { display:flex; gap:12px; justify-content:center; margin-top:28px; flex-wrap:wrap; }
     .btn-hero {
-      background:#fff; color:#b91c1c; border:none; border-radius:999px; padding:14px 30px;
-      font-family:inherit; font-size:.95rem; font-weight:800; cursor:pointer; transition:transform .12s, box-shadow .12s;
+      background:rgba(255,255,255,.12); color:#fff; border:1.5px solid rgba(255,255,255,.35);
+      border-radius:999px; padding:14px 28px; font-family:inherit; font-size:.95rem; font-weight:700;
+      cursor:pointer; transition:all .15s; backdrop-filter:blur(4px);
     }
-    .btn-hero:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,.18); }
-    .btn-hero.ghost { background:rgba(255,255,255,.12); color:#fff; border:1.5px solid rgba(255,255,255,.4); }
+    .btn-hero:hover { background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.6); transform:translateY(-1px); }
+    .btn-hero.primary { background:#fff; color:#1a3a8a; border-color:#fff; }
+    .btn-hero.primary:hover { background:#eff6ff; transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.2); }
 
-    .closed-banner { background:rgba(0,0,0,.18); border-radius:12px; padding:14px 18px; font-size:.88rem; margin-top:18px; }
+    .closed-banner { background:rgba(0,0,0,.2); backdrop-filter:blur(4px); border-radius:12px; border:1px solid rgba(255,255,255,.15); padding:14px 18px; font-size:.88rem; margin-top:18px; }
 
     /* Conteneur */
     .page-inner { max-width: 880px; margin: 0 auto; padding: 44px 24px 80px; }
     .section-title { font-size:1.4rem; font-weight:900; color:var(--ink); margin-bottom:6px; letter-spacing:-.02em; }
     .section-sub { font-size:.9rem; color:var(--muted); margin-bottom:24px; }
 
+    /* Pré-remplissage */
+    .prefill-banner {
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      background:linear-gradient(135deg,#eff6ff,#e0f2fe); border:1px solid #bfdbfe;
+      border-radius:14px; padding:14px 18px; margin-bottom:20px; font-size:.86rem; color:#1e40af;
+    }
+    .prefill-banner strong { font-weight:700; }
+    .prefill-banner-btns { display:flex; gap:8px; flex-shrink:0; }
+    .btn-prefill { font-size:.8rem; font-weight:700; padding:7px 14px; border-radius:999px; border:none; cursor:pointer; transition:all .12s; font-family:inherit; }
+    .btn-prefill.connect { background:#1a3a8a; color:#fff; }
+    .btn-prefill.connect:hover { background:#1e40af; }
+    .btn-prefill.adhere { background:#fff; color:#1a3a8a; border:1.5px solid #bfdbfe; }
+    .btn-prefill.adhere:hover { border-color:#1a3a8a; }
+
+    .prefill-success {
+      display:none; align-items:center; gap:10px;
+      background:#f0fdf4; border:1px solid #86efac; border-radius:14px; padding:12px 18px;
+      margin-bottom:20px; font-size:.85rem; color:#15803d; font-weight:600;
+    }
+
     /* Formulaire */
     .form-card { background:#fff; border-radius:18px; padding:32px 30px; box-shadow:0 2px 14px rgba(20,32,51,.07); margin-bottom:40px; }
     .field { margin-bottom:18px; }
     .field-label { font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px; display:block; }
-    .field-label .req { color:#dc2626; }
+    .field-label .req { color:#2563eb; }
     .field-input, .field-select {
       width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px;
       font-family:inherit; font-size:.92rem; outline:none; box-sizing:border-box; transition:border-color .15s; background:#fff;
     }
-    .field-input:focus, .field-select:focus { border-color:var(--blue); }
+    .field-input:focus, .field-select:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.1); }
     .field-hint { font-size:.76rem; color:var(--muted); margin-top:5px; line-height:1.5; }
     .field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     @media (max-width:560px){ .field-row { grid-template-columns:1fr; } }
@@ -67,9 +92,10 @@
     .rpps-status { font-size:.78rem; margin-top:6px; min-height:18px; color:var(--muted); }
     .rpps-status.ok  { color:#16a34a; font-weight:600; }
     .rpps-status.err { color:#dc2626; font-weight:600; }
+    .rpps-status.hash { color:#6366f1; font-weight:600; font-size:.72rem; word-break:break-all; }
 
-    .check-inline { display:flex; align-items:center; gap:8px; font-size:.86rem; color:var(--ink); cursor:pointer; }
-    .check-inline input { width:17px; height:17px; accent-color:var(--blue); }
+    .check-inline { display:flex; align-items:flex-start; gap:8px; font-size:.86rem; color:var(--ink); cursor:pointer; }
+    .check-inline input { width:17px; height:17px; accent-color:#2563eb; flex-shrink:0; margin-top:1px; }
 
     /* Mode d'exercice pills */
     .pill-row { display:flex; flex-wrap:wrap; gap:8px; }
@@ -77,38 +103,51 @@
       padding:9px 16px; border:1.5px solid var(--line); border-radius:999px; background:#fff;
       font-size:.85rem; font-weight:600; color:var(--ink); cursor:pointer; transition:all .12s;
     }
-    .pill:hover { border-color:var(--blue); }
-    .pill.sel { background:var(--blue); color:#fff; border-color:var(--blue); }
+    .pill:hover { border-color:#2563eb; }
+    .pill.sel { background:#2563eb; color:#fff; border-color:#2563eb; }
 
-    /* Motifs checkboxes */
+    /* Motifs */
     .motif-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     @media (max-width:560px){ .motif-grid { grid-template-columns:1fr; } }
     .motif-item {
       display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1.5px solid var(--line);
       border-radius:10px; cursor:pointer; font-size:.85rem; line-height:1.4; transition:all .12s;
     }
-    .motif-item:hover { border-color:var(--blue); background:#f8fbff; }
-    .motif-item.sel { border-color:var(--blue); background:#f0f6ff; }
-    .motif-item input { margin-top:2px; width:16px; height:16px; accent-color:var(--blue); flex-shrink:0; }
+    .motif-item:hover { border-color:#2563eb; background:#f8fbff; }
+    .motif-item.sel { border-color:#2563eb; background:#eff6ff; }
+    .motif-item input { margin-top:2px; width:16px; height:16px; accent-color:#2563eb; flex-shrink:0; }
 
-    .rgpd-box { background:#f8fafc; border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:20px 0; font-size:.8rem; color:var(--muted); line-height:1.6; }
-    .rgpd-box strong { color:var(--ink); }
+    /* Zone email/attestation */
+    .email-section { border:1.5px solid #e2e8f0; border-radius:14px; padding:20px; margin-top:20px; background:#fafbfc; }
+    .email-section-title { font-size:.88rem; font-weight:800; color:var(--ink); margin-bottom:6px; }
+    .email-section-desc { font-size:.8rem; color:var(--muted); line-height:1.6; margin-bottom:16px; }
 
-    .btn-submit-greve {
-      width:100%; background:linear-gradient(135deg,#dc2626,#b91c1c); color:#fff; border:none; border-radius:12px;
-      padding:16px; font-family:inherit; font-size:1rem; font-weight:800; cursor:pointer; transition:opacity .15s; margin-top:8px;
+    /* RGPD */
+    .rgpd-box {
+      background:#f0f7ff; border:1px solid #bfdbfe; border-radius:12px;
+      padding:16px 18px; margin:20px 0 0; font-size:.79rem; color:#1e3a8a; line-height:1.7;
     }
-    .btn-submit-greve:hover { opacity:.93; }
-    .btn-submit-greve:disabled { opacity:.5; cursor:not-allowed; }
+    .rgpd-box .rgpd-title { font-weight:800; font-size:.84rem; margin-bottom:6px; display:block; color:#1a3a8a; }
+    .rgpd-hash { font-family:monospace; font-size:.72rem; background:#dbeafe; padding:2px 6px; border-radius:4px; }
+
+    /* Submit */
+    .btn-submit-greve {
+      width:100%; background:linear-gradient(135deg,#1a3a8a,#2563eb); color:#fff; border:none;
+      border-radius:12px; padding:16px; font-family:inherit; font-size:1rem; font-weight:800;
+      cursor:pointer; transition:opacity .15s, transform .12s; margin-top:18px;
+      box-shadow:0 4px 14px rgba(37,99,235,.3);
+    }
+    .btn-submit-greve:hover { opacity:.92; transform:translateY(-1px); }
+    .btn-submit-greve:disabled { opacity:.5; cursor:not-allowed; transform:none; }
 
     /* Confirmation */
     .confirm-card { background:#fff; border-radius:18px; padding:40px 34px; text-align:center; box-shadow:0 2px 14px rgba(20,32,51,.07); }
     .confirm-card .big { font-size:3rem; margin-bottom:12px; }
     .confirm-card h2 { font-size:1.5rem; font-weight:900; color:var(--ink); margin-bottom:8px; }
-    .confirm-ref { display:inline-block; font-family:monospace; font-size:1rem; background:#f0f6ff; color:#1a4a80; padding:8px 16px; border-radius:8px; margin:14px 0; font-weight:700; letter-spacing:.05em; }
-    .adhesion-cta { background:linear-gradient(135deg,#2a6db8,#38a8b5); color:#fff; border-radius:14px; padding:22px; margin-top:26px; }
+    .confirm-ref { display:inline-block; font-family:monospace; font-size:1rem; background:#eff6ff; color:#1a3a8a; padding:8px 16px; border-radius:8px; margin:14px 0; font-weight:700; letter-spacing:.05em; border:1px solid #bfdbfe; }
+    .adhesion-cta { background:linear-gradient(135deg,#1a3a8a,#2563eb); color:#fff; border-radius:14px; padding:22px; margin-top:26px; }
     .adhesion-cta h3 { font-size:1.05rem; font-weight:800; margin-bottom:6px; }
-    .adhesion-cta p { font-size:.85rem; color:rgba(255,255,255,.9); margin-bottom:14px; line-height:1.55; }
+    .adhesion-cta p { font-size:.85rem; color:rgba(255,255,255,.88); margin-bottom:14px; line-height:1.55; }
 
     /* FAQ */
     .faq-item { background:#fff; border:1px solid var(--line); border-radius:12px; margin-bottom:10px; overflow:hidden; }
@@ -120,15 +159,16 @@
     .chev { transition:transform .2s; color:var(--muted); }
 
     .links-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
-    .link-chip { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1.5px solid var(--line); border-radius:999px; padding:8px 16px; font-size:.84rem; font-weight:600; color:var(--blue); text-decoration:none; transition:all .12s; }
-    .link-chip:hover { border-color:var(--blue); background:#f0f6ff; }
+    .link-chip { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1.5px solid var(--line); border-radius:999px; padding:8px 16px; font-size:.84rem; font-weight:600; color:#2563eb; text-decoration:none; transition:all .12s; }
+    .link-chip:hover { border-color:#2563eb; background:#eff6ff; }
 
     .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; padding:13px 24px; border-radius:10px; font-size:.88rem; font-weight:600; z-index:300; opacity:0; transition:opacity .25s; pointer-events:none; }
     .toast.show { opacity:1; }
     .toast.error { background:#c0392b; }
 
-    /* Attestation cachée (rendue en PDF) */
     #attestation-render { position:fixed; left:-9999px; top:0; width:794px; background:#fff; }
+
+    .divider { border:none; border-top:1px solid var(--line); margin:24px 0; }
   </style>
 </head>
 <body>
@@ -143,9 +183,11 @@
         <a href="decrypteurs.html">Les Décrypteurs</a>
         <a href="observatoire.html">Observatoire</a>
         <a href="plaidoyer.html">Plaidoyer</a>
-        <a href="greve.html" class="active">Médecins en Grève</a>
+        <a href="outils.html">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
         <a href="bureau.html">Bureau</a>
-        <a href="greve.html" style="color:#dc2626;font-weight:800;">✊ Grève</a>
+        <a href="greve.html" class="active" style="color:#2563eb;font-weight:800;">✊ Grève</a>
       </nav>
       <a href="connexion.html" id="header-login-link" style="font-size:.85rem;font-weight:700;color:var(--blue-dark);text-decoration:none;white-space:nowrap;">Se connecter</a>
       <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
@@ -161,7 +203,7 @@
 
       <div class="counter-box">
         <div class="counter-num" id="counter-num">—</div>
-        <div class="counter-label">médecins déjà mobilisés</div>
+        <div class="counter-label">médecins mobilisés</div>
       </div>
       <div class="progress-wrap" id="progress-wrap" style="display:none">
         <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
@@ -169,7 +211,7 @@
       </div>
 
       <div class="hero-cta-row" id="hero-cta">
-        <button class="btn-hero" onclick="scrollToForm()">Déclarer mon intention de grève</button>
+        <button class="btn-hero primary" onclick="scrollToForm()">✊ Déclarer ma grève</button>
       </div>
       <div class="closed-banner" id="closed-banner" style="display:none"></div>
     </div>
@@ -180,9 +222,23 @@
     <!-- FORMULAIRE -->
     <div id="form-section">
       <h2 class="section-title">Déclarer ma participation</h2>
-      <p class="section-sub">Votre identité professionnelle sert uniquement à vérifier votre inscription au RPPS et à éviter les doublons. <strong>Vos nom et prénom ne sont jamais conservés.</strong></p>
+      <p class="section-sub">Votre numéro RPPS est vérifié localement puis <strong>converti en empreinte anonyme irréversible</strong> — votre identité n'est jamais transmise ni stockée.</p>
+
+      <!-- Bannière pré-remplissage (non connecté) -->
+      <div class="prefill-banner" id="prefill-banner">
+        <span>💡 <strong>Adhérent GM ?</strong> Connectez-vous pour pré-remplir le formulaire en 1 clic.</span>
+        <div class="prefill-banner-btns">
+          <a href="connexion.html?next=greve.html" class="btn-prefill connect">Se connecter</a>
+          <a href="adherer.html" class="btn-prefill adhere">Adhérer</a>
+        </div>
+      </div>
+      <!-- Confirmation pré-remplissage (connecté) -->
+      <div class="prefill-success" id="prefill-success">
+        ✓ <span id="prefill-success-text">Formulaire pré-rempli depuis votre profil</span>
+      </div>
 
       <div class="form-card">
+        <!-- RPPS -->
         <div class="field-row">
           <div class="field">
             <label class="field-label">Numéro RPPS <span class="req" id="rpps-req">*</span></label>
@@ -193,36 +249,69 @@
               <span>Je suis interne / externe sans RPPS</span>
             </label>
           </div>
-          <div class="field">
-            <label class="field-label">Nom d'exercice <span class="req">*</span></label>
-            <input class="field-input" id="f-nom" placeholder="Pour vérification RPPS — non stocké">
-            <label class="field-label" style="margin-top:14px">Prénom d'exercice <span class="req">*</span></label>
-            <input class="field-input" id="f-prenom" placeholder="Pour vérification RPPS — non stocké">
+          <div class="field" style="display:flex;flex-direction:column;justify-content:flex-end">
+            <div class="field-hint" style="background:#fafbfc;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:.78rem;line-height:1.6;color:var(--muted)">
+              🔐 Votre RPPS est vérifié contre l'Annuaire Santé puis converti localement en empreinte anonyme (SHA-256). Seule cette empreinte est transmise — votre identité reste sur votre appareil.
+            </div>
           </div>
         </div>
 
+        <hr class="divider">
+
+        <!-- Spécialité + CP -->
         <div class="field-row">
           <div class="field">
             <label class="field-label">Spécialité</label>
             <select class="field-select" id="f-specialite">
               <option value="">Choisissez…</option>
-              <option>Médecine générale</option>
-              <option>Pédiatrie</option>
-              <option>Psychiatrie</option>
-              <option>Cardiologie</option>
-              <option>Dermatologie</option>
-              <option>Gynécologie</option>
-              <option>Ophtalmologie</option>
-              <option>ORL</option>
-              <option>Radiologie</option>
-              <option>Anesthésie-réanimation</option>
-              <option>Chirurgie</option>
-              <option>Rhumatologie</option>
-              <option>Gastro-entérologie</option>
-              <option>Endocrinologie</option>
-              <option>Néphrologie</option>
-              <option>Pneumologie</option>
-              <option>Autre spécialité</option>
+              <optgroup label="── Disciplines médicales">
+                <option>Allergologie</option>
+                <option>Anatomie et cytologie pathologique</option>
+                <option>Anesthésie-réanimation</option>
+                <option>Cardiologie</option>
+                <option>Dermatologie</option>
+                <option>Endocrinologie - Nutrition</option>
+                <option>Génétique médicale</option>
+                <option>Gériatrie</option>
+                <option>Gynécologie médicale</option>
+                <option>Hématologie</option>
+                <option>Hépato-gastro-entérologie</option>
+                <option>Maladies infectieuses et tropicales</option>
+                <option>Médecine du travail</option>
+                <option>Médecine générale</option>
+                <option>Médecine interne</option>
+                <option>Médecine nucléaire</option>
+                <option>Médecine physique et réadaptation</option>
+                <option>Médecine d'urgence</option>
+                <option>Néphrologie</option>
+                <option>Neurologie</option>
+                <option>Oncologie</option>
+                <option>Pédiatrie</option>
+                <option>Pneumologie</option>
+                <option>Psychiatrie</option>
+                <option>Radiologie</option>
+                <option>Réanimation médicale</option>
+                <option>Rhumatologie</option>
+                <option>Santé publique</option>
+              </optgroup>
+              <optgroup label="── Disciplines chirurgicales">
+                <option>Chirurgie esthétique, plastique et reconstructrice</option>
+                <option>Chirurgie maxillo-faciale et stomatologie</option>
+                <option>Chirurgie pédiatrique</option>
+                <option>Chirurgie thoracique et cardiovasculaire</option>
+                <option>Chirurgie vasculaire</option>
+                <option>Chirurgie viscérale et digestive</option>
+                <option>Gynécologie-obstétrique</option>
+                <option>Médecine légale et expertise médicale</option>
+                <option>Neurochirurgie</option>
+                <option>Ophtalmologie</option>
+                <option>ORL et chirurgie cervico-faciale</option>
+                <option>Orthopédie-traumatologie</option>
+                <option>Urologie</option>
+              </optgroup>
+              <optgroup label="── Biologie">
+                <option>Biologie médicale</option>
+              </optgroup>
             </select>
           </div>
           <div class="field">
@@ -231,54 +320,68 @@
           </div>
         </div>
 
+        <!-- Mode exercice -->
         <div class="field">
-          <label class="field-label">Mode d'exercice <span style="font-weight:400;text-transform:none;color:var(--muted)">(optionnel — pour nos statistiques)</span></label>
+          <label class="field-label">Mode d'exercice <span style="font-weight:400;text-transform:none;color:var(--muted)">(optionnel)</span></label>
           <div class="pill-row" id="mode-pills">
             <div class="pill" data-mode="liberal">Libéral</div>
             <div class="pill" data-mode="hospitalier">Hospitalier (public)</div>
-            <div class="pill" data-mode="salarie">Salarié (CLCC, ESPIC, privé)</div>
+            <div class="pill" data-mode="salarie">Salarié</div>
             <div class="pill" data-mode="mixte">Mixte</div>
           </div>
         </div>
 
+        <!-- Motifs -->
         <div class="field">
-          <label class="field-label">Motifs de votre mobilisation <span style="font-weight:400;text-transform:none;color:var(--muted)">(optionnel)</span></label>
+          <label class="field-label">Motifs de mobilisation <span style="font-weight:400;text-transform:none;color:var(--muted)">(optionnel — plusieurs choix possibles)</span></label>
           <div class="motif-grid" id="motif-grid"></div>
         </div>
 
-        <div class="field-row">
-          <div class="field">
-            <label class="field-label">Adresse email <span style="font-weight:400;text-transform:none;color:var(--muted)">(pour recevoir l'attestation)</span></label>
-            <input class="field-input" id="f-email" type="email" placeholder="vous@exemple.fr">
+        <!-- Email / attestation -->
+        <div class="email-section">
+          <div class="email-section-title">📄 Recevoir votre attestation (optionnel)</div>
+          <div class="email-section-desc">
+            Renseignez votre email pour recevoir votre attestation de grève en PDF. Vous bénéficierez également des informations de GM sur les actions à venir. Si vous laissez ce champ vide, cela ne change en rien votre comptabilisation comme gréviste.
           </div>
-          <div class="field">
-            <label class="field-label">Téléphone <span style="font-weight:400;text-transform:none;color:var(--muted)">(optionnel)</span></label>
-            <input class="field-input" id="f-tel" type="tel" placeholder="06 12 34 56 78">
+          <div class="field-row" style="margin-bottom:12px">
+            <div class="field" style="margin-bottom:0">
+              <label class="field-label">Email</label>
+              <input class="field-input" id="f-email" type="email" placeholder="vous@exemple.fr">
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label class="field-label">Téléphone <span style="font-weight:400;text-transform:none;color:var(--muted)">(optionnel)</span></label>
+              <input class="field-input" id="f-tel" type="tel" placeholder="06 12 34 56 78">
+            </div>
           </div>
+          <label class="check-inline">
+            <input type="checkbox" id="f-wants-attestation" checked>
+            <span>Envoyer mon attestation de grève par email <span style="color:var(--muted);font-weight:400">(votre email ne sera pas conservé après envoi)</span></span>
+          </label>
         </div>
 
+        <!-- RGPD -->
         <div class="rgpd-box">
-          <strong>🔒 Protection de vos données (RGPD)</strong><br>
-          Le responsable de traitement est <strong>Générations Médecins Île-de-France</strong>. Votre numéro RPPS et vos coordonnées sont conservés uniquement pour comptabiliser la mobilisation et vous envoyer votre attestation. Vos nom et prénom ne sont pas stockés. Vous disposez d'un droit d'accès, de rectification et de suppression de vos données : <a href="mailto:contact@generations-medecins.fr">contact@generations-medecins.fr</a>.
-          <label class="check-inline" style="margin-top:12px">
-            <input type="checkbox" id="f-consent-info">
-            <span>J'accepte d'être tenu informé par email de l'évolution du mouvement et des actions de Générations Médecins (désinscription possible à tout moment).</span>
-          </label>
+          <span class="rgpd-title">🔒 Protection de vos données</span>
+          Le responsable de traitement est <strong>Générations Médecins</strong>. Nous n'utilisons ni cookies de traçage ni scripts tiers.<br>
+          Nous collectons uniquement ce qui est nécessaire pour comptabiliser les déclarations et, si vous le choisissez, pour vous recontacter.<br><br>
+          <strong>Le compteur est basé sur une empreinte anonyme</strong> (<span class="rgpd-hash">SHA-256</span>) calculée <em>localement dans votre navigateur</em> à partir de votre numéro RPPS — impossible à inverser. Votre identité ne quitte pas votre appareil.<br><br>
+          Vos coordonnées (email/téléphone) sont <strong>optionnelles et stockées séparément du compteur</strong>. Votre email est supprimé de notre base dès l'envoi de l'attestation.<br>
+          Vous pouvez corriger ou supprimer vos données en refaisant une déclaration : les nouvelles informations remplacent les précédentes. Contact RGPD : <a href="mailto:contact@generations-medecins.fr" style="color:#1a3a8a">contact@generations-medecins.fr</a>
         </div>
 
         <button class="btn-submit-greve" id="btn-submit" onclick="submitGreve()">✊ Je déclare ma participation</button>
       </div>
     </div>
 
-    <!-- CONFIRMATION (cachée au départ) -->
+    <!-- CONFIRMATION -->
     <div id="confirm-section" style="display:none">
       <div class="confirm-card">
         <div class="big">✊</div>
         <h2>Merci, votre participation est enregistrée !</h2>
-        <p style="color:var(--muted);font-size:.92rem;line-height:1.6">Vous faites désormais partie du mouvement. Votre attestation de grève vous a été envoyée par email<span id="confirm-email-extra"></span>.</p>
+        <p style="color:var(--muted);font-size:.92rem;line-height:1.6" id="confirm-msg">Vous faites désormais partie du mouvement.</p>
         <div class="confirm-ref" id="confirm-ref"></div>
-        <div>
-          <button class="btn btn-outline" onclick="downloadAttestation()">📄 Télécharger mon attestation</button>
+        <div style="margin-top:10px">
+          <button class="btn btn-outline" onclick="downloadAttestation()">📄 Télécharger mon attestation PDF</button>
         </div>
         <div class="adhesion-cta">
           <h3>💪 Amplifions notre voix ensemble</h3>
@@ -321,9 +424,7 @@
     </div>
   </footer>
 
-  <!-- Zone de rendu de l'attestation (invisible, capturée en PDF) -->
   <div id="attestation-render"></div>
-
   <div class="toast" id="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -349,7 +450,7 @@
     }
     function esc(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
 
-    // Référence unique lisible : GM-GREVE-2026-AB3K9 (même format que le serveur)
+    // Référence lisible côté client (même format que le serveur)
     function genRef() {
       const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
       let code = '';
@@ -357,21 +458,53 @@
       return `GM-GREVE-${new Date().getFullYear()}-${code}`;
     }
 
+    // ── Hachage RPPS côté client (privacy-by-design) ─────────────────────────
+    async function hashRpps(rpps) {
+      const key = rpps.trim() + '|' + campagne.id;
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(key));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
     window.scrollToForm = () => $('form-section').scrollIntoView({ behavior:'smooth' });
 
-    // ── Init : charge la campagne active ──────────────────────────────────────
+    // ── Init ─────────────────────────────────────────────────────────────────
     async function init() {
       const { data, error } = await sb.from('greve_campagnes')
         .select('*').eq('actif', true).order('created_at', { ascending:false }).limit(1);
       if (error || !data || !data.length) {
-        // Pas de campagne active → on prend la plus récente pour l'affichage, form fermé
         const { data: any } = await sb.from('greve_campagnes').select('*').order('created_at',{ascending:false}).limit(1);
         campagne = any && any[0];
         renderClosed();
-        return;
+      } else {
+        campagne = data[0];
+        renderCampagne();
       }
-      campagne = data[0];
-      renderCampagne();
+      tryPrefill();
+    }
+
+    // ── Pré-remplissage si connecté ───────────────────────────────────────────
+    async function tryPrefill() {
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) return; // bannière non-connecté reste visible
+        $('prefill-banner').style.display = 'none';
+        const { data: profile } = await sb.from('profiles')
+          .select('specialite, cp, modes_exercice, rpps')
+          .eq('id', session.user.id).single();
+        if (!profile) return;
+        if (profile.specialite) $('f-specialite').value = profile.specialite;
+        if (profile.cp)         $('f-cp').value = profile.cp;
+        if (profile.rpps)       { $('f-rpps').value = profile.rpps; onRppsInput(); }
+        if (profile.modes_exercice && profile.modes_exercice.length) {
+          const first = Array.isArray(profile.modes_exercice) ? profile.modes_exercice[0] : profile.modes_exercice;
+          document.querySelectorAll('#mode-pills .pill').forEach(p => {
+            if (p.dataset.mode === first) { p.classList.add('sel'); selectedMode = first; }
+          });
+        }
+        if (session.user.email) $('f-email').value = session.user.email;
+        $('prefill-success').style.display = 'flex';
+        $('prefill-success-text').textContent = 'Formulaire pré-rempli depuis votre profil — vérifiez et validez.';
+      } catch { /* silencieux */ }
     }
 
     function renderClosed() {
@@ -379,7 +512,7 @@
       $('counter-num').textContent = (campagne?.declaration_count || 0).toLocaleString('fr-FR');
       $('hero-cta').style.display = 'none';
       $('closed-banner').style.display = 'block';
-      $('closed-banner').textContent = '⏸ Les déclarations sont actuellement fermées. Revenez prochainement.';
+      $('closed-banner').innerHTML = '⏸ Les déclarations sont actuellement fermées. Revenez prochainement.';
       $('form-section').style.display = 'none';
       if (campagne) renderFaq();
     }
@@ -387,16 +520,11 @@
     function renderCampagne() {
       document.title = campagne.titre + ' — Générations Médecins';
       $('hero-accroche').textContent = campagne.accroche || '';
-
       if (campagne.date_debut && campagne.date_fin) {
         $('hero-dates').style.display = 'inline-block';
         $('hero-dates').textContent = '📅 Du ' + fmtDate(campagne.date_debut) + ' au ' + fmtDate(campagne.date_fin);
       }
-
-      // Compteur animé
       animateCounter($('counter-num'), campagne.declaration_count || 0);
-
-      // Jauge objectif
       if (campagne.objectif > 0) {
         $('progress-wrap').style.display = 'block';
         const pct = Math.min(100, Math.round((campagne.declaration_count / campagne.objectif) * 100));
@@ -404,30 +532,25 @@
         $('progress-current').textContent = (campagne.declaration_count||0).toLocaleString('fr-FR') + ' déclarés';
         $('progress-goal').textContent = 'Objectif : ' + campagne.objectif.toLocaleString('fr-FR');
       }
-
-      renderMotifs();
-      renderFaq();
-      renderLinks();
+      renderMotifs(); renderFaq(); renderLinks();
     }
 
     function fmtDate(d){ return new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}); }
 
     function animateCounter(el, target) {
       const dur = 1100, t0 = performance.now();
-      function step(t){
+      (function step(t){
         const p = Math.min(1, (t-t0)/dur);
-        const ease = 1 - Math.pow(1-p, 3);
-        el.textContent = Math.round(target*ease).toLocaleString('fr-FR');
+        el.textContent = Math.round(target*(1-Math.pow(1-p,3))).toLocaleString('fr-FR');
         if (p<1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
+      })(t0);
     }
 
     function renderMotifs() {
       const motifs = campagne.motifs || [];
       $('motif-grid').innerHTML = motifs.map(m => `
         <label class="motif-item" data-id="${esc(m.id)}">
-          <input type="checkbox" value="${esc(m.id)}" onchange="this.closest('.motif-item').classList.toggle('sel', this.checked)">
+          <input type="checkbox" value="${esc(m.id)}" onchange="this.closest('.motif-item').classList.toggle('sel',this.checked)">
           <span>${esc(m.label)}</span>
         </label>`).join('');
     }
@@ -451,17 +574,16 @@
         `<a class="link-chip" href="${esc(l.url)}" target="_blank" rel="noopener">📄 ${esc(l.label)}</a>`).join('');
     }
 
-    // ── Mode d'exercice pills ─────────────────────────────────────────────────
+    // ── Pills mode exercice ───────────────────────────────────────────────────
     document.querySelectorAll('#mode-pills .pill').forEach(p => {
       p.addEventListener('click', () => {
         const was = p.classList.contains('sel');
         document.querySelectorAll('#mode-pills .pill').forEach(x => x.classList.remove('sel'));
-        if (!was) { p.classList.add('sel'); selectedMode = p.dataset.mode; }
-        else selectedMode = null;
+        if (!was) { p.classList.add('sel'); selectedMode = p.dataset.mode; } else selectedMode = null;
       });
     });
 
-    // ── RPPS : interne toggle + vérif Annuaire Santé ──────────────────────────
+    // ── Toggle interne ────────────────────────────────────────────────────────
     window.toggleInterne = function() {
       const on = $('f-interne').checked;
       $('f-rpps').disabled = on;
@@ -471,6 +593,7 @@
       if (on) { $('f-rpps').value = ''; rppsVerified = false; }
     };
 
+    // ── Vérification RPPS (Annuaire Santé) ───────────────────────────────────
     let rppsTimer = null;
     window.onRppsInput = function() {
       const v = $('f-rpps').value.replace(/\D/g,'').slice(0,11);
@@ -494,17 +617,16 @@
         const data = await res.json();
         if (data.total > 0 || (data.entry && data.entry.length)) {
           rppsVerified = true;
-          st.textContent = '✓ RPPS vérifié dans l\'Annuaire Santé';
+          st.textContent = '✓ RPPS vérifié — empreinte calculée localement';
           st.className = 'rpps-status ok';
         } else {
           rppsVerified = false;
-          st.textContent = '⚠️ RPPS introuvable dans l\'Annuaire Santé. Vérifiez votre numéro.';
+          st.textContent = '⚠️ RPPS introuvable dans l\'Annuaire Santé.';
           st.className = 'rpps-status err';
         }
       } catch {
-        // Annuaire indisponible → on n'empêche pas, mais on prévient
-        rppsVerified = true; // best effort : la contrainte anti-doublon reste côté serveur
-        st.textContent = 'ℹ️ Annuaire momentanément indisponible — votre déclaration reste possible.';
+        rppsVerified = true;
+        st.textContent = 'ℹ️ Annuaire momentanément indisponible — déclaration possible.';
         st.className = 'rpps-status';
       }
     }
@@ -514,64 +636,65 @@
       if (!campagne) { toast('Aucune campagne active', true); return; }
       const interne = $('f-interne').checked;
       const rpps = $('f-rpps').value.replace(/\D/g,'');
-      const nom = $('f-nom').value.trim();
-      const prenom = $('f-prenom').value.trim();
       const email = $('f-email').value.trim();
+      const wantsAttestation = $('f-wants-attestation').checked;
 
       if (!interne && rpps.length < 8) { toast('Renseignez un numéro RPPS valide (ou cochez interne/externe)', true); return; }
-      if (!nom || !prenom) { toast('Nom et prénom requis pour la vérification', true); return; }
       if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast('Adresse email invalide', true); return; }
-      if (email === '' ) {
-        if (!confirm('Sans email, vous ne recevrez pas votre attestation de grève. Continuer quand même ?')) return;
-      }
 
       const motifs = Array.from(document.querySelectorAll('#motif-grid input:checked')).map(c => c.value);
       const cp = $('f-cp').value.replace(/\D/g,'').slice(0,5);
-
       const btn = $('btn-submit');
       btn.disabled = true; btn.textContent = '⏳ Enregistrement…';
 
       try {
-        // Génère la référence côté client → le PDF en pièce jointe et la confirmation
-        // affichent exactement le même numéro (le serveur valide ce format).
+        // 1. Hash RPPS localement — l'identité ne quitte pas le navigateur
+        const rppsHash = interne ? null : await hashRpps(rpps);
+
         const ref = genRef();
         lastRef = ref;
 
-        // Génère l'attestation PDF (mémorise lastPdfBlob pour le téléchargement local)
-        const pdfBase64 = await buildAttestationPdf({
-          ref, specialite: $('f-specialite').value, cp,
-        }, true);
+        // 2. Génère le PDF (pour pièce jointe email)
+        const pdfBase64 = (email && wantsAttestation)
+          ? await buildAttestationPdf({ ref, specialite: $('f-specialite').value, cp }, true)
+          : null;
 
+        // 3. Envoi au serveur (le RPPS brut ne part JAMAIS)
         const res = await fetch('/.netlify/functions/soumettre-greve', {
           method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({
             campagneId: campagne.id,
             ref,
-            rpps: interne ? null : rpps,
+            rppsHash,
             estInterne: interne,
             specialite: $('f-specialite').value || null,
             cp: cp || null,
             modeExercice: selectedMode,
             motifs,
-            email: email || null,
+            email: (email && wantsAttestation) ? email : null,
             tel: $('f-tel').value.trim() || null,
-            consentementInfo: $('f-consent-info').checked,
-            pdfBase64: email ? pdfBase64 : null,
+            wantsAttestation: !!(email && wantsAttestation),
+            pdfBase64,
           }),
         });
+
         const out = await res.json();
         if (!res.ok) { toast(out.error || 'Erreur', true); btn.disabled=false; btn.textContent='✊ Je déclare ma participation'; return; }
 
         lastRef = out.ref || ref;
-
-        // Affiche la confirmation
         $('form-section').style.display = 'none';
         $('confirm-section').style.display = 'block';
         $('confirm-ref').textContent = out.ref;
-        $('confirm-email-extra').textContent = email ? '' : ' (aucun email fourni — pensez à télécharger votre attestation ci-dessous)';
-        if (!out.emailEnvoye && email) {
-          $('confirm-email-extra').textContent = " (l'envoi par email a rencontré un souci — utilisez le téléchargement ci-dessous)";
+
+        let msg = 'Vous faites désormais partie du mouvement.';
+        if (email && wantsAttestation) {
+          msg += out.emailEnvoye
+            ? ' Votre attestation a été envoyée à ' + esc(email) + '.'
+            : " L'envoi de l'attestation a rencontré un souci — téléchargez-la ci-dessous.";
+        } else {
+          msg += ' Téléchargez votre attestation ci-dessous.';
         }
+        $('confirm-msg').innerHTML = msg;
         window.scrollTo({ top:0, behavior:'smooth' });
       } catch(e) {
         toast('Erreur réseau : ' + e.message, true);
@@ -579,38 +702,38 @@
       }
     };
 
-    // ── Génération de l'attestation PDF ───────────────────────────────────────
+    // ── PDF ───────────────────────────────────────────────────────────────────
     async function buildAttestationPdf(info, returnBase64) {
       const dateStr = new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
       const html = `
         <div style="width:794px;padding:60px 64px;font-family:Inter,Arial,sans-serif;color:#152033;box-sizing:border-box">
-          <div style="display:flex;align-items:center;gap:14px;border-bottom:3px solid #b91c1c;padding-bottom:18px;margin-bottom:34px">
-            <div style="width:54px;height:54px;border-radius:12px;background:linear-gradient(135deg,#2a6db8,#38a8b5);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:20px">GM</div>
+          <div style="display:flex;align-items:center;gap:14px;border-bottom:3px solid #1a3a8a;padding-bottom:18px;margin-bottom:34px">
+            <div style="width:54px;height:54px;border-radius:12px;background:linear-gradient(135deg,#1a3a8a,#2563eb);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:20px">GM</div>
             <div>
               <div style="font-size:20px;font-weight:900">Générations Médecins Île-de-France</div>
               <div style="font-size:13px;color:#64748b">Mouvement médical indépendant</div>
             </div>
           </div>
           <h1 style="font-size:26px;font-weight:900;text-align:center;margin:0 0 6px;letter-spacing:-.02em">ATTESTATION DE GRÈVE</h1>
-          <p style="text-align:center;color:#b91c1c;font-weight:700;font-size:14px;margin:0 0 40px">${esc(campagne.titre)}</p>
+          <p style="text-align:center;color:#1a3a8a;font-weight:700;font-size:14px;margin:0 0 40px">${esc(campagne.titre)}</p>
           <p style="font-size:15px;line-height:1.9;margin:0 0 24px">
-            Je soussigné(e), médecin inscrit(e) au Répertoire Partagé des Professionnels de Santé (RPPS),
-            déclare par la présente participer au mouvement de grève
+            Le porteur de cette attestation a déclaré sa participation au mouvement de grève
             <strong>« ${esc(campagne.titre)} »</strong>${campagne.date_debut ? ', à compter du <strong>'+fmtDate(campagne.date_debut)+'</strong>' : ''}.
           </p>
           <table style="width:100%;font-size:14px;border-collapse:collapse;margin:30px 0">
-            <tr><td style="padding:9px 0;color:#64748b;width:200px">Spécialité</td><td style="padding:9px 0;font-weight:600">${esc(info.specialite)||'—'}</td></tr>
+            <tr><td style="padding:9px 0;color:#64748b;width:220px">Spécialité</td><td style="padding:9px 0;font-weight:600">${esc(info.specialite)||'—'}</td></tr>
             <tr><td style="padding:9px 0;color:#64748b">Code postal d'exercice</td><td style="padding:9px 0;font-weight:600">${esc(info.cp)||'—'}</td></tr>
             <tr><td style="padding:9px 0;color:#64748b">Date de déclaration</td><td style="padding:9px 0;font-weight:600">${dateStr}</td></tr>
             <tr><td style="padding:9px 0;color:#64748b">Référence</td><td style="padding:9px 0;font-weight:700;font-family:monospace;letter-spacing:.04em">${esc(info.ref)}</td></tr>
           </table>
-          <div style="background:#fef2f2;border-left:4px solid #b91c1c;padding:16px 20px;border-radius:6px;font-size:13px;color:#7f1d1d;line-height:1.6;margin:30px 0">
-            Cette attestation est un document militant délivré par Générations Médecins Île-de-France. Elle témoigne de l'engagement de son porteur dans le mouvement social des médecins libéraux.
+          <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:16px 20px;border-radius:6px;font-size:13px;color:#1e3a8a;line-height:1.6;margin:30px 0">
+            Cette attestation est un document militant délivré par Générations Médecins Île-de-France. Elle témoigne de l'engagement de son porteur dans le mouvement social des médecins libéraux.<br>
+            <em style="font-size:12px;color:#3b82f6">Déclaration anonymisée — aucune donnée d'identification stockée.</em>
           </div>
           <div style="margin-top:50px;display:flex;justify-content:space-between;align-items:flex-end">
             <div style="font-size:12px;color:#94a3b8">Délivré le ${dateStr}<br>generations-medecins.fr</div>
             <div style="text-align:center">
-              <div style="font-family:'Brush Script MT',cursive;font-size:22px;color:#1a4a80">Générations Médecins</div>
+              <div style="font-family:'Brush Script MT',cursive;font-size:22px;color:#1a3a8a">Générations Médecins</div>
               <div style="border-top:1px solid #cbd5e1;margin-top:4px;padding-top:4px;font-size:11px;color:#94a3b8">Le Bureau</div>
             </div>
           </div>
@@ -622,13 +745,11 @@
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ unit:'mm', format:'a4', orientation:'portrait' });
       const pageW = pdf.internal.pageSize.getWidth();
-      const imgH = (canvas.height * pageW) / canvas.width;
-      pdf.addImage(canvas.toDataURL('image/jpeg',0.9), 'JPEG', 0, 0, pageW, imgH);
+      pdf.addImage(canvas.toDataURL('image/jpeg',0.9), 'JPEG', 0, 0, pageW, (canvas.height * pageW) / canvas.width);
       render.innerHTML = '';
-
       lastPdfBlob = pdf.output('blob');
       if (returnBase64) {
-        return await new Promise(resolve => {
+        return new Promise(resolve => {
           const r = new FileReader();
           r.onload = () => resolve(r.result);
           r.readAsDataURL(lastPdfBlob);
@@ -637,11 +758,16 @@
     }
 
     window.downloadAttestation = function() {
-      if (!lastPdfBlob) { toast('Attestation indisponible', true); return; }
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(lastPdfBlob);
-      a.download = `attestation-greve-${lastRef||''}.pdf`;
-      a.click();
+      if (lastPdfBlob) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(lastPdfBlob);
+        a.download = `attestation-greve-${lastRef||''}.pdf`;
+        a.click();
+      } else {
+        // Regénère si la session a été rechargée
+        buildAttestationPdf({ ref: lastRef || 'ATTESTATION', specialite: '', cp: '' }, false)
+          .then(() => { window.downloadAttestation(); });
+      }
     };
 
     init();

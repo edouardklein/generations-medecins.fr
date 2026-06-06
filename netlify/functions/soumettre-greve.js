@@ -1,11 +1,16 @@
 /**
- * Netlify Function — Soumission d'une déclaration de grève (module Médecins en Grève)
+ * Netlify Function — Soumission d'une déclaration de grève
+ *
+ * Architecture privacy-by-design :
+ *   - Reçoit un rppsHash (SHA-256 calculé côté client) — jamais le RPPS brut
+ *   - Email/tel utilisés uniquement pour envoyer l'attestation, JAMAIS stockés en base
+ *   - UPSERT : une nouvelle déclaration avec le même hash remplace la précédente
  *
  * Flux :
  *   1. Vérifie la campagne active et la plage de dates
- *   2. Insère la déclaration (anti-doublon RPPS/campagne géré par contrainte SQL)
- *   3. Si email + PDF fournis → envoie l'attestation en pièce jointe (Brevo transactionnel)
- *   4. Si consentement_info + email → inscrit le contact à la liste mobilisation Brevo
+ *   2. UPSERT de la déclaration (dedup via rpps_hash/campagne_id)
+ *   3. Si wantsAttestation + email + PDF → envoie l'attestation (Brevo)
+ *   4. Si email → inscrit à la liste mobilisation Brevo (best effort)
  *
  * Env vars : SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, BREVO_API_KEY,
  *            SENDER_EMAIL, SENDER_NAME, GREVE_LIST_ID (optionnel)
@@ -18,10 +23,9 @@ function srvHeaders(extra = {}) {
   return { apikey: SSK, Authorization: `Bearer ${SSK}`, 'Content-Type': 'application/json', ...extra };
 }
 
-// Référence unique lisible : GM-GREVE-2026-AB3K9
 function genRef() {
   const year = new Date().getFullYear();
-  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // sans I,L,O,0,1 (lisibilité)
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
   let code = '';
   for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
   return `GM-GREVE-${year}-${code}`;
@@ -35,10 +39,7 @@ exports.handler = async (event) => {
   };
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers };
   if (event.httpMethod !== 'POST')    return { statusCode: 405, headers, body: '{"error":"Method not allowed"}' };
-
-  if (!SB || !SSK) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Configuration Supabase manquante' }) };
-  }
+  if (!SB || !SSK) return { statusCode: 500, headers, body: JSON.stringify({ error: 'Configuration Supabase manquante' }) };
 
   let body;
   try { body = JSON.parse(event.body || '{}'); } catch {
@@ -46,23 +47,22 @@ exports.handler = async (event) => {
   }
 
   const {
-    campagneId, rpps, specialite, cp, modeExercice, motifs = [],
-    email, tel, consentementInfo = false, estInterne = false, pdfBase64,
+    campagneId, rppsHash, specialite, cp, modeExercice, motifs = [],
+    email, tel, wantsAttestation = false, estInterne = false, pdfBase64,
     ref: clientRef,
   } = body;
 
-  if (!campagneId) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Campagne non précisée' }) };
-  }
-  // RPPS obligatoire sauf internes/externes
-  if (!estInterne && (!rpps || !/^\d{8,11}$/.test(String(rpps).trim()))) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Numéro RPPS invalide (8 à 11 chiffres) ou cochez « interne/externe sans RPPS ».' }) };
+  if (!campagneId) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Campagne non précisée' }) };
+
+  // Validation hash : 64 chars hex, ou null pour les internes
+  if (!estInterne && (!rppsHash || !/^[a-f0-9]{64}$/.test(rppsHash))) {
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Empreinte RPPS invalide (ou cochez « interne/externe sans RPPS »)' }) };
   }
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Adresse email invalide' }) };
   }
 
-  // 1. Vérifie la campagne (active + dans la plage)
+  // 1. Vérifie la campagne
   const campRes = await fetch(`${SB}/rest/v1/greve_campagnes?id=eq.${encodeURIComponent(campagneId)}&select=*`, { headers: srvHeaders() });
   const camps = await campRes.json();
   const camp = Array.isArray(camps) ? camps[0] : null;
@@ -70,51 +70,41 @@ exports.handler = async (event) => {
   if (!camp.actif) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Les déclarations sont actuellement fermées.' }) };
 
   const today = new Date().toISOString().slice(0, 10);
-  if (camp.date_debut && today < camp.date_debut) {
+  if (camp.date_debut && today < camp.date_debut)
     return { statusCode: 403, headers, body: JSON.stringify({ error: `Les déclarations ouvrent le ${camp.date_debut}.` }) };
-  }
-  if (camp.date_fin && today > camp.date_fin) {
+  if (camp.date_fin && today > camp.date_fin)
     return { statusCode: 403, headers, body: JSON.stringify({ error: `Les déclarations sont closes depuis le ${camp.date_fin}.` }) };
-  }
 
-  // 2. Insertion de la déclaration
-  // La référence est générée côté client (pour que le PDF en pièce jointe affiche
-  // le même numéro), mais on valide son format ; sinon on en génère une.
+  // 2. UPSERT — une re-déclaration avec le même hash met à jour les données
   const ref = (typeof clientRef === 'string' && /^GM-GREVE-\d{4}-[A-Z0-9]{5}$/.test(clientRef))
     ? clientRef : genRef();
-  const rppsClean = estInterne ? null : String(rpps).trim();
 
-  const insRes = await fetch(`${SB}/rest/v1/greve_declarations`, {
-    method: 'POST',
-    headers: srvHeaders({ Prefer: 'return=representation' }),
-    body: JSON.stringify({
-      campagne_id: campagneId,
-      ref,
-      rpps: rppsClean,
-      specialite: specialite || null,
-      cp: cp || null,
-      mode_exercice: modeExercice || null,
-      motifs,
-      email: email || null,
-      tel: tel || null,
-      consentement_info: !!consentementInfo,
-    }),
-  });
+  const insRes = await fetch(
+    `${SB}/rest/v1/greve_declarations?on_conflict=rpps_hash,campagne_id`,
+    {
+      method: 'POST',
+      headers: srvHeaders({ Prefer: 'resolution=merge-duplicates,return=representation' }),
+      body: JSON.stringify({
+        campagne_id: campagneId,
+        ref,
+        rpps_hash: estInterne ? null : rppsHash,
+        specialite: specialite || null,
+        cp: cp || null,
+        mode_exercice: modeExercice || null,
+        motifs,
+        // email et tel ne sont JAMAIS insérés en base
+      }),
+    }
+  );
 
   if (!insRes.ok) {
     const errText = await insRes.text();
-    // Contrainte d'unicité RPPS/campagne → déjà déclaré
-    if (/unique_rpps_campagne|duplicate key/i.test(errText)) {
-      return { statusCode: 409, headers, body: JSON.stringify({ error: 'Ce numéro RPPS a déjà été déclaré pour cette mobilisation.' }) };
-    }
     return { statusCode: 502, headers, body: JSON.stringify({ error: 'Erreur enregistrement', detail: errText.slice(0, 200) }) };
   }
 
-  const inserted = (await insRes.json())[0];
-
-  // 3. Envoi de l'attestation par email (PDF en pièce jointe)
+  // 3. Envoi de l'attestation (éphémère — email jamais persisté)
   let emailEnvoye = false;
-  if (email && pdfBase64 && process.env.BREVO_API_KEY && process.env.SENDER_EMAIL) {
+  if (wantsAttestation && email && pdfBase64 && process.env.BREVO_API_KEY && process.env.SENDER_EMAIL) {
     const html = `<!DOCTYPE html><html><body style="margin:0;background:#eef3f8;font-family:Arial,Helvetica,sans-serif">
   <div style="max-width:560px;margin:0 auto;padding:28px 18px">
     <div style="background:#fff;border-radius:16px;padding:30px 28px;box-shadow:0 2px 12px rgba(20,32,51,.08)">
@@ -125,14 +115,14 @@ exports.handler = async (event) => {
         Merci d'avoir déclaré votre participation au mouvement. Votre attestation de grève est jointe à cet email au format PDF.<br><br>
         <strong>Référence :</strong> ${ref}
       </p>
-      <div style="background:#f0f6ff;border-radius:10px;padding:14px 16px;margin:20px 0;font-size:13px;color:#1a4a80;line-height:1.6">
+      <div style="background:#eff6ff;border-radius:10px;padding:14px 16px;margin:20px 0;font-size:13px;color:#1e40af;line-height:1.6">
         💪 <strong>Générations Médecins</strong> défend la médecine libérale au quotidien.
-        Si vous n'êtes pas encore adhérent, rejoignez-nous pour amplifier notre voix :
-        <a href="https://generations-medecins.fr/adherer.html" style="color:#2a6db8;font-weight:700">adhérer →</a>
+        Si vous n'êtes pas encore adhérent, rejoignez-nous :
+        <a href="https://generations-medecins.fr/adherer.html" style="color:#2563eb;font-weight:700">adhérer →</a>
       </div>
       <p style="margin:18px 0 0;font-size:12px;color:#94a3b8;line-height:1.5">
         Vous recevez cet email car vous avez déclaré une intention de grève sur generations-medecins.fr.
-        ${consentementInfo ? "Vous avez accepté d'être tenu informé des actions du mouvement ; vous pouvez vous désinscrire à tout moment via le lien présent dans nos emails." : ""}
+        Vous pouvez vous désinscrire à tout moment via le lien présent dans nos emails.
       </p>
     </div>
     <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:18px">Générations Médecins Île-de-France · Médecins en Grève</p>
@@ -150,16 +140,10 @@ exports.handler = async (event) => {
       }),
     });
     emailEnvoye = brevoRes.ok;
-    if (emailEnvoye) {
-      await fetch(`${SB}/rest/v1/greve_declarations?id=eq.${inserted.id}`, {
-        method: 'PATCH', headers: srvHeaders({ Prefer: 'return=minimal' }),
-        body: JSON.stringify({ attestation_envoyee: true }),
-      }).catch(() => {});
-    }
   }
 
-  // 4. Inscription à la liste mobilisation Brevo (consentement explicite)
-  if (email && consentementInfo && process.env.BREVO_API_KEY && process.env.GREVE_LIST_ID) {
+  // 4. Inscription liste Brevo (best effort — opt-in implicite si email fourni)
+  if (email && process.env.BREVO_API_KEY && process.env.GREVE_LIST_ID) {
     await fetch('https://api.brevo.com/v3/contacts', {
       method: 'POST',
       headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json' },
@@ -169,7 +153,7 @@ exports.handler = async (event) => {
         updateEnabled: true,
         attributes: { SPECIALITE: specialite || '', CP: cp || '' },
       }),
-    }).catch(() => {}); // best effort, ne bloque pas la déclaration
+    }).catch(() => {});
   }
 
   return {

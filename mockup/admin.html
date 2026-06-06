@@ -326,6 +326,36 @@
       font-family: inherit; font-size: 0.85rem; color: var(--muted);
       background: var(--surface);
     }
+
+    /* ── Toggle switch (campagne ouvert/fermé) ────────────────────────────── */
+    .ios-toggle-wrap { display:flex; align-items:center; gap:10px; }
+    .ios-toggle-label { font-size:.82rem; font-weight:700; color:#94a3b8; transition:color .2s; white-space:nowrap; }
+    .ios-toggle-label.on  { color:#16a34a; }
+    .ios-toggle-label.off { color:#64748b; }
+    .ios-toggle { position:relative; display:inline-block; width:50px; height:28px; flex-shrink:0; }
+    .ios-toggle input { opacity:0; width:0; height:0; }
+    .ios-slider {
+      position:absolute; inset:0; background:#cbd5e1; border-radius:999px; cursor:pointer;
+      transition:background .2s; box-shadow:inset 0 1px 3px rgba(0,0,0,.1);
+    }
+    .ios-slider:before {
+      content:''; position:absolute; width:22px; height:22px; left:3px; top:3px;
+      background:#fff; border-radius:50%; transition:transform .2s;
+      box-shadow:0 2px 6px rgba(0,0,0,.2);
+    }
+    input:checked + .ios-slider { background:#22c55e; }
+    input:checked + .ios-slider:before { transform:translateX(22px); }
+
+    /* ── Boutons modernes grève ───────────────────────────────────────────── */
+    .g-btn { display:inline-flex; align-items:center; gap:7px; border:none; border-radius:10px; padding:9px 18px; font-family:inherit; font-size:.86rem; font-weight:700; cursor:pointer; transition:all .15s; text-decoration:none; white-space:nowrap; }
+    .g-btn-primary  { background:linear-gradient(135deg,#1a3a8a,#2563eb); color:#fff; box-shadow:0 3px 10px rgba(37,99,235,.25); }
+    .g-btn-primary:hover  { box-shadow:0 4px 14px rgba(37,99,235,.4); transform:translateY(-1px); }
+    .g-btn-outline  { background:#fff; color:var(--ink); border:1.5px solid var(--line); }
+    .g-btn-outline:hover  { border-color:#2563eb; color:#2563eb; background:#f8fbff; }
+    .g-btn-danger   { background:#fff; color:#dc2626; border:1.5px solid #fca5a5; }
+    .g-btn-danger:hover   { background:#fef2f2; border-color:#dc2626; }
+    .g-btn-add { display:inline-flex; align-items:center; gap:5px; font-size:.8rem; font-weight:700; color:#2563eb; background:#eff6ff; border:1.5px dashed #bfdbfe; border-radius:8px; padding:7px 14px; cursor:pointer; font-family:inherit; transition:all .12s; }
+    .g-btn-add:hover { background:#dbeafe; border-color:#2563eb; }
   </style>
 </head>
 <body style="visibility:hidden">
@@ -778,10 +808,14 @@
           <div class="stat-card" style="margin-bottom:24px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
               <div style="font-weight:800;font-size:1.05rem;color:var(--ink)">Campagne en cours</div>
-              <label style="display:flex;align-items:center;gap:8px;font-size:.86rem;font-weight:700;cursor:pointer">
-                <input type="checkbox" id="g-actif" style="width:18px;height:18px;accent-color:var(--blue)">
-                <span id="g-actif-label">Déclarations fermées</span>
-              </label>
+              <div class="ios-toggle-wrap">
+                <span class="ios-toggle-label off" id="g-label-closed">Fermé</span>
+                <label class="ios-toggle">
+                  <input type="checkbox" id="g-actif">
+                  <span class="ios-slider"></span>
+                </label>
+                <span class="ios-toggle-label" id="g-label-open">Ouvert</span>
+              </div>
             </div>
 
             <div style="margin-bottom:14px">
@@ -811,27 +845,36 @@
             <div style="margin-bottom:14px">
               <label style="font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:block;margin-bottom:7px">Motifs proposés</label>
               <div id="g-motifs-list" style="display:flex;flex-direction:column;gap:7px;margin-bottom:8px"></div>
-              <button class="btn btn-outline" style="font-size:.8rem;padding:7px 14px" onclick="greveAddMotif()">+ Ajouter un motif</button>
+              <button class="g-btn-add" onclick="greveAddMotif()">+ Motif</button>
             </div>
 
             <!-- Liens -->
             <div style="margin-bottom:14px">
               <label style="font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:block;margin-bottom:7px">Liens / articles</label>
               <div id="g-liens-list" style="display:flex;flex-direction:column;gap:7px;margin-bottom:8px"></div>
-              <button class="btn btn-outline" style="font-size:.8rem;padding:7px 14px" onclick="greveAddLien()">+ Ajouter un lien</button>
+              <button class="g-btn-add" onclick="greveAddLien()">+ Lien</button>
             </div>
 
             <!-- FAQ -->
             <div style="margin-bottom:18px">
               <label style="font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:block;margin-bottom:7px">FAQ</label>
               <div id="g-faq-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px"></div>
-              <button class="btn btn-outline" style="font-size:.8rem;padding:7px 14px" onclick="greveAddFaq()">+ Ajouter une question</button>
+              <button class="g-btn-add" onclick="greveAddFaq()">+ Question</button>
             </div>
 
-            <div style="display:flex;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:18px">
-              <button class="btn btn-primary" onclick="greveSave()">💾 Enregistrer la campagne</button>
-              <button class="btn btn-outline" onclick="greveExportCsv()">📥 Exporter les emails opt-in (CSV)</button>
-              <button class="btn btn-outline" style="margin-left:auto;color:#dc2626;border-color:#fca5a5" onclick="greveReset()">🔄 Nouvelle campagne (remettre les compteurs à zéro)</button>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);padding-top:18px">
+              <button class="g-btn g-btn-primary" onclick="greveSave()">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Enregistrer
+              </button>
+              <button class="g-btn g-btn-outline" onclick="greveExportCsv()">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV
+              </button>
+              <button class="g-btn g-btn-danger" style="margin-left:auto" onclick="greveReset()">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                Nouvelle campagne
+              </button>
             </div>
           </div>
 
@@ -3080,8 +3123,15 @@
     document.getElementById('g-objectif').value = c.objectif || 0;
     const actif = document.getElementById('g-actif');
     actif.checked = !!c.actif;
-    document.getElementById('g-actif-label').textContent = c.actif ? 'Déclarations OUVERTES' : 'Déclarations fermées';
-    actif.onchange = () => { document.getElementById('g-actif-label').textContent = actif.checked ? 'Déclarations OUVERTES' : 'Déclarations fermées'; };
+    function updateActifToggle(checked) {
+      const open = document.getElementById('g-label-open');
+      const closed = document.getElementById('g-label-closed');
+      open.classList.toggle('on', checked);
+      open.classList.toggle('off', !checked);
+      closed.classList.toggle('off', checked);
+    }
+    updateActifToggle(actif.checked);
+    actif.onchange = () => updateActifToggle(actif.checked);
     renderGreveMotifs(c.motifs || []);
     renderGreveLiens(c.liens || []);
     renderGreveFaq(c.faq || []);
@@ -3180,7 +3230,7 @@
     document.getElementById('gs-total').textContent = total.toLocaleString('fr-FR');
     document.getElementById('gs-objectif').textContent = obj.toLocaleString('fr-FR');
     document.getElementById('gs-pct').textContent = obj ? Math.round(total / obj * 100) + '%' : '—';
-    document.getElementById('gs-optin').textContent = greveDecls.filter(d => d.consentement_info && d.email).length;
+    document.getElementById('gs-optin').textContent = (greveCampagne.optin_count || 0).toLocaleString('fr-FR');
 
     const modes = {};
     greveDecls.forEach(d => { if (d.mode_exercice) modes[d.mode_exercice] = (modes[d.mode_exercice] || 0) + 1; });
@@ -3205,7 +3255,7 @@
       <table style="width:100%;border-collapse:collapse">
         <tr style="text-align:left;color:var(--muted);font-size:.74rem;text-transform:uppercase;letter-spacing:.04em">
           <th style="padding:6px 8px">Date</th><th style="padding:6px 8px">Réf</th><th style="padding:6px 8px">Spécialité</th>
-          <th style="padding:6px 8px">CP</th><th style="padding:6px 8px">Mode</th><th style="padding:6px 8px">Email</th><th style="padding:6px 8px">Info</th>
+          <th style="padding:6px 8px">CP</th><th style="padding:6px 8px">Mode</th>
         </tr>
         ${recent.map(d => `<tr style="border-top:1px solid var(--line)">
           <td style="padding:7px 8px">${new Date(d.created_at).toLocaleDateString('fr-FR')}</td>
@@ -3213,25 +3263,22 @@
           <td style="padding:7px 8px">${esc(d.specialite)||'—'}</td>
           <td style="padding:7px 8px">${esc(d.cp)||'—'}</td>
           <td style="padding:7px 8px">${esc(d.mode_exercice)||'—'}</td>
-          <td style="padding:7px 8px">${d.email ? '✓' : '—'}</td>
-          <td style="padding:7px 8px">${d.consentement_info ? '📬' : '—'}</td>
         </tr>`).join('')}
       </table>`;
   }
 
   // — Export CSV des emails opt-in —
   window.greveExportCsv = function() {
-    const optins = greveDecls.filter(d => d.consentement_info && d.email);
-    if (!optins.length) { toast('Aucun email opt-in à exporter', 'error'); return; }
-    const rows = [['email','specialite','cp','mode_exercice','date'].join(',')]
-      .concat(optins.map(d => [d.email, d.specialite||'', d.cp||'', d.mode_exercice||'', d.created_at.slice(0,10)]
+    if (!greveDecls.length) { toast('Aucune déclaration à exporter', 'error'); return; }
+    const rows = [['ref','specialite','cp','mode_exercice','date'].join(',')]
+      .concat(greveDecls.map(d => [d.ref, d.specialite||'', d.cp||'', d.mode_exercice||'', d.created_at.slice(0,10)]
         .map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')));
     const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `greve-emails-optin-${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `greve-declarations-${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
-    toast(`✓ ${optins.length} emails exportés`);
+    toast(`✓ ${greveDecls.length} déclarations exportées`);
   };
 
   // — Réinitialiser : clôture la campagne et en crée une nouvelle (historique conservé) —
