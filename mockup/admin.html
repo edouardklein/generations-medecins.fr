@@ -2696,7 +2696,7 @@
       <div style="margin-top:18px">
         <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:6px">Question originale</div>
         <div style="background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:14px;font-size:.88rem;line-height:1.6;white-space:pre-wrap">${esc(c.question||'')}</div>
-        ${docs.length ? `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">${docs.map(d=>`<a href="${esc(d.url)}" target="_blank" style="font-size:.76rem;color:var(--blue);border:1px solid var(--line);border-radius:6px;padding:3px 8px">📎 ${esc(d.name)}</a>`).join('')}</div>` : ''}
+        ${docs.length ? `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">${docs.map(d=>`<button onclick="doctrineOpenDoc('${esc(d.path || d.url)}')" style="font-size:.76rem;color:var(--blue);background:none;border:1px solid var(--line);border-radius:6px;padding:3px 8px;cursor:pointer;font-family:inherit">📎 ${esc(d.name)}</button>`).join('')}</div>` : ''}
       </div>
 
       <!-- Question reformulée -->
@@ -2731,7 +2731,7 @@
       <div style="margin-top:18px">
         <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:6px">Synthèse IA</div>
         <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;font-size:.85rem;line-height:1.7;white-space:pre-wrap">${esc(c.synthese)}</div>
-        ${c.pdf_url ? `<div style="margin-top:8px"><a href="${esc(c.pdf_url)}" target="_blank" class="btn-action btn-primary" style="font-size:.78rem;text-decoration:none">📥 Télécharger le PDF</a></div>` : ''}
+        ${c.pdf_url ? `<div style="margin-top:8px"><button onclick="doctrineOpenDoc('${esc(c.pdf_url)}')" class="btn-action btn-primary" style="font-size:.78rem">📥 Télécharger le PDF</button></div>` : ''}
       </div>` : ''}
 
       <!-- Note opérateur -->
@@ -2743,6 +2743,14 @@
         <button class="btn-action" onclick="doctrineNoteEnregistrer('${c.id}')" style="font-size:.76rem;margin-top:6px">💾 Enregistrer la note</button>
       </div>`;
   }
+
+  // Ouvre un fichier du bucket privé via URL signée temporaire (5 min)
+  window.doctrineOpenDoc = async function(path) {
+    if (/^https?:\/\//.test(path)) { window.open(path, '_blank'); return; } // ancien format
+    const { data, error } = await sb.storage.from('consultations').createSignedUrl(path, 300);
+    if (error || !data?.signedUrl) { toast('Accès refusé ou fichier introuvable', 'error'); return; }
+    window.open(data.signedUrl, '_blank');
+  };
 
   window.toggleDoctrineCard = function(id) {
     const det = document.getElementById('doctrine-detail-' + id);
@@ -2808,13 +2816,14 @@
       const out = await res.json();
       if (!res.ok) throw new Error(out.error || res.status);
       toast('✓ Synthèse générée — génération du PDF…');
-      // PDF côté client
-      await doctrineGenererPdf(id, out.synthese);
+      // PDF côté client — besoin du membre_id pour le ranger dans son dossier
+      const { data: cj } = await sb.from('consultations_juridiques').select('membre_id').eq('id', id).single();
+      await doctrineGenererPdf(id, out.synthese, cj?.membre_id);
       loadDoctrine();
     } catch(e) { toast('Erreur : ' + e.message, 'error'); }
   };
 
-  async function doctrineGenererPdf(consultationId, synthese) {
+  async function doctrineGenererPdf(consultationId, synthese, membreId) {
     if (!window.jspdf) {
       // Charge jsPDF si pas déjà présent
       await new Promise((res, rej) => {
@@ -2889,14 +2898,13 @@
     }
 
     const blob = pdf.output('blob');
-    // Upload dans Supabase Storage
-    const path = `doctrine/${consultationId}.pdf`;
-    const { data: upd, error: upErr } = await sb.storage.from('consultations').upload(path, blob, {
+    // Upload dans le dossier du membre (bucket privé) → on stocke le PATH, pas une URL publique
+    const path = `${membreId}/doctrine-${consultationId}.pdf`;
+    const { error: upErr } = await sb.storage.from('consultations').upload(path, blob, {
       contentType: 'application/pdf', upsert: true,
     });
     if (upErr) { toast('PDF généré mais erreur upload : ' + upErr.message, 'error'); return; }
-    const { data: { publicUrl } } = sb.storage.from('consultations').getPublicUrl(path);
-    await sb.from('consultations_juridiques').update({ pdf_url: publicUrl }).eq('id', consultationId);
+    await sb.from('consultations_juridiques').update({ pdf_url: path }).eq('id', consultationId);
     toast('✓ PDF généré et sauvegardé');
     // Téléchargement direct
     const a = document.createElement('a');
