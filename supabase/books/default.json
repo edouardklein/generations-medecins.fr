@@ -201,50 +201,19 @@
     "props": {
       "eyebrow": "01 • Présence dans les médias",
       "title": "Une voix qui porte",
-      "subtitle": "Plateaux TV, presse spécialisée, réseaux sociaux — GM IDF est au cœur du débat médical.",
-      "sections": [
+      "subtitle": "Plateaux TV et presse médicale — GM est au cœur du débat médical.",
+      "tiles": [
         {
-          "kicker": "Plateaux TV",
-          "glyph": "📺",
-          "items": [
-            {
-              "name": "New Deal Santé",
-              "caption": "Le show de Martin Blachier",
-              "logo": "/media/new-deal-sante.png"
-            },
-            {
-              "name": "TF1",
-              "caption": "Journaux & magazines santé"
-            }
-          ]
+          "kicker": "Plateau TV",
+          "name": "New Deal Santé",
+          "caption": "Le show de Martin Blachier",
+          "image": "/media/new-deal-sante.png"
         },
         {
           "kicker": "Presse médicale",
-          "glyph": "📰",
-          "items": [
-            {
-              "name": "What's Up Doc"
-            },
-            {
-              "name": "Egora",
-              "logo": "/media/Egora.png"
-            }
-          ]
-        },
-        {
-          "kicker": "Réseaux sociaux",
-          "glyph": "💼",
-          "items": [
-            {
-              "name": "LinkedIn — Président GM",
-              "caption": "17 000 abonnés"
-            },
-            {
-              "name": "YouTube",
-              "caption": "Vidéos & interventions",
-              "logo": "/media/youtube.png"
-            }
-          ]
+          "name": "Egora",
+          "caption": "Couverture des prises de position du syndicat",
+          "image": "/media/Egora.png"
         }
       ],
       "footnote": "Des prises de parole régulières qui renforcent la légitimité du réseau auprès des prescripteurs."
