@@ -456,331 +456,292 @@
       ],
     };
 
-    // Config des champs du robot par variable name
-    // question: ce que le robot demande
+    // Config des champs du robot par variable name (correspond aux {{variables}} des templates)
+    // question: ce que le robot demande — formulé pour un médecin libéral
     // type: text | textarea | date | url | address | dept
     // placeholder: exemple
-    // llm: prompt OpenAI pour reformulation (null = bouton désactivé)
+    // llm: prompt OpenAI pour reformulation (null = champ précis, bouton grisé avec message explicatif)
     const VAR_CFG = {
-      // ── Identité / cabinet ──────────────────────────────────────────────────
+
+      // ── Adresses ─────────────────────────────────────────────────────────────
       adresse_cabinet: {
         question: 'Quelle est l\'adresse complète de votre cabinet ?',
-        type: 'address', placeholder: '12 rue de la Paix, 75001 Paris',
-        llm: null,
+        type: 'address', placeholder: '12 rue de la Paix, 75001 Paris', llm: null,
       },
-      // ── Google / RGPD ───────────────────────────────────────────────────────
-      url_fiche: {
-        question: 'Quelle est l\'URL de la fiche Google que vous souhaitez faire supprimer ?',
-        type: 'url', placeholder: 'https://maps.app.goo.gl/…',
-        llm: null,
+      adresse_cabinet_secondaire: {
+        question: 'Quelle est l\'adresse du cabinet secondaire que vous souhaitez ouvrir ?',
+        type: 'address', placeholder: '3 rue des Acacias, 77000 Melun', llm: null,
       },
-      nom_destinataire: {
-        question: 'Quel est le nom du responsable ou de l\'organisme destinataire ?',
-        type: 'text', placeholder: 'Délégué à la Protection des Données',
-        llm: null,
+      adresse_confrere: {
+        question: 'Quelle est l\'adresse postale du confrère ou de la consoeur concerné(e) ?',
+        type: 'address', placeholder: '5 avenue Foch, 75016 Paris', llm: null,
       },
-      objet_demande: {
-        question: 'Quel est l\'objet précis de votre demande RGPD ?',
-        type: 'textarea', placeholder: 'Suppression des données personnelles inexactes publiées…',
-        llm: 'Tu es juriste spécialisé en droit numérique et RGPD. Reformule ce texte en termes formels et précis pour une demande officielle de droit à l\'effacement.',
+      adresse_proprietaire: {
+        question: 'Quelle est l\'adresse postale du propriétaire (bailleur) du local ?',
+        type: 'address', placeholder: 'SCI Les Tilleuls, 15 rue du Moulin, 75016 Paris', llm: null,
       },
-      reference_rgpd: {
-        question: 'Quelle référence ou numéro de dossier souhaitez-vous mentionner ? (laisser vide si aucun)',
-        type: 'text', placeholder: 'Ref. RGPD-2024-XXXXX',
-        llm: null,
+
+      // ── Identité ──────────────────────────────────────────────────────────────
+      nom_patient: {
+        question: 'Quel est le nom et prénom du patient concerné ?',
+        type: 'text', placeholder: 'M. Jean DUPONT', llm: null,
       },
-      // ── CPAM / Assurance maladie ────────────────────────────────────────────
-      departement: {
-        question: 'Dans quel département se situe votre CPAM ?',
-        type: 'dept', placeholder: '',
-        llm: null,
+      nom_confrere: {
+        question: 'Quel est le nom et prénom du confrère ou de la consoeur concerné(e) ?',
+        type: 'text', placeholder: 'Dr Marie LAMBERT', llm: null,
+      },
+      nom_proprietaire: {
+        question: 'Quel est le nom ou la raison sociale du propriétaire (bailleur) ?',
+        type: 'text', placeholder: 'SCI Les Tilleuls / M. Bernard MARTIN', llm: null,
+      },
+      nom_prestataire: {
+        question: 'Quel est le nom du prestataire ou fournisseur concerné ?',
+        type: 'text', placeholder: 'Doctolib / Cegedim / …', llm: null,
+      },
+      nom_auteur: {
+        question: 'Quel est le nom de l\'auteur des propos litigieux ?',
+        type: 'text', placeholder: 'Pseudo « dupont75 » ou nom réel si connu', llm: null,
+      },
+      nom_logiciel: {
+        question: 'Quel est le nom du logiciel ou outil dont vous demandez l\'export ?',
+        type: 'text', placeholder: 'Doctolib / Medimail / Hellodoc / …', llm: null,
+      },
+      specialite: {
+        question: 'Quelle est la spécialité du confrère ou de la consoeur ?',
+        type: 'text', placeholder: 'Médecin généraliste / Cardiologue / …', llm: null,
+      },
+
+      // ── Dates ─────────────────────────────────────────────────────────────────
+      annee: {
+        question: 'Quelle est l\'année concernée ?',
+        type: 'text', placeholder: '2024', llm: null,
       },
       date_notification: {
-        question: 'Quelle est la date de notification indiquée sur le courrier de mise sous accord préalable ?',
-        type: 'date', placeholder: '',
-        llm: null,
-      },
-      objet_map: {
-        question: 'Quel est l\'objet de la mise sous accord préalable (ex. : prescription de kinésithérapie) ?',
-        type: 'text', placeholder: 'la prescription de kinésithérapie',
-        llm: null,
-      },
-      motifs: {
-        question: 'Quels sont vos motifs de contestation ?',
-        type: 'textarea', placeholder: 'Décrivez les raisons médicales et réglementaires…',
-        llm: 'Tu es médecin généraliste et juriste en droit de la santé. Reformule ces motifs de contestation de manière structurée, professionnelle et convaincante pour un courrier officiel à la CPAM.',
-      },
-      numero_dossier: {
-        question: 'Quel est le numéro de dossier ou de référence mentionné par la CPAM ?',
-        type: 'text', placeholder: '2024-XXXXXXXXX',
-        llm: null,
-      },
-      reference_courrier: {
-        question: 'Quelle est la référence du courrier CPAM auquel vous répondez ?',
-        type: 'text', placeholder: 'Réf. : CPAM-75-2024-XXXXX',
-        llm: null,
+        question: 'Quelle est la date indiquée sur le courrier de notification reçu ?',
+        type: 'date', placeholder: '', llm: null,
       },
       date_controle: {
-        question: 'Quelle est la date du contrôle ou de la réclamation CPAM ?',
-        type: 'date', placeholder: '',
-        llm: null,
+        question: 'Quelle est la date du contrôle ou de la vérification effectué ?',
+        type: 'date', placeholder: '', llm: null,
       },
-      nom_controleur: {
-        question: 'Quel est le nom du médecin-conseil ou contrôleur mentionné ?',
-        type: 'text', placeholder: 'Dr Dupont',
-        llm: null,
+      date_consultation: {
+        question: 'Quelle est la date de la consultation concernée ?',
+        type: 'date', placeholder: '', llm: null,
       },
-      montant_reversement: {
-        question: 'Quel est le montant du reversement réclamé (en euros) ?',
-        type: 'text', placeholder: '1 250,00 €',
-        llm: null,
+      date_contrat: {
+        question: 'Quelle est la date de signature du contrat en question ?',
+        type: 'date', placeholder: '', llm: null,
       },
-      date_reversement: {
-        question: 'Quelle est la date limite de reversement indiquée ?',
-        type: 'date', placeholder: '',
-        llm: null,
+      date_bail: {
+        question: 'Quelle est la date de signature de votre bail professionnel ?',
+        type: 'date', placeholder: '', llm: null,
+      },
+      date_debut: {
+        question: 'Quelle est la date de début prévue ?',
+        type: 'date', placeholder: '', llm: null,
+      },
+      date_fin: {
+        question: 'Quelle est la date de fin ou de terme ?',
+        type: 'date', placeholder: '', llm: null,
+      },
+      date_fin_souhaitee: {
+        question: 'À quelle date souhaitez-vous que la situation prenne fin ?',
+        type: 'date', placeholder: '', llm: null,
+      },
+      date_resiliation_souhaitee: {
+        question: 'À quelle date souhaitez-vous résilier ?',
+        type: 'date', placeholder: '', llm: null,
+      },
+      date_incident: {
+        question: 'À quelle date l\'incident s\'est-il produit ?',
+        type: 'date', placeholder: '', llm: null,
+      },
+      date_installation: {
+        question: 'Quelle est la date prévue d\'installation ou d\'ouverture ?',
+        type: 'date', placeholder: '', llm: null,
+      },
+      date_publication: {
+        question: 'À quelle date les propos litigieux ont-ils été publiés ?',
+        type: 'date', placeholder: '', llm: null,
+      },
+
+      // ── Montants ──────────────────────────────────────────────────────────────
+      montant_du: {
+        question: 'Quel est le montant total dû (en euros) ?',
+        type: 'text', placeholder: '240,00 €', llm: null,
+      },
+      montant_reclame: {
+        question: 'Quel est le montant réclamé par la CPAM ou l\'organisme (en euros) ?',
+        type: 'text', placeholder: '1 250,00 €', llm: null,
+      },
+      montant_conteste: {
+        question: 'Quel est le montant que vous contestez (en euros) ?',
+        type: 'text', placeholder: '1 250,00 €', llm: null,
+      },
+      montant_total: {
+        question: 'Quel est le montant total concerné (en euros) ?',
+        type: 'text', placeholder: '3 600,00 €', llm: null,
+      },
+      montant_depassement: {
+        question: 'Quel est le montant moyen de dépassement par consultation (en euros) ?',
+        type: 'text', placeholder: '30 €', llm: null,
+      },
+      loyer_actuel: {
+        question: 'Quel est votre loyer mensuel actuel (en euros) ?',
+        type: 'text', placeholder: '1 200 €/mois', llm: null,
+      },
+      loyer_nouveau: {
+        question: 'Quel est le nouveau loyer proposé par le bailleur (en euros) ?',
+        type: 'text', placeholder: '1 450 €/mois', llm: null,
+      },
+      tarif_consultation: {
+        question: 'Quel est votre tarif de consultation (en euros) ?',
+        type: 'text', placeholder: '25 € / 50 €', llm: null,
+      },
+      tarif_remboursement: {
+        question: 'Quel est le tarif de remboursement Sécurité Sociale pour cet acte (en euros) ?',
+        type: 'text', placeholder: '25 €', llm: null,
+      },
+
+      // ── Textes courts ─────────────────────────────────────────────────────────
+      departement: {
+        question: 'Dans quel département se situe votre CPAM ?',
+        type: 'dept', placeholder: '', llm: null,
+      },
+      objet_controle: {
+        question: 'Sur quoi porte exactement le contrôle CPAM (ex. : prescription de kinésithérapie, arrêts de travail) ?',
+        type: 'text', placeholder: 'prescription de kinésithérapie', llm: null,
+      },
+      objet_litige: {
+        question: 'Quel est l\'objet précis du litige ou de la réclamation ?',
+        type: 'text', placeholder: 'facturation de la majoration de nuit refusée', llm: null,
+      },
+      secteur: {
+        question: 'Quel est votre secteur de conventionnement ?',
+        type: 'text', placeholder: 'secteur 2 OPTAM / secteur 1', llm: null,
+      },
+      motif_depassement: {
+        question: 'Quel est le motif de votre dépassement d\'honoraires (notoriété, plateau technique, etc.) ?',
+        type: 'text', placeholder: 'exercice en plateau technique spécialisé', llm: null,
       },
       motif_reversement: {
         question: 'Quel est le motif invoqué par la CPAM pour ce reversement ?',
-        type: 'textarea', placeholder: 'Prescription hors référentiel lors de la consultation du…',
-        llm: 'Tu es médecin. Résume en termes précis et neutres le motif de reversement CPAM tel qu\'il sera cité dans un courrier de contestation.',
+        type: 'text', placeholder: 'prescription hors référentiel lors de la consultation du…', llm: null,
       },
-      // ── Patients ────────────────────────────────────────────────────────────
-      nom_patient: {
-        question: 'Quel est le nom et prénom du patient concerné ?',
-        type: 'text', placeholder: 'M. Jean DUPONT',
-        llm: null,
+      motif_difficulte: {
+        question: 'Quelle difficulté financière ou situation exceptionnelle justifie votre demande d\'échelonnement ?',
+        type: 'text', placeholder: 'baisse d\'activité liée à une maladie / période de transition…', llm: null,
       },
-      adresse_patient: {
-        question: 'Quelle est l\'adresse postale du patient ?',
-        type: 'address', placeholder: '5 rue des Lilas, 75020 Paris',
-        llm: null,
+      periode: {
+        question: 'Quelle est la période concernée (ex. : 2022-2024, 1er semestre 2023) ?',
+        type: 'text', placeholder: '2022-2023', llm: null,
+      },
+      preavis_mois: {
+        question: 'Quelle est la durée du préavis en mois (indiquée dans le contrat) ?',
+        type: 'text', placeholder: '3', llm: null,
+      },
+      preavis_semaines: {
+        question: 'Quelle est la durée du préavis en semaines (indiquée dans le contrat) ?',
+        type: 'text', placeholder: '4', llm: null,
+      },
+      nombre_mensualites: {
+        question: 'Combien de mensualités souhaitez-vous pour l\'échelonnement ?',
+        type: 'text', placeholder: '12', llm: null,
+      },
+      numero_contrat: {
+        question: 'Quel est le numéro de votre contrat ou d\'abonnement ?',
+        type: 'text', placeholder: 'XXXX-XXXXXXXX', llm: null,
+      },
+      article_resiliation: {
+        question: 'Quel article du contrat prévoit la résiliation (si connu) ?',
+        type: 'text', placeholder: 'Article 12.2 des CGV', llm: null,
+      },
+      pourcentage_hausse: {
+        question: 'De quel pourcentage le bailleur souhaite-t-il augmenter le loyer ?',
+        type: 'text', placeholder: '8 %', llm: null,
+      },
+      plateforme: {
+        question: 'Sur quelle plateforme ou quel support les propos ont-ils été publiés ?',
+        type: 'text', placeholder: 'Google Maps / Doctolib / Facebook', llm: null,
+      },
+      url_contenu: {
+        question: 'Quelle est l\'URL exacte du contenu litigieux ?',
+        type: 'url', placeholder: 'https://maps.google.com/…', llm: null,
+      },
+      tribunal: {
+        question: 'Quel tribunal saisissez-vous ou mentionnez-vous ?',
+        type: 'text', placeholder: 'Tribunal judiciaire de Paris', llm: null,
+      },
+      temoins: {
+        question: 'Y a-t-il des témoins ? Si oui, lesquels (nom, qualité) ?',
+        type: 'text', placeholder: 'Mme Dupont, secrétaire médicale / aucun témoin', llm: null,
+      },
+      disponibilites: {
+        question: 'Quelles sont vos disponibilités pour collaborer ou vous réunir ?',
+        type: 'text', placeholder: 'mardi et jeudi, 14h–19h', llm: null,
+      },
+      delai_souhaite: {
+        question: 'Dans quel délai souhaitez-vous une réponse ou une action ?',
+        type: 'text', placeholder: '15 jours / 1 mois', llm: null,
+      },
+      format_souhaite: {
+        question: 'Sous quel format souhaitez-vous recevoir vos données (CSV, PDF, JSON…) ?',
+        type: 'text', placeholder: 'CSV ou PDF', llm: null,
+      },
+      type_traitement: {
+        question: 'Quel type de traitement de données personnelles souhaitez-vous faire cesser ?',
+        type: 'text', placeholder: 'publicité ciblée / partage avec des tiers', llm: null,
+      },
+      finalite: {
+        question: 'Quelle est la finalité pour laquelle vos données ont été collectées (selon l\'organisme) ?',
+        type: 'text', placeholder: 'prospection commerciale / amélioration du service', llm: null,
+      },
+
+      // ── Textes longs (avec reformulation IA possible) ──────────────────────
+      motifs_contestation: {
+        question: 'Quels sont vos motifs de contestation ? Expliquez librement, l\'IA pourra reformuler ensuite.',
+        type: 'textarea', placeholder: 'Cette prescription est justifiée par l\'état clinique du patient car…',
+        llm: 'Tu es médecin généraliste et juriste en droit de la santé. Reformule ces motifs de contestation de manière structurée, professionnelle et convaincante pour un courrier officiel à la CPAM. Conserve tous les éléments médicaux mentionnés. Réponds uniquement avec le texte reformulé, sans préambule ni conclusion.',
+      },
+      motifs: {
+        question: 'Quels sont vos motifs ? Expliquez librement, l\'IA pourra reformuler ensuite.',
+        type: 'textarea', placeholder: 'Décrivez la situation…',
+        llm: 'Tu es médecin. Reformule ces motifs de manière professionnelle, factuelle et concise pour un courrier officiel. Réponds uniquement avec le texte reformulé.',
       },
       motif: {
-        question: 'Quel est le motif principal (fin de relation thérapeutique, impayé, etc.) ?',
-        type: 'textarea', placeholder: 'Défaut de paiement malgré relances, comportement agressif…',
-        llm: 'Tu es médecin rédigeant un courrier officiel à un patient. Reformule ce motif de manière factuelle, neutre et professionnelle.',
+        question: 'Quel est le motif principal ? Expliquez librement.',
+        type: 'textarea', placeholder: 'Décrivez la situation…',
+        llm: 'Tu es médecin rédigeant un courrier officiel. Reformule ce motif de manière factuelle, neutre et professionnelle. Réponds uniquement avec le texte reformulé.',
       },
-      honoraires_dus: {
-        question: 'Quel est le montant des honoraires impayés (en euros) ?',
-        type: 'text', placeholder: '120,00 €',
-        llm: null,
+      arguments: {
+        question: 'Quels arguments souhaitez-vous faire valoir ? Listez librement, l\'IA pourra les mettre en forme.',
+        type: 'textarea', placeholder: 'Mon dossier montre que… / La réglementation prévoit que…',
+        llm: 'Tu es juriste en droit médical. Reformule et structure ces arguments de manière convaincante pour un courrier officiel. Réponds uniquement avec le texte reformulé.',
       },
-      date_derniere_consultation: {
-        question: 'Quelle est la date de la dernière consultation facturée impayée ?',
-        type: 'date', placeholder: '',
-        llm: null,
-      },
-      date_mise_en_demeure: {
-        question: 'Quelle est la date de mise en demeure initiale (si déjà envoyée) ?',
-        type: 'date', placeholder: '',
-        llm: null,
-      },
-      type_depassement: {
-        question: 'Quel type de dépassement pratiquez-vous (secteur 2, OPTAM, OPTAM-CO) ?',
-        type: 'text', placeholder: 'secteur 2 / OPTAM',
-        llm: null,
-      },
-      montant_depassement: {
-        question: 'Quel est le montant moyen de dépassement par consultation ?',
-        type: 'text', placeholder: '30 €',
-        llm: null,
-      },
-      taux_depassement: {
-        question: 'Quel est votre taux de dépassement habituel ?',
-        type: 'text', placeholder: '50 %',
-        llm: null,
-      },
-      // ── URSSAF ──────────────────────────────────────────────────────────────
-      numero_compte: {
-        question: 'Quel est votre numéro de compte URSSAF ou SIRET ?',
-        type: 'text', placeholder: '75 12345678901',
-        llm: null,
-      },
-      montant_redressement: {
-        question: 'Quel est le montant du redressement URSSAF notifié (en euros) ?',
-        type: 'text', placeholder: '4 800,00 €',
-        llm: null,
-      },
-      periode_controle: {
-        question: 'Quelle est la période concernée par le contrôle URSSAF ?',
-        type: 'text', placeholder: '2021-2023',
-        llm: null,
-      },
-      date_notification_urssaf: {
-        question: 'Quelle est la date de notification du redressement URSSAF ?',
-        type: 'date', placeholder: '',
-        llm: null,
-      },
-      motifs_urssaf: {
-        question: 'Quels sont vos motifs de contestation du redressement URSSAF ?',
-        type: 'textarea', placeholder: 'Les heures comptabilisées ne correspondent pas à…',
-        llm: 'Tu es expert-comptable spécialisé libéral. Reformule ces motifs de contestation d\'un redressement URSSAF de manière structurée, argumentée et en droit social.',
-      },
-      montant_echeance: {
-        question: 'Quel montant proposez-vous par échéance de règlement (en euros) ?',
-        type: 'text', placeholder: '400,00 €',
-        llm: null,
-      },
-      nombre_echeances: {
-        question: 'Combien d\'échéances mensuelles proposez-vous ?',
-        type: 'text', placeholder: '12',
-        llm: null,
-      },
-      date_premier_echeance: {
-        question: 'Quelle est la date de la première échéance proposée ?',
-        type: 'date', placeholder: '',
-        llm: null,
-      },
-      // ── Cabinet / Bail ──────────────────────────────────────────────────────
-      nom_bailleur: {
-        question: 'Quel est le nom du bailleur (propriétaire du local) ?',
-        type: 'text', placeholder: 'SCI Les Tilleuls / M. Bernard MARTIN',
-        llm: null,
-      },
-      adresse_bailleur: {
-        question: 'Quelle est l\'adresse postale du bailleur ?',
-        type: 'address', placeholder: '15 avenue du Général de Gaulle, 75016 Paris',
-        llm: null,
-      },
-      reference_bail: {
-        question: 'Quelle est la référence de votre bail professionnel ?',
-        type: 'text', placeholder: 'Bail du 01/09/2018',
-        llm: null,
-      },
-      date_bail: {
-        question: 'Quelle est la date de signature de votre bail actuel ?',
-        type: 'date', placeholder: '',
-        llm: null,
-      },
-      description_travaux: {
-        question: 'Décrivez les travaux nécessaires dans votre cabinet',
-        type: 'textarea', placeholder: 'Fuite d\'eau au plafond de la salle d\'attente, peinture écaillée…',
-        llm: 'Tu es juriste en droit immobilier. Reformule cette description de travaux en termes techniques formels adaptés à un courrier de mise en demeure au bailleur, en précisant les obligations locatives.',
-      },
-      delai_travaux: {
-        question: 'Quel délai raisonnable accordez-vous au bailleur pour réaliser ces travaux ?',
-        type: 'text', placeholder: '30 jours',
-        llm: null,
-      },
-      montant_augmentation: {
-        question: 'De quel montant le bailleur souhaite-t-il augmenter le loyer ?',
-        type: 'text', placeholder: '200 € / mois',
-        llm: null,
-      },
-      taux_augmentation_prevu: {
-        question: 'Quel taux d\'augmentation est prévu (ILC ou autre) ?',
-        type: 'text', placeholder: 'ILC +8% soit 200€/mois',
-        llm: null,
-      },
-      date_resiliation: {
-        question: 'Quelle est la date de résiliation souhaitée ?',
-        type: 'date', placeholder: '',
-        llm: null,
-      },
-      motif_resiliation: {
-        question: 'Quel est le motif de résiliation du bail ?',
-        type: 'textarea', placeholder: 'Cessation d\'activité / déménagement du cabinet…',
-        llm: 'Tu es juriste en droit immobilier. Reformule ce motif de résiliation de bail professionnel en termes formels et clairs.',
-      },
-      // ── Collaboration ────────────────────────────────────────────────────────
-      nom_confrere: {
-        question: 'Quel est le nom et prénom du confrère concerné ?',
-        type: 'text', placeholder: 'Dr Marie LAMBERT',
-        llm: null,
-      },
-      specialite_confrere: {
-        question: 'Quelle est la spécialité du confrère ?',
-        type: 'text', placeholder: 'Médecin généraliste',
-        llm: null,
+      justification: {
+        question: 'Quelle est la justification que vous souhaitez apporter ?',
+        type: 'textarea', placeholder: 'L\'acte était médicalement nécessaire car…',
+        llm: 'Tu es médecin. Reformule cette justification médicale en termes précis et professionnels pour un courrier officiel. Réponds uniquement avec le texte reformulé.',
       },
       conditions_proposees: {
         question: 'Quelles sont les conditions de la collaboration proposée (rémunération, jours, durée) ?',
         type: 'textarea', placeholder: 'Rétrocession de 40%, 2 jours/semaine, période d\'essai 3 mois…',
-        llm: 'Tu es juriste en droit médical. Reformule ces conditions de collaboration libérale en termes formels et précis, conformes à la réglementation.',
+        llm: 'Tu es juriste en droit médical. Reformule ces conditions de collaboration libérale en termes formels et précis, conformes à la réglementation. Réponds uniquement avec le texte reformulé.',
       },
-      date_debut: {
-        question: 'Quelle est la date de début de la collaboration ?',
-        type: 'date', placeholder: '',
-        llm: null,
-      },
-      nom_collaborateur: {
-        question: 'Quel est le nom complet du médecin collaborateur ?',
-        type: 'text', placeholder: 'Dr Sophie MARTIN',
-        llm: null,
-      },
-      date_fin: {
-        question: 'Quelle est la date de fin ou de préavis de la collaboration ?',
-        type: 'date', placeholder: '',
-        llm: null,
-      },
-      // ── Défense / Contentieux ────────────────────────────────────────────────
-      nature_diffamation: {
-        question: 'Quelle est la nature des propos diffamatoires ou dénigrants ?',
-        type: 'textarea', placeholder: 'Avis Google mentionnant "incompétent", "dangereux"…',
-        llm: 'Tu es avocat spécialisé en droit de la presse. Reformule la description de ces propos diffamatoires de manière juridique précise, en qualifiant les faits.',
-      },
-      date_publication: {
-        question: 'Quelle est la date de publication des propos litigieux ?',
-        type: 'date', placeholder: '',
-        llm: null,
-      },
-      support_publication: {
-        question: 'Sur quel support ont été publiés ces propos ?',
-        type: 'text', placeholder: 'Google Maps / Doctolib / réseau social',
-        llm: null,
+      description_travaux: {
+        question: 'Décrivez les travaux nécessaires dans votre cabinet (l\'IA pourra reformuler en termes techniques).',
+        type: 'textarea', placeholder: 'Fuite d\'eau au plafond de la salle d\'attente, peinture écaillée, électricité vétuste…',
+        llm: 'Tu es juriste en droit immobilier. Reformule cette description de travaux en termes techniques formels adaptés à une mise en demeure au bailleur. Précise les obligations légales du bailleur. Réponds uniquement avec le texte reformulé.',
       },
       description_incident: {
-        question: 'Décrivez l\'incident signalé (violences, menaces, etc.)',
+        question: 'Décrivez l\'incident (agression, menaces, etc.) — soyez factuel, l\'IA peut aider à formuler.',
         type: 'textarea', placeholder: 'Le patient a proféré des menaces verbales puis…',
-        llm: 'Tu es juriste. Reformule cette description d\'incident en style factuel, neutre et chronologique, adapté à un signalement officiel ou un dépôt de plainte.',
+        llm: 'Tu es juriste. Reformule cette description d\'incident en style factuel, neutre et chronologique, adapté à un signalement officiel ou un dépôt de plainte. Réponds uniquement avec le texte reformulé.',
       },
-      nom_plaignant: {
-        question: 'Quel est le nom de la personne victime ou plaignante ?',
-        type: 'text', placeholder: 'Dr Jean DUPONT',
-        llm: null,
-      },
-      lien_parente: {
-        question: 'Quel est le lien de parenté ou la relation avec le patient ?',
-        type: 'text', placeholder: 'Conjoint / enfant mineur',
-        llm: null,
-      },
-      // ── Organismes / ARS ─────────────────────────────────────────────────────
-      date_installation: {
-        question: 'Quelle est la date prévue d\'installation ou d\'ouverture du cabinet ?',
-        type: 'date', placeholder: '',
-        llm: null,
-      },
-      adresse_installation: {
-        question: 'Quelle est l\'adresse du futur cabinet ?',
-        type: 'address', placeholder: '3 rue des Acacia, 77000 Melun',
-        llm: null,
-      },
-      type_cabinet: {
-        question: 'Quel type de cabinet créez-vous ?',
-        type: 'text', placeholder: 'Cabinet libéral individuel / maison de santé pluriprofessionnelle',
-        llm: null,
-      },
-      commune_installation: {
-        question: 'Dans quelle commune vous installez-vous ?',
-        type: 'text', placeholder: 'Melun (77000)',
-        llm: null,
-      },
-      distance_autre_medecin: {
-        question: 'Quelle est la distance avec le médecin le plus proche (km) ?',
-        type: 'text', placeholder: '8 km',
-        llm: null,
-      },
-      // ── Doctolib ─────────────────────────────────────────────────────────────
-      date_resiliation_doctolib: {
-        question: 'Quelle est la date de résiliation de votre contrat Doctolib ?',
-        type: 'date', placeholder: '',
-        llm: null,
-      },
-      motif_resiliation_doctolib: {
-        question: 'Quel est le motif de résiliation Doctolib ?',
-        type: 'textarea', placeholder: 'Cessation d\'activité / tarif trop élevé / migration vers un autre outil…',
-        llm: 'Reformule ce motif de résiliation d\'un contrat Doctolib en termes formels et clairs pour un courrier officiel.',
+      references_legales: {
+        question: 'Quelles références légales ou réglementaires souhaitez-vous citer (articles, décrets…) ?',
+        type: 'textarea', placeholder: 'Article L. 4130-1 du CSP, Décret du 12 mars 2022…',
+        llm: 'Tu es juriste en droit médical. Reformule et complète si possible ces références légales pour qu\'elles soient correctement citées dans un courrier officiel. Réponds uniquement avec le texte reformulé.',
       },
     };
 
