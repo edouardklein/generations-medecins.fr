@@ -152,6 +152,7 @@
         <a href="regions.html">Régions</a>
         <a href="bureau.html">Bureau</a>
       </nav>
+      <a href="connexion.html" id="header-login-link" style="font-size:.85rem;font-weight:700;color:var(--blue-dark);text-decoration:none;white-space:nowrap;">Se connecter</a>
       <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
     </div>
   </header>
@@ -160,7 +161,7 @@
     <div class="page-hero-inner">
       <span class="badge badge-blue">🛠️ Outils pratiques</span>
       <h1>Outils</h1>
-      <p>Ce que vous cherchez désespérément sur Google, enfin centralisé. Gratuit pour certains, réservé aux adhérents pour les fonctionnalités avancées.</p>
+      <p>Tous les outils du syndicat, centralisés. Disponibles pour tous les adhérents.</p>
     </div>
   </div>
 
@@ -173,17 +174,23 @@
           <div class="tool-name">Bibliothèque de courriers</div>
           <p class="tool-desc">Courriers CPAM, lettres de refus tiers payant, modèles RGPD, suppression fiche Google, contrats de collaboration. Générateur automatisé inclus.</p>
           <div class="tool-footer">
-            <span class="pill pill-free">Gratuit</span>
+            <span class="pill pill-members">Adhérents</span>
             <span class="tool-cta">Voir les courriers →</span>
           </div>
         </a>
 
         <div class="tool-card" id="juridique">
           <div class="tool-icon">🚨</div>
-          <div class="tool-name">SOS Juridique</div>
-          <p class="tool-desc">Décrivez votre situation. Un LLM l'analyse et vous oriente vers la bonne ressource ou un avocat partenaire. Délai de réponse garanti 48h.</p>
+          <div class="tool-name" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            SOS Juridique
+            <span style="display:inline-flex;align-items:center;gap:5px;background:#f0faf5;border:1px solid #b8e8d0;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;color:#0d6e3f;letter-spacing:.02em">
+              Boosted by
+              <img src="doctrine-logo.png" alt="Doctrine" style="height:14px;vertical-align:middle" onerror="this.style.display='none'">
+            </span>
+          </div>
+          <p class="tool-desc">Décrivez votre situation. Elle est analysée et vous êtes orienté vers la bonne ressource ou notre avocat partenaire (<a href="https://spi-avocats.com/" target="_blank" rel="noopener" style="color:var(--blue);font-weight:600">SPI Avocats</a>).</p>
           <div class="tool-footer">
-            <span class="pill pill-members">🔒 Adhérents</span>
+            <span class="pill pill-members">Adhérents</span>
             <a href="adherer.html" class="tool-cta">Adhérer →</a>
           </div>
         </div>
@@ -193,7 +200,7 @@
           <div class="tool-name">Calculateur URSSAF / CARMF</div>
           <p class="tool-desc">Pour les internes qui s'installent. Simulez vos cotisations sociales, retraite CARMF, prévoyance, selon vos revenus prévisionnels.</p>
           <div class="tool-footer">
-            <span class="pill pill-free">Gratuit</span>
+            <span class="pill pill-members">Adhérents</span>
             <span class="tool-cta">Bientôt →</span>
           </div>
         </div>
@@ -203,7 +210,7 @@
           <div class="tool-name">Carte des élus santé</div>
           <p class="tool-desc">"Mon député, qu'a-t-il voté sur les sujets santé ?" Veille automatique des votes à l'Assemblée nationale. Redoutable en période électorale.</p>
           <div class="tool-footer">
-            <span class="pill pill-free">Gratuit</span>
+            <span class="pill pill-members">Adhérents</span>
             <span class="tool-cta">Bientôt →</span>
           </div>
         </div>
@@ -213,7 +220,7 @@
           <div class="tool-name">Petites annonces</div>
           <p class="tool-desc">Remplacements, installations, cessions de cabinet entre adhérents. Réseau de confiance vérifié. Pas de Leboncoin médical — un vrai réseau pairs.</p>
           <div class="tool-footer">
-            <span class="pill pill-members">🔒 Adhérents</span>
+            <span class="pill pill-members">Adhérents</span>
             <a href="adherer.html" class="tool-cta">Adhérer →</a>
           </div>
         </div>
@@ -243,7 +250,7 @@
           <div class="tool-name">Aide à la cotation</div>
           <p class="tool-desc">Retrouvez rapidement les codes CCAM et NGAP pour chaque acte. Associations autorisées, modificateurs, pièges fréquents et optimisation légale.</p>
           <div class="tool-footer">
-            <span class="pill pill-free">Gratuit</span>
+            <span class="pill pill-members">Adhérents</span>
             <span class="tool-cta">Accéder →</span>
           </div>
         </a>
@@ -253,7 +260,7 @@
           <div class="tool-name">Aide à l'installation</div>
           <p class="tool-desc">Le guide pas-à-pas pour s'installer : URSSAF, CPAM, OrdreM, logiciels, cabinet, assurances. Checklist interactive par étape.</p>
           <div class="tool-footer">
-            <span class="pill pill-free">Gratuit</span>
+            <span class="pill pill-members">Adhérents</span>
             <span class="tool-cta">Voir le guide →</span>
           </div>
         </a>
@@ -263,7 +270,7 @@
           <div class="tool-name">Comparer les modes d'exercice</div>
           <p class="tool-desc">S1, S2, OPTAM, MSP, SEL, salarié du privé, mixte — comprendre les différences concrètes en termes de revenus, charges et liberté.</p>
           <div class="tool-footer">
-            <span class="pill pill-free">Gratuit</span>
+            <span class="pill pill-members">Adhérents</span>
             <span class="tool-cta">Comparer →</span>
           </div>
         </a>
@@ -273,7 +280,7 @@
           <div class="tool-name">Consultation des adhérents</div>
           <p class="tool-desc">Un système de vote et de sondage intégré pour que chaque décision importante soit prise avec les adhérents, pas à leur place.</p>
           <div class="tool-footer">
-            <span class="pill pill-members">🔒 Adhérents · À venir</span>
+            <span class="pill pill-soon">⏳ À venir</span>
             <span class="tool-cta">En savoir plus →</span>
           </div>
         </a>
@@ -285,7 +292,7 @@
             <div class="tool-name">Simulateur de revenus</div>
             <p class="tool-desc">Comparez libéral pur, SEL, salariat, mixte. Impact des dernières conventions inclus, charges sociales détaillées, évolution projetée sur 3 ans.</p>
             <div class="tool-footer">
-              <span class="pill pill-free" style="background:rgba(137,200,106,0.2);color:#89c86a">Gratuit</span>
+              <span class="pill pill-members" style="background:rgba(255,255,255,0.15);color:#fff">Adhérents</span>
               <span class="tool-cta">Être notifié à l'ouverture →</span>
             </div>
           </div>
@@ -319,7 +326,7 @@
 
   <section class="cta-section">
     <h2>Accédez à tous les outils.</h2>
-    <p>Les outils réservés aux adhérents sont conçus pour les situations où vous en avez le plus besoin. SOS Juridique, petites annonces, consultation — tout ça avec votre adhésion.</p>
+    <p>SOS Juridique, bibliothèque de courriers, petites annonces, consultation des adhérents — tous les outils inclus dans l'adhésion.</p>
     <a href="adherer.html" class="btn btn-white btn-lg">Adhérer maintenant →</a>
   </section>
 

@@ -239,8 +239,14 @@
             <div class="benefit">
               <div class="benefit-icon">🚨</div>
               <div>
-                <div class="benefit-title">SOS Juridique — délai garanti 48h</div>
-                <div class="benefit-desc">Décrivez votre situation. Un LLM l'analyse et vous route vers un avocat partenaire avec réponse garantie sous 48h.</div>
+                <div class="benefit-title" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  SOS Juridique
+                  <span style="display:inline-flex;align-items:center;gap:5px;background:#f0faf5;border:1px solid #b8e8d0;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;color:#0d6e3f;letter-spacing:.02em">
+                    Boosted by
+                    <img src="doctrine-logo.png" alt="Doctrine" style="height:14px;vertical-align:middle" onerror="this.style.display='none'">
+                  </span>
+                </div>
+                <div class="benefit-desc">Décrivez votre situation. Elle est analysée et vous êtes orienté vers la bonne ressource ou notre avocat partenaire (<a href="https://spi-avocats.com/" target="_blank" rel="noopener" style="color:var(--blue)">SPI Avocats</a>).</div>
               </div>
             </div>
             <div class="benefit">
@@ -273,8 +279,8 @@
             </div>
           </div>
           <div class="testimonial">
-            <p class="testimonial-text">"Enfin un mouvement qui répond à mes questions en 24h et qui me dit clairement ce qui change pour moi. La bibliothèque de courriers m'a déjà sauvé deux fois."</p>
-            <div class="testimonial-author">— Dr. M.T., Généraliste S1, Val-de-Marne</div>
+            <p class="testimonial-text">"Je cherchais un syndicat qui parle le même langage que nous, sans les postures habituelles. Les décrypteurs conventionnels sont clairs et utiles au quotidien."</p>
+            <div class="testimonial-author">— Dr. C.L., Médecin généraliste, Paris 15e</div>
           </div>
         </div>
 
@@ -338,11 +344,11 @@
             <div class="form-row">
               <div class="form-group">
                 <label for="telephone">Téléphone</label>
-                <input type="tel" id="telephone" name="telephone" placeholder="06 12 34 56 78">
+                <input type="tel" id="telephone" name="telephone" placeholder="06 12 34 56 78" required>
               </div>
               <div class="form-group">
-                <label for="code_postal">Code postal d'exercice</label>
-                <input type="text" id="code_postal" name="code_postal" placeholder="75001" maxlength="5" pattern="[0-9]{5}">
+                <label for="code_postal">Code postal d'exercice <span style="color:#b91c1c">*</span></label>
+                <input type="text" id="code_postal" name="code_postal" placeholder="75001" maxlength="5" pattern="[0-9]{5}" required>
               </div>
             </div>
 

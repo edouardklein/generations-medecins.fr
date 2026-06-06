@@ -1,0 +1,8 @@
+# Variables d'environnement — jamais en git
+.env
+.env.local
+.env.production
+
+# Divers
+.DS_Store
+node_modules/
