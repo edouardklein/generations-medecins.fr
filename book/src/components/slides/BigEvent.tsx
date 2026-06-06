@@ -2,14 +2,6 @@ import { motion } from 'framer-motion'
 import type { BigEventProps } from '../../lib/types'
 import { fadeUp, stagger, VIEWPORT_ONCE } from './_anim'
 
-// Decorative footers per parcours — fills the visual void at the bottom of
-// each track card so we don't end up with half-empty boxes.
-const trackKickers: Record<string, { icon: string; tagline: string }> = {
-  '1': { icon: '🎓', tagline: 'Préparer • Cadrer • Décider' },
-  '2': { icon: '🏥', tagline: 'Statuts • Fiscalité • Mixte' },
-  '3': { icon: '🧑‍⚕️', tagline: 'Achat • Pied à terre • Prêt' },
-}
-
 export default function BigEvent(props: BigEventProps) {
   return (
     <div className="h-full w-full grid" style={{ gridTemplateRows: 'auto auto 1fr auto', rowGap: 20 }}>
@@ -54,51 +46,36 @@ export default function BigEvent(props: BigEventProps) {
         variants={stagger}
         className="grid grid-cols-3 gap-5 min-h-0"
       >
-        {props.tracks.map((t, i) => {
-          const kicker = trackKickers[t.num]
-          return (
-            <motion.div
-              key={t.num}
-              custom={i}
-              variants={fadeUp}
-              className="relative rounded-2xl bg-white/[0.04] border border-white/5 p-6 overflow-hidden flex flex-col"
-            >
-              <div className="absolute -bottom-6 -right-3 h-display text-[150px] leading-none text-white/[0.06] select-none pointer-events-none">
-                {t.num}
-              </div>
+        {props.tracks.map((t, i) => (
+          <motion.div
+            key={t.num}
+            custom={i}
+            variants={fadeUp}
+            className="relative rounded-2xl bg-white/[0.04] border border-white/5 p-6 overflow-hidden flex flex-col"
+          >
+            <div className="absolute -bottom-6 -right-3 h-display text-[150px] leading-none text-white/[0.06] select-none pointer-events-none">
+              {t.num}
+            </div>
 
-              <div className="text-[13px] tracking-[0.3em] uppercase text-gold-500">Parcours {t.num}</div>
-              <div className="mt-2 h-display text-[24px] leading-tight text-white relative z-10">{t.title}</div>
-              {t.audience && (
-                <div className="mt-1.5 text-[13px] italic text-navy-200 relative z-10">{t.audience}</div>
-              )}
+            <div className="text-[13px] tracking-[0.3em] uppercase text-gold-500">Parcours {t.num}</div>
+            <div className="mt-2 h-display text-[24px] leading-tight text-white relative z-10">{t.title}</div>
+            {t.audience && (
+              <div className="mt-1.5 text-[13px] italic text-navy-200 relative z-10">{t.audience}</div>
+            )}
 
-              <ul className="mt-5 space-y-3 relative z-10">
-                {t.topics.map((topic, k) => (
-                  <li
-                    key={k}
-                    className="text-[16px] text-white/95 flex gap-3 leading-snug rounded-lg bg-white/[0.03] border border-white/5 px-3 py-2"
-                  >
-                    <span className="text-gold-500 flex-none mt-0.5">▸</span>
-                    <span>{topic}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* Decorative footer to fill the lower half of the card */}
-              {kicker && (
-                <div className="mt-auto pt-5 relative z-10">
-                  <div className="flex items-center gap-3 rounded-xl border border-gold-500/30 bg-gold-500/5 px-4 py-3">
-                    <span className="text-2xl">{kicker.icon}</span>
-                    <span className="text-[12px] tracking-[0.22em] uppercase text-gold-400">
-                      {kicker.tagline}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          )
-        })}
+            <ul className="mt-5 space-y-2.5 relative z-10 flex-1">
+              {t.topics.map((topic, k) => (
+                <li
+                  key={k}
+                  className="text-[15px] text-white/95 flex gap-2.5 leading-snug rounded-lg bg-white/[0.03] border border-white/5 px-3 py-2"
+                >
+                  <span className="text-gold-500 flex-none mt-0.5">▸</span>
+                  <span>{topic}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        ))}
       </motion.div>
 
       {/* Common topics — flex-wrap chips */}

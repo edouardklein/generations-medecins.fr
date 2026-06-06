@@ -50,9 +50,9 @@ export const defaultBook: Book = {
         title: 'Une audience importante',
         subtitle: 'Le réseau Générations Médecins en chiffres.',
         stats: [
-          { label: 'Adhérents IDF', value: 2000, caption: 'médecins en Île-de-France' },
-          { label: 'Adhérents AURA', value: 500, caption: 'Auvergne-Rhône-Alpes' },
-          { label: 'Abonnés LinkedIn', value: 17000, caption: 'Président GM IDF — LinkedIn' },
+          { label: 'Adhérents IDF', value: 2000, suffix: '+', caption: 'médecins en Île-de-France' },
+          { label: 'Adhérents AURA', value: 1000, suffix: '+', caption: 'Auvergne-Rhône-Alpes' },
+          { label: 'Abonnés LinkedIn', value: 17000, caption: 'Président GM — LinkedIn' },
           { label: 'Contacts', value: 12000, caption: 'Base Médecins en Grève' },
           { label: 'Événements / an', value: 10, caption: 'soirées networking qualifiées' },
         ],
@@ -89,7 +89,7 @@ export const defaultBook: Book = {
             role: 'Président',
             specialty: 'Psychiatre',
             details: 'Direction médicale — Clariane, NeuroStim, Cline Research, Masterclass Médicale',
-            photoUrl: '/bureau/AB.jpg',
+            photoUrl: '/bureau/AB.png',
           },
           {
             initials: 'MT',
@@ -100,7 +100,7 @@ export const defaultBook: Book = {
               'Board médical de Résorose & Celene Care',
               'Ancienne vice-présidente nationale de la SFjRO (Société Française des jeunes radiothérapeutes oncologues)',
             ],
-            photoUrl: '/bureau/MT.jpg',
+            photoUrl: '/bureau/MHT.png',
           },
           {
             initials: 'PH',
@@ -108,21 +108,20 @@ export const defaultBook: Book = {
             role: 'Vice-président',
             specialty: 'Dermatologue',
             details: 'Chef de Service Dermatologie — Kremlin-Bicêtre',
-            photoUrl: '/bureau/PH.jpg',
+            photoUrl: '/bureau/PH.png',
           },
           {
             initials: 'CC',
             name: 'Dr. Cherifa CHEURFA',
             role: 'Vice-présidente',
             specialty: 'Anesthésiste-réanimateur',
-            photoUrl: '/bureau/CC.jpg',
           },
           {
             initials: 'LK',
             name: 'Dr. Louise-Anne KLEIN',
             role: 'Vice-présidente',
             specialty: 'Gynécologue obstétricienne',
-            photoUrl: '/bureau/LK.jpg',
+            photoUrl: '/bureau/LAK.png',
           },
           {
             initials: 'FV',
@@ -130,7 +129,7 @@ export const defaultBook: Book = {
             role: 'Trésorier',
             specialty: 'Anesthésiste-réanimateur',
             details: 'Chef de Service de Réanimation — Saint-Antoine',
-            photoUrl: '/bureau/FV.jpg',
+            photoUrl: '/bureau/FV.jpeg',
           },
           {
             initials: 'RB',
@@ -138,7 +137,7 @@ export const defaultBook: Book = {
             role: 'Chargée de mission',
             specialty: 'Radiologue',
             details: "Ancienne présidente de l'UNIR (Union Nationale des Internes en Radiologie)",
-            photoUrl: '/bureau/RB.jpg',
+            photoUrl: '/bureau/RB.png',
           },
           {
             initials: 'SH',
@@ -146,7 +145,7 @@ export const defaultBook: Book = {
             role: 'Chargée de mission',
             specialty: 'Psychiatre hospitalier — Sainte-Anne',
             details: 'Représentante à la commission régionale paritaire',
-            photoUrl: '/bureau/SH.jpg',
+            photoUrl: '/bureau/SH.png',
           },
         ],
         footnote:
@@ -165,22 +164,22 @@ export const defaultBook: Book = {
             glyph: '📺',
             items: [
               { name: 'New Deal Santé', caption: 'Le show de Martin Blachier', logo: '/media/new-deal-sante.png' },
-              { name: 'TF1', caption: 'Journaux & magazines santé', logo: '/media/tf1.png' },
+              { name: 'TF1', caption: 'Journaux & magazines santé' },
             ],
           },
           {
             kicker: 'Presse médicale',
             glyph: '📰',
             items: [
-              { name: "What's Up Doc", logo: '/media/whatsupdoc.png' },
-              { name: 'Egora', logo: '/media/egora.png' },
+              { name: "What's Up Doc" },
+              { name: 'Egora', logo: '/media/Egora.png' },
             ],
           },
           {
             kicker: 'Réseaux sociaux',
             glyph: '💼',
             items: [
-              { name: 'LinkedIn — Président GM IDF', caption: '17 000 abonnés', logo: '/media/linkedin.png' },
+              { name: 'LinkedIn — Président GM', caption: '17 000 abonnés' },
               { name: 'YouTube', caption: 'Vidéos & interventions', logo: '/media/youtube.png' },
             ],
           },
@@ -406,6 +405,10 @@ export const defaultBook: Book = {
             title: 'SOS juridique',
             body:
               "Une IA juridique + un avocat de garde : plus rapide, plus accessible et plus à jour qu'un juriste classique. Réponses concrètes, contextualisées au droit médical.",
+            tools: [
+              { name: 'Doctrine', logo: '/logos/Doctrine_logo.png' },
+              { name: 'SPI Avocats' },
+            ],
           },
           {
             glyph: '🏥',
@@ -497,7 +500,7 @@ export const defaultBook: Book = {
           "Trois niveaux d'engagement pour vous projeter, avec des contreparties qui montent en intensité.",
         packs: [
           {
-            name: 'Bronze',
+            name: 'Initiateur',
             price: '60 K€',
             tagline: 'Pour amorcer une présence forte auprès de notre communauté',
             features: [
@@ -510,12 +513,12 @@ export const defaultBook: Book = {
             ],
           },
           {
-            name: 'Argent',
+            name: 'Allié',
             price: '100 K€',
-            tagline: 'Engagement renforcé, co-construction, visibilité événementielle',
+            tagline: "L'allié privilégié — co-construction, visibilité événementielle",
             features: [
-              "✦ Inclut l'intégralité du Bronze",
-              "Co-organisation de 2 events / an",
+              "✦ Inclut l'intégralité de l'Initiateur",
+              'Co-organisation de 2 events / an',
               'Webinaire co-brandé avec inscriptions et replay',
               'Intervention de 10 min au Big Event',
               'Module sponsorisé sur la plateforme',
@@ -523,15 +526,15 @@ export const defaultBook: Book = {
             ],
           },
           {
-            name: 'Or',
+            name: 'Mécène',
             price: '150 K€',
             tagline: 'Partenariat premium — votre marque ancrée dans la communauté',
             premium: true,
             features: [
-              "✦ Inclut l'intégralité de l'Argent",
+              "✦ Inclut l'intégralité de l'Allié",
               "Naming d'un module (ex : « SOS juridique by X »)",
               'Soirée VIP exclusive avec les KOLs',
-              "Prise de parole en ouverture du Big Event",
+              'Prise de parole en ouverture du Big Event',
               'Co-création de contenu (newsletter, podcast)',
               'Accès direct au dashboard reporting',
             ],

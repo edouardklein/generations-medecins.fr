@@ -243,7 +243,13 @@ export type FeaturesProps = {
   eyebrow?: string
   title: string
   subtitle?: string
-  features: { glyph: string; tag?: string; title: string; body: string }[]
+  features: {
+    glyph: string
+    tag?: string
+    title: string
+    body: string
+    tools?: { name: string; logo?: string }[]
+  }[]
 }
 
 export type PartnersLogosProps = {

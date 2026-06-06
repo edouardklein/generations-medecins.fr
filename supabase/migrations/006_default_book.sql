@@ -1,8 +1,6 @@
 -- Default book template
 create or replace function public.apply_default_book(p_slug text)
-returns int
-language plpgsql
-security definer
+returns int language plpgsql security definer
 set search_path = public, extensions
 as $fn$
 declare
@@ -71,17 +69,19 @@ declare
         {
           "label": "Adhérents IDF",
           "value": 2000,
+          "suffix": "+",
           "caption": "médecins en Île-de-France"
         },
         {
           "label": "Adhérents AURA",
-          "value": 500,
+          "value": 1000,
+          "suffix": "+",
           "caption": "Auvergne-Rhône-Alpes"
         },
         {
           "label": "Abonnés LinkedIn",
           "value": 17000,
-          "caption": "Président GM IDF — LinkedIn"
+          "caption": "Président GM — LinkedIn"
         },
         {
           "label": "Contacts",
@@ -141,7 +141,7 @@ declare
           "role": "Président",
           "specialty": "Psychiatre",
           "details": "Direction médicale — Clariane, NeuroStim, Cline Research, Masterclass Médicale",
-          "photoUrl": "/bureau/AB.jpg"
+          "photoUrl": "/bureau/AB.png"
         },
         {
           "initials": "MT",
@@ -152,7 +152,7 @@ declare
             "Board médical de Résorose & Celene Care",
             "Ancienne vice-présidente nationale de la SFjRO (Société Française des jeunes radiothérapeutes oncologues)"
           ],
-          "photoUrl": "/bureau/MT.jpg"
+          "photoUrl": "/bureau/MHT.png"
         },
         {
           "initials": "PH",
@@ -160,21 +160,20 @@ declare
           "role": "Vice-président",
           "specialty": "Dermatologue",
           "details": "Chef de Service Dermatologie — Kremlin-Bicêtre",
-          "photoUrl": "/bureau/PH.jpg"
+          "photoUrl": "/bureau/PH.png"
         },
         {
           "initials": "CC",
           "name": "Dr. Cherifa CHEURFA",
           "role": "Vice-présidente",
-          "specialty": "Anesthésiste-réanimateur",
-          "photoUrl": "/bureau/CC.jpg"
+          "specialty": "Anesthésiste-réanimateur"
         },
         {
           "initials": "LK",
           "name": "Dr. Louise-Anne KLEIN",
           "role": "Vice-présidente",
           "specialty": "Gynécologue obstétricienne",
-          "photoUrl": "/bureau/LK.jpg"
+          "photoUrl": "/bureau/LAK.png"
         },
         {
           "initials": "FV",
@@ -182,7 +181,7 @@ declare
           "role": "Trésorier",
           "specialty": "Anesthésiste-réanimateur",
           "details": "Chef de Service de Réanimation — Saint-Antoine",
-          "photoUrl": "/bureau/FV.jpg"
+          "photoUrl": "/bureau/FV.jpeg"
         },
         {
           "initials": "RB",
@@ -190,7 +189,7 @@ declare
           "role": "Chargée de mission",
           "specialty": "Radiologue",
           "details": "Ancienne présidente de l'UNIR (Union Nationale des Internes en Radiologie)",
-          "photoUrl": "/bureau/RB.jpg"
+          "photoUrl": "/bureau/RB.png"
         },
         {
           "initials": "SH",
@@ -198,7 +197,7 @@ declare
           "role": "Chargée de mission",
           "specialty": "Psychiatre hospitalier — Sainte-Anne",
           "details": "Représentante à la commission régionale paritaire",
-          "photoUrl": "/bureau/SH.jpg"
+          "photoUrl": "/bureau/SH.png"
         }
       ],
       "footnote": "Plusieurs KOL au sein du bureau • Plusieurs vice-présidents de la FMF ou de syndicats verticaux • Plusieurs chefs de service • Multidisciplinarité forte."
@@ -222,8 +221,7 @@ declare
             },
             {
               "name": "TF1",
-              "caption": "Journaux & magazines santé",
-              "logo": "/media/tf1.png"
+              "caption": "Journaux & magazines santé"
             }
           ]
         },
@@ -232,12 +230,11 @@ declare
           "glyph": "📰",
           "items": [
             {
-              "name": "What's Up Doc",
-              "logo": "/media/whatsupdoc.png"
+              "name": "What's Up Doc"
             },
             {
               "name": "Egora",
-              "logo": "/media/egora.png"
+              "logo": "/media/Egora.png"
             }
           ]
         },
@@ -246,9 +243,8 @@ declare
           "glyph": "💼",
           "items": [
             {
-              "name": "LinkedIn — Président GM IDF",
-              "caption": "17 000 abonnés",
-              "logo": "/media/linkedin.png"
+              "name": "LinkedIn — Président GM",
+              "caption": "17 000 abonnés"
             },
             {
               "name": "YouTube",
@@ -557,7 +553,16 @@ declare
           "glyph": "⚖️",
           "tag": "Juridique",
           "title": "SOS juridique",
-          "body": "Une IA juridique + un avocat de garde : plus rapide, plus accessible et plus à jour qu'un juriste classique. Réponses concrètes, contextualisées au droit médical."
+          "body": "Une IA juridique + un avocat de garde : plus rapide, plus accessible et plus à jour qu'un juriste classique. Réponses concrètes, contextualisées au droit médical.",
+          "tools": [
+            {
+              "name": "Doctrine",
+              "logo": "/logos/Doctrine_logo.png"
+            },
+            {
+              "name": "SPI Avocats"
+            }
+          ]
         },
         {
           "glyph": "🏥",
@@ -707,7 +712,7 @@ declare
       "subtitle": "Trois niveaux d'engagement pour vous projeter, avec des contreparties qui montent en intensité.",
       "packs": [
         {
-          "name": "Bronze",
+          "name": "Initiateur",
           "price": "60 K€",
           "tagline": "Pour amorcer une présence forte auprès de notre communauté",
           "features": [
@@ -720,11 +725,11 @@ declare
           ]
         },
         {
-          "name": "Argent",
+          "name": "Allié",
           "price": "100 K€",
-          "tagline": "Engagement renforcé, co-construction, visibilité événementielle",
+          "tagline": "L'allié privilégié — co-construction, visibilité événementielle",
           "features": [
-            "✦ Inclut l'intégralité du Bronze",
+            "✦ Inclut l'intégralité de l'Initiateur",
             "Co-organisation de 2 events / an",
             "Webinaire co-brandé avec inscriptions et replay",
             "Intervention de 10 min au Big Event",
@@ -733,12 +738,12 @@ declare
           ]
         },
         {
-          "name": "Or",
+          "name": "Mécène",
           "price": "150 K€",
           "tagline": "Partenariat premium — votre marque ancrée dans la communauté",
           "premium": true,
           "features": [
-            "✦ Inclut l'intégralité de l'Argent",
+            "✦ Inclut l'intégralité de l'Allié",
             "Naming d'un module (ex : « SOS juridique by X »)",
             "Soirée VIP exclusive avec les KOLs",
             "Prise de parole en ouverture du Big Event",
@@ -810,9 +815,7 @@ declare
   v_count int;
 begin
   select id into v_partner_id from public.partners where slug = p_slug;
-  if v_partner_id is null then
-    raise exception 'No partner with slug %', p_slug;
-  end if;
+  if v_partner_id is null then raise exception 'No partner with slug %', p_slug; end if;
   update public.partner_books set slides = v_slides, updated_at = now() where partner_id = v_partner_id;
   if not found then insert into public.partner_books (partner_id, slides) values (v_partner_id, v_slides); end if;
   v_count := jsonb_array_length(v_slides);

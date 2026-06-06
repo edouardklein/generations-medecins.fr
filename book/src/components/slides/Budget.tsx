@@ -31,20 +31,20 @@ export default function Budget(props: BudgetProps) {
                 key={it.label}
                 custom={i}
                 variants={fadeUp}
-                className="group rounded-2xl bg-white/[0.04] border border-white/5 p-5 hover:bg-white/[0.07] transition"
+                className="group rounded-2xl bg-white/[0.04] border border-white/5 px-5 py-3.5 hover:bg-white/[0.07] transition"
               >
                 <div className="flex items-baseline justify-between gap-6">
                   <div className="min-w-0 flex-1">
-                    <div className="text-[22px] font-semibold text-white leading-tight">{it.label}</div>
+                    <div className="text-[18px] font-semibold text-white leading-tight">{it.label}</div>
                     {it.detail && (
-                      <div className="mt-1 text-[14px] text-navy-200">{it.detail}</div>
+                      <div className="mt-0.5 text-[13px] text-navy-200 leading-snug">{it.detail}</div>
                     )}
                   </div>
-                  <div className="h-display text-[36px] leading-none text-gold-500 whitespace-nowrap">
+                  <div className="h-display text-[30px] leading-none text-gold-500 whitespace-nowrap">
                     <CountUp to={it.amount} /> {currency}
                   </div>
                 </div>
-                <div className="mt-3 h-[5px] rounded-full bg-white/5 overflow-hidden">
+                <div className="mt-2.5 h-[5px] rounded-full bg-white/5 overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: `${share}%` }}
