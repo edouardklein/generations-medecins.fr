@@ -70,6 +70,19 @@ export default function Audience(props: AudienceProps) {
           </div>
         </motion.div>
       </div>
+
+      {props.callout && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT_ONCE}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className="mt-5 rounded-2xl bg-gold-500/10 border border-gold-500/40 px-6 py-4 flex items-center gap-4"
+        >
+          <span className="text-3xl">🤝</span>
+          <div className="text-[16px] text-white leading-snug">{props.callout}</div>
+        </motion.div>
+      )}
     </div>
   )
 }

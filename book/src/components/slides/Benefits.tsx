@@ -29,19 +29,19 @@ export default function Benefits(props: BenefitsProps) {
                 {b.num}
               </div>
               <div className="flex-1 min-w-0 flex flex-col">
-                <div className="text-[20px] font-semibold text-white leading-tight">{b.title}</div>
-                <p className="mt-2 text-[14px] leading-snug text-navy-100">{b.body}</p>
+                <div className="text-[21px] font-semibold text-white leading-tight">{b.title}</div>
+                <p className="mt-3 text-[16px] leading-snug text-white/95">{b.body}</p>
                 {b.items && b.items.length > 0 && (
-                  <ul className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
+                  <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5">
                     {b.items.map((it, k) => (
-                      <li key={k} className="text-[12px] text-navy-200 leading-snug flex gap-1.5">
+                      <li key={k} className="text-[14px] text-navy-100 leading-snug flex gap-1.5">
                         <span className="text-gold-500 flex-none">•</span>
                         <span>{it}</span>
                       </li>
                     ))}
                   </ul>
                 )}
-                <div className="mt-auto pt-3 flex items-start gap-2 text-[13px] text-gold-400 leading-snug">
+                <div className="mt-auto pt-4 flex items-start gap-2 text-[15px] text-gold-400 leading-snug font-medium">
                   <span className="inline-block w-5 h-px mt-2.5 bg-gold-500 flex-none" />
                   <span>{b.arrow}</span>
                 </div>
@@ -58,9 +58,9 @@ export default function Benefits(props: BenefitsProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={VIEWPORT_ONCE}
           transition={{ delay: 0.4, duration: 0.6 }}
-          className="mt-4 rounded-2xl bg-gold-500/8 border border-gold-500/30 px-6 py-4"
+          className="mt-4 rounded-2xl bg-gold-500/10 border border-gold-500/40 px-6 py-4"
         >
-          <p className="text-[15px] text-white leading-snug italic">{props.closing}</p>
+          <p className="text-[17px] text-white leading-snug font-medium">{props.closing}</p>
         </motion.div>
       )}
     </div>

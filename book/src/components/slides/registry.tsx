@@ -13,6 +13,9 @@ import BigEvent from './BigEvent'
 import Features from './Features'
 import PartnersLogos from './PartnersLogos'
 import Budget from './Budget'
+import Testimonials from './Testimonials'
+import Media from './Media'
+import Packs from './Packs'
 import PartnersGrid from './PartnersGrid'
 import Visibility from './Visibility'
 import Plan from './Plan'
@@ -62,6 +65,12 @@ export function renderSlide(slide: Slide, ctx: SlideContext) {
       )
     case 'budget':
       return <Budget {...slide.props} />
+    case 'testimonials':
+      return <Testimonials {...slide.props} />
+    case 'media':
+      return <Media {...slide.props} />
+    case 'packs':
+      return <Packs {...slide.props} />
     case 'partnersGrid':
       return <PartnersGrid {...slide.props} />
     case 'visibility':

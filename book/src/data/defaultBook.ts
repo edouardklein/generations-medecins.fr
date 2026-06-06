@@ -2,7 +2,6 @@ import type { Book } from '../lib/types'
 
 const partnerLogoBySlug = (slug: string) => `/logos/${slug}`
 
-// Real partners shown on the "Nos partenaires" slide (logos sit in book/public/logos)
 const knownPartners = [
   { name: 'Crédit Agricole', logo: partnerLogoBySlug('CA.png') },
   { name: 'La Médicale', logo: partnerLogoBySlug('LM.png') },
@@ -27,7 +26,7 @@ export const defaultBook: Book = {
         brand: 'GÉNÉRATIONS MÉDECINS IDF',
         titleLines: ['Devenez', "l'allié privilégié", 'des médecins', 'franciliens.'],
         subtitle:
-          'Un réseau de 2 000 médecins en Île-de-France. Une communauté engagée. Un parcours partenaire pensé pour votre impact.',
+          'Un réseau de 2 000 médecins. Une communauté engagée. Un parcours partenaire pensé pour votre impact.',
         footer: 'BOOK PARTENAIRES • ÉDITION 2026',
       },
     },
@@ -36,11 +35,11 @@ export const defaultBook: Book = {
       props: {
         title: 'Sommaire',
         items: [
-          { chapter: '01', title: 'Qui sommes-nous ?', description: 'Manifesto, bureau & KOLs', range: 'Slides 03 – 05' },
-          { chapter: '02', title: "L'opportunité partenaire", description: 'Bénéfices, audience, leviers d\'activation', range: 'Slides 06 – 08' },
-          { chapter: '03', title: 'Nos rendez-vous', description: 'Events mensuels et The Big Event', range: 'Slides 09 – 10' },
-          { chapter: '04', title: 'Plateforme & partenaires', description: 'Nos outils et notre communauté', range: 'Slides 11 – 12' },
-          { chapter: '05', title: 'Besoins & engagement', description: 'Budget, charte et contact', range: 'Slides 13 – 15' },
+          { chapter: '01', title: 'Qui sommes-nous ?', description: 'Audience, manifesto, bureau, médias', range: 'Slides 03 – 06' },
+          { chapter: '02', title: "L'opportunité partenaire", description: "Bénéfices, audience, leviers d'activation", range: 'Slides 07 – 09' },
+          { chapter: '03', title: 'Nos rendez-vous', description: 'Events mensuels et The Big Event', range: 'Slides 10 – 11' },
+          { chapter: '04', title: 'Plateforme & communauté', description: 'Outils, partenaires, témoignages', range: 'Slides 12 – 15' },
+          { chapter: '05', title: 'Investissement & engagement', description: 'Besoins, packs, charte, contact', range: 'Slides 16 – 19' },
         ],
       },
     },
@@ -49,15 +48,16 @@ export const defaultBook: Book = {
       props: {
         eyebrow: 'Notre audience',
         title: 'Une audience importante',
-        subtitle: 'Générations Médecins Île-de-France en chiffres.',
+        subtitle: 'Le réseau Générations Médecins en chiffres.',
         stats: [
           { label: 'Adhérents IDF', value: 2000, caption: 'médecins en Île-de-France' },
+          { label: 'Adhérents AURA', value: 500, caption: 'Auvergne-Rhône-Alpes' },
           { label: 'Abonnés LinkedIn', value: 17000, caption: 'Président GM IDF — LinkedIn' },
           { label: 'Contacts', value: 12000, caption: 'Base Médecins en Grève' },
-          { label: 'Événements / an', value: 12, caption: 'soirées networking qualifiées' },
+          { label: 'Événements / an', value: 10, caption: 'soirées networking qualifiées' },
         ],
         quote:
-          "Un partenariat avec GM IDF, c'est un accès direct à un terrain qualifié, une audience engagée et une crédibilité scientifique sans équivalent.",
+          "Un partenariat avec GM, c'est un accès direct à un terrain qualifié, une audience engagée et une crédibilité scientifique sans équivalent.",
       },
     },
     {
@@ -65,10 +65,10 @@ export const defaultBook: Book = {
       props: {
         eyebrow: '01 • Qui sommes-nous',
         title: 'Une organisation au service des médecins',
-        subtitle: 'Générations Médecins Île-de-France accompagne et défend les médecins franciliens.',
+        subtitle: 'Générations Médecins accompagne et défend les médecins.',
         verbs: ['Informer.', 'Fédérer.', 'Accompagner.'],
         body:
-          "Nous accompagnons les médecins franciliens tout au long de leur carrière, de l'installation aux nouveaux modèles d'exercice. Une communauté active, des contenus utiles et des événements qui rapprochent ville et hôpital.",
+          "Nous accompagnons les médecins tout au long de leur carrière, de l'installation aux nouveaux modèles d'exercice. Une communauté active, des contenus utiles et des événements qui rapprochent ville et hôpital.",
         pillars: [
           { num: '1', title: 'Impact & terrain', text: "Services et contenus à forte valeur pour l'installation, l'exercice et la carrière." },
           { num: '2', title: 'Projets structurants', text: 'Plateformes, événements, baromètres pour la communauté médicale.' },
@@ -89,12 +89,18 @@ export const defaultBook: Book = {
             role: 'Président',
             specialty: 'Psychiatre',
             details: 'Direction médicale — Clariane, NeuroStim, Cline Research, Masterclass Médicale',
+            photoUrl: '/bureau/AB.jpg',
           },
           {
             initials: 'MT',
             name: 'Dr. Minh-Hanh TA',
             role: 'Secrétaire générale',
             specialty: 'Onco-radiothérapeute',
+            highlights: [
+              'Board médical de Résorose & Celene Care',
+              'Ancienne vice-présidente nationale de la SFjRO (Société Française des jeunes radiothérapeutes oncologues)',
+            ],
+            photoUrl: '/bureau/MT.jpg',
           },
           {
             initials: 'PH',
@@ -102,18 +108,21 @@ export const defaultBook: Book = {
             role: 'Vice-président',
             specialty: 'Dermatologue',
             details: 'Chef de Service Dermatologie — Kremlin-Bicêtre',
+            photoUrl: '/bureau/PH.jpg',
           },
           {
             initials: 'CC',
             name: 'Dr. Cherifa CHEURFA',
             role: 'Vice-présidente',
             specialty: 'Anesthésiste-réanimateur',
+            photoUrl: '/bureau/CC.jpg',
           },
           {
             initials: 'LK',
             name: 'Dr. Louise-Anne KLEIN',
             role: 'Vice-présidente',
             specialty: 'Gynécologue obstétricienne',
+            photoUrl: '/bureau/LK.jpg',
           },
           {
             initials: 'FV',
@@ -121,12 +130,62 @@ export const defaultBook: Book = {
             role: 'Trésorier',
             specialty: 'Anesthésiste-réanimateur',
             details: 'Chef de Service de Réanimation — Saint-Antoine',
+            photoUrl: '/bureau/FV.jpg',
           },
-          { initials: 'RB', name: 'R. Bendrihem', role: 'Chargée de mission', small: true },
-          { initials: 'SH', name: 'S. Hugain', role: 'Chargée de mission', small: true },
+          {
+            initials: 'RB',
+            name: 'Dr. Rivka BENDRIHEM',
+            role: 'Chargée de mission',
+            specialty: 'Radiologue',
+            details: "Ancienne présidente de l'UNIR (Union Nationale des Internes en Radiologie)",
+            photoUrl: '/bureau/RB.jpg',
+          },
+          {
+            initials: 'SH',
+            name: 'Dr. Soraya HUGAIN',
+            role: 'Chargée de mission',
+            specialty: 'Psychiatre hospitalier — Sainte-Anne',
+            details: 'Représentante à la commission régionale paritaire',
+            photoUrl: '/bureau/SH.jpg',
+          },
         ],
         footnote:
-          'Plusieurs KOL au sein du bureau • Plusieurs Vice-présidents de la FMF ou de syndicats verticaux • Plusieurs Chefs de Service • Multidisciplinarité forte.',
+          'Plusieurs KOL au sein du bureau • Plusieurs vice-présidents de la FMF ou de syndicats verticaux • Plusieurs chefs de service • Multidisciplinarité forte.',
+      },
+    },
+    {
+      type: 'media',
+      props: {
+        eyebrow: '01 • Présence dans les médias',
+        title: 'Une voix qui porte',
+        subtitle: 'Plateaux TV, presse spécialisée, réseaux sociaux — GM IDF est au cœur du débat médical.',
+        sections: [
+          {
+            kicker: 'Plateaux TV',
+            glyph: '📺',
+            items: [
+              { name: 'New Deal Santé', caption: 'Le show de Martin Blachier', logo: '/media/new-deal-sante.png' },
+              { name: 'TF1', caption: 'Journaux & magazines santé', logo: '/media/tf1.png' },
+            ],
+          },
+          {
+            kicker: 'Presse médicale',
+            glyph: '📰',
+            items: [
+              { name: "What's Up Doc", logo: '/media/whatsupdoc.png' },
+              { name: 'Egora', logo: '/media/egora.png' },
+            ],
+          },
+          {
+            kicker: 'Réseaux sociaux',
+            glyph: '💼',
+            items: [
+              { name: 'LinkedIn — Président GM IDF', caption: '17 000 abonnés', logo: '/media/linkedin.png' },
+              { name: 'YouTube', caption: 'Vidéos & interventions', logo: '/media/youtube.png' },
+            ],
+          },
+        ],
+        footnote: 'Des prises de parole régulières qui renforcent la légitimité du réseau auprès des prescripteurs.',
       },
     },
     {
@@ -134,7 +193,7 @@ export const defaultBook: Book = {
       props: {
         eyebrow: "02 • L'opportunité",
         title: 'Ce que nous vous apportons',
-        subtitle: 'Quatre raisons concrètes de nouer un partenariat pluriannuel avec GM IDF.',
+        subtitle: 'Quatre raisons concrètes de nouer un partenariat pluriannuel avec GM.',
         benefits: [
           {
             num: '01',
@@ -145,15 +204,14 @@ export const defaultBook: Book = {
           },
           {
             num: '02',
-            title: "Une audience ultra-ciblée et difficile à toucher autrement",
+            title: 'Une audience ultra-ciblée et difficile à toucher autrement',
             body: "Les médecins sont l'une des populations professionnelles les plus difficiles à atteindre :",
             items: [
               'Peu de temps disponible',
               'Forte sollicitation commerciale',
               'Faible efficacité des canaux publicitaires',
             ],
-            arrow:
-              "Nos partenaires bénéficient d'un accès direct à une communauté déjà engagée et identifiée.",
+            arrow: "Accès direct à une communauté déjà engagée et identifiée.",
           },
           {
             num: '03',
@@ -161,12 +219,12 @@ export const defaultBook: Book = {
             body:
               "Un partenariat avec Générations Médecins place votre marque dans un environnement de confiance plutôt qu'une logique publicitaire.",
             arrow:
-              "Taux de conversion significativement supérieurs lorsque la mise en relation passe par une organisation professionnelle reconnue.",
+              'Taux de conversion x 3 lorsque la mise en relation passe par une organisation professionnelle reconnue.',
           },
           {
             num: '04',
             title: 'Des dispositifs générateurs de leads',
-            body: 'Nous pouvons mettre en place :',
+            body: 'Nous avons mis en place :',
             items: [
               'Webinaires thématiques',
               'Guides pratiques',
@@ -181,7 +239,7 @@ export const defaultBook: Book = {
           },
         ],
         closing:
-          "Nous ne proposons pas que de la visibilité. Nous proposons un accès privilégié à plusieurs centaines de jeunes médecins au moment précis où ils choisissent leur banque, leur assureur, leur prévoyance et leurs partenaires professionnels.",
+          "Nous ne proposons pas que de la visibilité. Nous proposons un accès privilégié à plusieurs centaines de jeunes médecins au moment précis où ils choisissent leur banque, leur assureur, leur RCP, leur prévoyance et leurs partenaires professionnels.",
       },
     },
     {
@@ -189,7 +247,7 @@ export const defaultBook: Book = {
       props: {
         eyebrow: "02 • L'opportunité",
         title: 'Notre audience en détail',
-        subtitle: 'Une communauté médicale francilienne segmentée et activable.',
+        subtitle: 'Une communauté médicale segmentée et activable.',
         segments: [
           { label: 'Spécialistes', share: 70, description: 'Cœur de cible — spé > MG' },
           { label: '< 10 ans depuis le DES', share: 90, description: 'Jeunes médecins en installation' },
@@ -198,9 +256,11 @@ export const defaultBook: Book = {
         channels: [
           { label: 'Mailing', value: '12 000', caption: 'membres actifs (base sondages)' },
           { label: 'LinkedIn', value: '17 000', caption: 'abonnés (Président GM IDF)' },
-          { label: 'Events mensuels', value: '360 / an', caption: '30 participants × 12 soirées' },
+          { label: 'Events mensuels', value: '360', caption: 'contacts privilégiés lors d\'événements privilégiés' },
           { label: 'Big Event annuel', value: '200', caption: 'participants qualifiés' },
         ],
+        callout:
+          "Là où tout le monde a déserté le présentiel, nous y maintenons nos événements à pleine capacité — pour créer du lien, fidéliser et bâtir une vraie communauté.",
       },
     },
     {
@@ -214,15 +274,15 @@ export const defaultBook: Book = {
             num: '01',
             title: 'Newsletter récurrente',
             body:
-              "Petites annonces, décryptages d'actualité, contenus pratiques pour la vie professionnelle des médecins franciliens.",
+              "Petites annonces, décryptages d'actualité, contenus pratiques pour la vie professionnelle des médecins.",
             tags: ['12 000 destinataires', 'Hebdomadaire'],
           },
           {
             num: '02',
             title: 'Events mensuels',
             body:
-              "Soirées en petit comité, format afterwork qualitatif, vraie proximité — les médecins viennent, échangent, se reconnaissent.",
-            tags: ['12 / an', '30 participants'],
+              "Soirées en petit comité, format afterwork qualitatif. Nos événements affichent COMPLET et donnent lieu à des relais sur nos réseaux sociaux.",
+            tags: ['10 / an', '30 participants', 'COMPLETS'],
           },
           {
             num: '03',
@@ -238,12 +298,12 @@ export const defaultBook: Book = {
       type: 'events',
       props: {
         eyebrow: '03 • Nos rendez-vous',
-        title: 'Events Mensuels avec nos partenaires',
-        subtitle: 'Hack Your Care, Celene, NeuroStim, Clariane — formats afterwork qualitatifs.',
+        title: 'Events Mensuels',
+        subtitle: 'Un talk, une soirée — format afterwork qualitatif, en petit comité.',
         keyFacts: [
-          { value: '12', label: 'Événements / an', caption: 'un par mois, hors été' },
-          { value: '20–35', label: 'Participants', caption: 'cabinets, salles partenaires, locaux HYC' },
-          { value: '4', label: 'Thèmes phares', caption: 'innovation, exercice, entrepreneuriat, formats' },
+          { value: '10', label: 'Événements / an', caption: 'un par mois, hors été' },
+          { value: '20–35', label: 'Participants', caption: 'cabinets, salles partenaires' },
+          { value: '4', label: 'Thèmes phares', caption: 'innovation, exercice, entrepreneuriat, médico-légal' },
         ],
         program: [
           { time: '19h00', label: 'Accueil & verre de bienvenue' },
@@ -256,7 +316,7 @@ export const defaultBook: Book = {
           { title: 'Innovation', body: 'Médecine & IA, outils au cabinet' },
           { title: 'Exercice', body: "Centres de santé, s'installer sans s'isoler" },
           { title: 'Entrepreneuriat', body: 'Gestion, finances, développement' },
-          { title: 'Formats', body: 'Tables rondes • Interventions • Ateliers • Intervenant extérieur' },
+          { title: 'Médico-légal', body: 'RCP, responsabilité, plaintes, droits du médecin' },
         ],
       },
     },
@@ -280,6 +340,7 @@ export const defaultBook: Book = {
             topics: [
               'Préparer sa carrière : libérale / hospitalière / mixte',
               'Connaître ses droits et statuts : congés, formations, etc.',
+              'Comment choisir sa RCP : critères clés à regarder',
             ],
           },
           {
@@ -288,15 +349,17 @@ export const defaultBook: Book = {
             topics: [
               'Connaître ses droits et statuts : congés, formations, etc.',
               "Optimisation fiscale, finance, le libéral à l'hôpital",
+              'Comment choisir sa RCP : critères clés à regarder',
             ],
           },
           {
             num: '3',
             title: 'Internes',
-            audience: 'En rapprochement avec l\'ISNI',
+            audience: "En rapprochement avec l'ISNI",
             topics: [
               "Mécanismes d'achat, pied à terre",
               'Fiscalité, prêt préférentiel CA',
+              'Comment choisir sa RCP : critères clés à regarder',
             ],
           },
         ],
@@ -313,7 +376,7 @@ export const defaultBook: Book = {
           'ESS',
           'Gérer ses salariés',
           'Faire du réseau',
-          'Lutter contre l\'isolement',
+          "Lutter contre l'isolement",
           'Repenser le syndicalisme',
           'Financiarisation',
           'Euthanasie',
@@ -335,7 +398,7 @@ export const defaultBook: Book = {
       props: {
         eyebrow: '04 • Plateforme',
         title: 'Notre plateforme membre',
-        subtitle: 'Des outils concrets construits par et pour la communauté médicale francilienne.',
+        subtitle: 'Des outils concrets construits par et pour la communauté médicale.',
         features: [
           {
             glyph: '⚖️',
@@ -361,14 +424,14 @@ export const defaultBook: Book = {
           {
             glyph: '📢',
             tag: 'Engagement',
-            title: 'Mobilisation & lanceurs d\'alerte',
+            title: "Mobilisation & lanceurs d'alerte",
             body:
               'Espace sécurisé pour signaler des dérives, alimenter le plaidoyer, et coordonner les actions de terrain.',
           },
           {
             glyph: '🧠',
             tag: 'Contenus',
-            title: 'Décryptages d\'actualité',
+            title: "Décryptages d'actualité",
             body:
               'Newsletter hebdo et fiches courtes : on traduit les évolutions réglementaires et conventionnelles en actions concrètes.',
           },
@@ -380,9 +443,33 @@ export const defaultBook: Book = {
       props: {
         eyebrow: '04 • Nos partenaires',
         title: 'Nos partenaires',
-        subtitle:
-          "Une communauté de partenaires fidèles. Cette présentation est faite pour vous séduire — votre place est avec nous.",
         partners: knownPartners,
+      },
+    },
+    {
+      type: 'testimonials',
+      props: {
+        eyebrow: '04 • Ils en parlent',
+        title: 'Retours de nos partenaires',
+        subtitle: 'Ce que disent celles et ceux qui ont déjà choisi GM.',
+        testimonials: [
+          {
+            quote:
+              "À compléter — citation de Frédéric Faive sur la valeur du partenariat (l'accès aux médecins, la qualité du networking, la conversion qu'ils observent).",
+            name: 'Frédéric Faive',
+            role: 'Fondateur',
+            company: 'One Gestion Privée',
+            logo: '/logos/OGP.png',
+          },
+          {
+            quote:
+              "À compléter — citation de Mme Grandgirard (engagement réel des équipes, suivi rigoureux, accès qualifié, etc.).",
+            name: 'Mme Grandgirard',
+            role: 'Responsable',
+            company: 'Crédit Agricole IDF',
+            logo: '/logos/CA.png',
+          },
+        ],
       },
     },
     {
@@ -390,15 +477,67 @@ export const defaultBook: Book = {
       props: {
         eyebrow: '05 • Investissement',
         title: 'Nos besoins pour mener nos actions',
-        subtitle:
-          "Budget annuel global pour déployer l'ensemble du programme 2026 — événements, plateforme, communication.",
+        subtitle: 'Budget annuel global pour déployer le programme 2026 — détaillé poste par poste.',
         items: [
-          { label: 'Events mensuels', detail: '2 750 € × 12 événements', amount: 33000 },
+          { label: 'Events mensuels', detail: '4 000 € × 10 événements', amount: 40000 },
+          { label: 'Location de salle', detail: 'Lieux events + Big Event', amount: 5000 },
           { label: 'Développement des modules', detail: 'Plateforme membre, SOS juridique, outils', amount: 50000 },
           { label: 'Budget communication', detail: 'Production, réseaux, newsletter, design', amount: 25000 },
           { label: 'Big Event annuel', detail: '200 participants — ½ journée + soirée', amount: 30000 },
         ],
         totalLabel: 'Total annuel',
+      },
+    },
+    {
+      type: 'packs',
+      props: {
+        eyebrow: "05 • Comment nous accompagner",
+        title: 'Les packs partenaires',
+        subtitle:
+          "Trois niveaux d'engagement pour vous projeter, avec des contreparties qui montent en intensité.",
+        packs: [
+          {
+            name: 'Bronze',
+            price: '60 K€',
+            tagline: 'Pour amorcer une présence forte auprès de notre communauté',
+            features: [
+              'Logo partenaire sur tous les supports',
+              'Mention dans la newsletter mensuelle',
+              '2 posts dédiés sur nos réseaux sociaux',
+              'Logo sur tous les events GM (10/an)',
+              '4 invitations par event mensuel',
+              'Point de contact dédié',
+            ],
+          },
+          {
+            name: 'Argent',
+            price: '100 K€',
+            tagline: 'Engagement renforcé, co-construction, visibilité événementielle',
+            features: [
+              "✦ Inclut l'intégralité du Bronze",
+              "Co-organisation de 2 events / an",
+              'Webinaire co-brandé avec inscriptions et replay',
+              'Intervention de 10 min au Big Event',
+              'Module sponsorisé sur la plateforme',
+              'Reporting trimestriel détaillé',
+            ],
+          },
+          {
+            name: 'Or',
+            price: '150 K€',
+            tagline: 'Partenariat premium — votre marque ancrée dans la communauté',
+            premium: true,
+            features: [
+              "✦ Inclut l'intégralité de l'Argent",
+              "Naming d'un module (ex : « SOS juridique by X »)",
+              'Soirée VIP exclusive avec les KOLs',
+              "Prise de parole en ouverture du Big Event",
+              'Co-création de contenu (newsletter, podcast)',
+              'Accès direct au dashboard reporting',
+            ],
+          },
+        ],
+        note: '50 K€ déjà sécurisés via nos partenaires institutionnels. Restent ~100 K€ à mobiliser pour boucler le budget 2026.',
       },
     },
     {
@@ -409,7 +548,7 @@ export const defaultBook: Book = {
         subtitle: 'Une relation transparente, encadrée et bénéfique pour tous.',
         pillars: [
           { glyph: '§', title: 'Éthique & déontologie', body: "Conformité à l'éthique professionnelle, aux réglementations applicables et à la déontologie médicale." },
-          { glyph: '○', title: 'Indépendance', body: "Respect absolu de l'indépendance scientifique et éditoriale de Générations Médecins IDF." },
+          { glyph: '○', title: 'Indépendance', body: "Respect absolu de l'indépendance scientifique et éditoriale de Générations Médecins." },
           { glyph: '◆', title: 'Transparence', body: 'Engagement de transparence sur les actions menées, leurs résultats et le reporting trimestriel.' },
           { glyph: '✚', title: 'Co-création', body: 'Co-construction des projets bénéficiant aux médecins, patients et système de santé.' },
         ],

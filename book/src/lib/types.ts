@@ -21,6 +21,9 @@ export type Slide =
   | { type: 'features'; props: FeaturesProps }
   | { type: 'partnersLogos'; props: PartnersLogosProps }
   | { type: 'budget'; props: BudgetProps }
+  | { type: 'testimonials'; props: TestimonialsProps }
+  | { type: 'media'; props: MediaProps }
+  | { type: 'packs'; props: PacksProps }
   | { type: 'partnersGrid'; props: PartnersGridProps }
   | { type: 'visibility'; props: VisibilityProps }
   | { type: 'plan'; props: PlanProps }
@@ -96,6 +99,8 @@ export type BureauMember = {
   role: string
   specialty?: string
   details?: string
+  highlights?: string[]
+  photoUrl?: string
   small?: boolean
 }
 export type BureauProps = {
@@ -129,6 +134,7 @@ export type AudienceProps = {
   subtitle?: string
   segments: AudienceSegment[]
   channels: AudienceChannel[]
+  callout?: string
 }
 
 export type PillarsProps = {
@@ -257,4 +263,52 @@ export type BudgetProps = {
   items: { label: string; detail?: string; amount: number }[]
   currency?: string
   totalLabel?: string
+}
+
+export type TestimonialItem = {
+  quote: string
+  name: string
+  role?: string
+  company?: string
+  logo?: string
+}
+export type TestimonialsProps = {
+  eyebrow?: string
+  title: string
+  subtitle?: string
+  testimonials: TestimonialItem[]
+}
+
+export type MediaItem = {
+  name: string
+  caption?: string
+  logo?: string
+  image?: string
+}
+export type MediaSection = {
+  kicker: string
+  glyph?: string
+  items: MediaItem[]
+}
+export type MediaProps = {
+  eyebrow?: string
+  title: string
+  subtitle?: string
+  sections: MediaSection[]
+  footnote?: string
+}
+
+export type PackTier = {
+  name: string
+  price: string
+  tagline?: string
+  features: string[]
+  premium?: boolean
+}
+export type PacksProps = {
+  eyebrow?: string
+  title: string
+  subtitle?: string
+  packs: PackTier[]
+  note?: string
 }
