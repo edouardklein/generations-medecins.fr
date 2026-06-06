@@ -300,16 +300,6 @@
         return;
       }
 
-      // Demande de permission micro explicite pour éviter l'échec silencieux Chrome/Edge
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(t => t.stop());
-      } catch (err) {
-        infoEl.style.display = 'block';
-        infoEl.textContent = '⚠️ Microphone refusé. Autorisez-le dans les paramètres du navigateur.';
-        return;
-      }
-
       const baseValue = inp.value;
       let finalTranscript = '';
 
