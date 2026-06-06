@@ -276,8 +276,19 @@
   (function () {
     let recognition = null;
     let isListening  = false;  // intention utilisateur (≠ état Chrome)
+    let gotResult    = false;  // a-t-on reçu au moins un résultat ?
+    let logLines = [];
 
-    function startRecognition(SpeechRec, btn, infoEl, inp) {
+    function log(line) {
+      const infoEl = document.getElementById('mic-info');
+      const ts = new Date().toLocaleTimeString('fr-FR', { hour12:false });
+      logLines.push(`${ts} · ${line}`);
+      if (logLines.length > 8) logLines = logLines.slice(-8);
+      infoEl.style.display = 'block';
+      infoEl.innerHTML = logLines.map(l => '<div>'+l+'</div>').join('');
+    }
+
+    function startRecognition(SpeechRec, btn, inp) {
       const baseCapture = inp.value;   // snapshot au lancement ou au redémarrage auto
       let finalTranscript = '';
 
@@ -287,14 +298,16 @@
       recognition.interimResults = true;
       recognition.maxAlternatives = 1;
 
-      recognition.onstart = () => {
-        btn.textContent = '⏹ Arrêter la dictée';
-        btn.classList.add('listening');
-        infoEl.style.display = 'block';
-        infoEl.textContent = '🎙 Dictée en cours… parlez maintenant (recliquez pour arrêter).';
-      };
+      recognition.onstart      = () => { log('▶️ onstart (écoute lancée)'); btn.textContent = '⏹ Arrêter la dictée'; btn.classList.add('listening'); };
+      recognition.onaudiostart = () => log('🔊 onaudiostart (capture audio OK)');
+      recognition.onsoundstart = () => log('🔉 onsoundstart (un son est capté)');
+      recognition.onspeechstart= () => log('🗣️ onspeechstart (voix détectée !)');
+      recognition.onspeechend  = () => log('🤫 onspeechend');
+      recognition.onsoundend   = () => log('🔇 onsoundend');
+      recognition.onaudioend   = () => log('⏸️ onaudioend');
 
       recognition.onresult = (e) => {
+        gotResult = true;
         let interim = '';
         for (let i = e.resultIndex; i < e.results.length; i++) {
           const t = e.results[i][0].transcript;
@@ -303,29 +316,26 @@
         }
         const sep = baseCapture && !baseCapture.endsWith(' ') && !baseCapture.endsWith('\n') ? ' ' : '';
         inp.value = baseCapture + sep + finalTranscript + interim;
+        log('✅ onresult: "' + (finalTranscript + interim).slice(-40) + '"');
       };
 
       recognition.onerror = (e) => {
-        // no-speech est ignoré : on redémarre dans onend automatiquement
-        if (e.error === 'no-speech' || e.error === 'aborted') return;
-        const msg = {
-          'audio-capture': 'Aucun microphone détecté.',
-          'not-allowed':   'Permission micro refusée.',
-          'network':       'Erreur réseau (service Google requis).',
-        }[e.error] || 'Erreur dictée : ' + e.error;
-        isListening = false;
-        if (msg) { infoEl.style.display = 'block'; infoEl.textContent = '⚠️ ' + msg; }
+        log('❌ onerror: ' + e.error);
+        if (e.error === 'no-speech' || e.error === 'aborted') return; // relancé dans onend
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+          isListening = false;
+          log('⛔ Permission/Service micro refusé — STOP');
+        }
       };
 
       recognition.onend = () => {
+        log('⏹️ onend (isListening=' + isListening + ')');
         recognition = null;
         if (isListening) {
-          // Chrome a stoppé tout seul (no-speech, timeout…) → on relance silencieusement
-          startRecognition(SpeechRec, btn, infoEl, inp);
+          startRecognition(SpeechRec, btn, inp); // Chrome a coupé seul → on relance
         } else {
           btn.textContent = '🎤 Dicter ma question';
           btn.classList.remove('listening');
-          setTimeout(() => infoEl.style.display = 'none', 2000);
         }
       };
 
@@ -333,39 +343,36 @@
         recognition.start();
       } catch (err) {
         isListening = false;
-        infoEl.style.display = 'block';
-        infoEl.textContent = '⚠️ Impossible de démarrer : ' + err.message;
+        log('💥 start() exception: ' + err.message);
         recognition = null;
       }
     }
 
     window.dictate = function () {
       const btn    = document.getElementById('mic-btn');
-      const infoEl = document.getElementById('mic-info');
       const inp    = document.getElementById('question-input');
 
       // Toggle stop
       if (isListening) {
         isListening = false;
+        log('🛑 Arrêt demandé par l\'utilisateur');
         if (recognition) { try { recognition.stop(); } catch {} }
         return;
       }
 
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRec) {
-        infoEl.style.display = 'block';
-        infoEl.innerHTML = '⚠️ Dictée non supportée. Compatible : <strong>Chrome</strong>, <strong>Edge</strong>, <strong>Safari</strong> (pas Firefox).';
+        log('⚠️ API non supportée (Chrome/Edge/Safari uniquement, pas Firefox)');
         return;
       }
-
       if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-        infoEl.style.display = 'block';
-        infoEl.textContent = '⚠️ La dictée nécessite HTTPS.';
+        log('⚠️ HTTPS requis');
         return;
       }
 
-      isListening = true;
-      startRecognition(SpeechRec, btn, infoEl, inp);
+      logLines = []; gotResult = false; isListening = true;
+      log('🎬 Démarrage… (API ' + (window.SpeechRecognition ? 'standard' : 'webkit') + ')');
+      startRecognition(SpeechRec, btn, inp);
     };
   })();
   </script>
