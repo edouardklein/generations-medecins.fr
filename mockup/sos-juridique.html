@@ -271,6 +271,101 @@
 
   <div class="toast" id="toast"></div>
 
+  <!-- Dictée vocale — script indépendant de Supabase -->
+  <script>
+  (function () {
+    let recognition = null;
+
+    window.dictate = async function () {
+      const btn    = document.getElementById('mic-btn');
+      const infoEl = document.getElementById('mic-info');
+      const inp    = document.getElementById('question-input');
+
+      // Toggle stop
+      if (recognition) {
+        try { recognition.stop(); } catch {}
+        return;
+      }
+
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) {
+        infoEl.style.display = 'block';
+        infoEl.innerHTML = '⚠️ Dictée non supportée. Compatible : <strong>Chrome</strong>, <strong>Edge</strong>, <strong>Safari</strong> (pas Firefox).';
+        return;
+      }
+
+      if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        infoEl.style.display = 'block';
+        infoEl.textContent = '⚠️ La dictée nécessite HTTPS.';
+        return;
+      }
+
+      // Demande de permission micro explicite pour éviter l'échec silencieux Chrome/Edge
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(t => t.stop());
+      } catch (err) {
+        infoEl.style.display = 'block';
+        infoEl.textContent = '⚠️ Microphone refusé. Autorisez-le dans les paramètres du navigateur.';
+        return;
+      }
+
+      const baseValue = inp.value;
+      let finalTranscript = '';
+
+      recognition = new SpeechRec();
+      recognition.lang = 'fr-FR';
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        btn.textContent = '⏹ Arrêter la dictée';
+        btn.classList.add('listening');
+        infoEl.style.display = 'block';
+        infoEl.textContent = '🎙 Dictée en cours… parlez maintenant (recliquez pour arrêter).';
+      };
+
+      recognition.onresult = (e) => {
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const t = e.results[i][0].transcript;
+          if (e.results[i].isFinal) finalTranscript += t;
+          else interim += t;
+        }
+        const sep = baseValue && !baseValue.endsWith(' ') && !baseValue.endsWith('\n') ? ' ' : '';
+        inp.value = baseValue + sep + finalTranscript + interim;
+      };
+
+      recognition.onerror = (e) => {
+        const msg = {
+          'no-speech':     'Aucune voix détectée. Réessayez en parlant plus fort.',
+          'audio-capture': 'Aucun microphone détecté.',
+          'not-allowed':   'Permission micro refusée.',
+          'network':       'Erreur réseau (service Google requis).',
+          'aborted':       '',
+        }[e.error] || 'Erreur dictée : ' + e.error;
+        if (msg) { infoEl.style.display = 'block'; infoEl.textContent = '⚠️ ' + msg; }
+      };
+
+      recognition.onend = () => {
+        btn.textContent = '🎤 Dicter ma question';
+        btn.classList.remove('listening');
+        setTimeout(() => { if (!recognition) infoEl.style.display = 'none'; }, 2000);
+        recognition = null;
+      };
+
+      try {
+        recognition.start();
+      } catch (err) {
+        infoEl.style.display = 'block';
+        infoEl.textContent = '⚠️ Impossible de démarrer : ' + err.message;
+        recognition = null;
+      }
+    };
+  })();
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
   (function() {
@@ -280,7 +375,6 @@
 
     let membre = null;
     let pendingFiles = [];
-    let recognition = null;
 
     const $ = id => document.getElementById(id);
     function toast(msg, isErr) {
@@ -299,99 +393,6 @@
     };
 
     function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
-
-    // ── Dictée vocale ─────────────────────────────────────────────────────────
-    // Le micro reste actif tant que l'utilisateur ne reclique pas (continuous).
-    window.dictate = async function () {
-      const btn = $('mic-btn');
-      const infoEl = $('mic-info');
-
-      // Toggle : si déjà en écoute, on arrête
-      if (recognition) {
-        try { recognition.stop(); } catch {}
-        return;
-      }
-
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) {
-        infoEl.style.display = 'block';
-        infoEl.innerHTML = '⚠️ Votre navigateur ne supporte pas la dictée. Compatible : <strong>Chrome</strong>, <strong>Edge</strong>, <strong>Safari</strong> (pas Firefox).';
-        return;
-      }
-
-      // HTTPS requis (sauf localhost)
-      if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-        infoEl.style.display = 'block';
-        infoEl.textContent = '⚠️ La dictée nécessite une connexion HTTPS.';
-        return;
-      }
-
-      // Demande explicite de permission micro (Chrome/Edge l'exigent sinon échec silencieux)
-      try {
-        if (navigator.mediaDevices?.getUserMedia) {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          stream.getTracks().forEach(t => t.stop());
-        }
-      } catch (err) {
-        infoEl.style.display = 'block';
-        infoEl.textContent = '⚠️ Microphone refusé. Autorisez-le dans les paramètres du navigateur.';
-        return;
-      }
-
-      const inp = $('question-input');
-      const baseValue = inp.value;  // texte déjà saisi conservé
-      let finalTranscript = '';
-
-      recognition = new SpeechRec();
-      recognition.lang = 'fr-FR';
-      recognition.continuous = true;      // reste actif jusqu'au clic d'arrêt
-      recognition.interimResults = true;  // affichage en temps réel
-      recognition.maxAlternatives = 1;
-
-      recognition.onstart = () => {
-        btn.textContent = '⏹ Arrêter la dictée';
-        btn.classList.add('listening');
-        infoEl.style.display = 'block';
-        infoEl.textContent = '🎙 Dictée en cours… parlez maintenant (recliquez pour arrêter).';
-      };
-
-      recognition.onresult = (e) => {
-        let interim = '';
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-          const transcript = e.results[i][0].transcript;
-          if (e.results[i].isFinal) finalTranscript += transcript;
-          else interim += transcript;
-        }
-        const sep = baseValue && !baseValue.endsWith(' ') && !baseValue.endsWith('\n') ? ' ' : '';
-        inp.value = baseValue + sep + finalTranscript + interim;
-      };
-
-      recognition.onerror = (e) => {
-        const msg = {
-          'no-speech':     'Aucune voix détectée. Réessayez en parlant plus fort.',
-          'audio-capture': 'Aucun microphone détecté.',
-          'not-allowed':   'Permission micro refusée. Autorisez-la dans les paramètres du navigateur.',
-          'network':       'Erreur réseau (la reconnaissance utilise un service en ligne).',
-          'aborted':       '',
-        }[e.error] || ('Erreur dictée : ' + e.error);
-        if (msg) { infoEl.style.display = 'block'; infoEl.textContent = '⚠️ ' + msg; }
-      };
-
-      recognition.onend = () => {
-        btn.textContent = '🎤 Dicter ma question';
-        btn.classList.remove('listening');
-        setTimeout(() => { if (!recognition) infoEl.style.display = 'none'; }, 2000);
-        recognition = null;
-      };
-
-      try {
-        recognition.start();
-      } catch (err) {
-        infoEl.style.display = 'block';
-        infoEl.textContent = '⚠️ Impossible de démarrer la dictée : ' + err.message;
-        recognition = null;
-      }
-    };
 
     // ── Init ─────────────────────────────────────────────────────────────────
     async function init() {
