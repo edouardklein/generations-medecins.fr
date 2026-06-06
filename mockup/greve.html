@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Médecins en Grève — Générations Médecins</title>
+  <meta name="description" content="Déclarez votre intention de grève et recevez votre attestation. Mobilisation des médecins libéraux portée par Générations Médecins Île-de-France.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background: #eef3f8; }
+
+    /* Hero */
+    .greve-hero {
+      background: linear-gradient(135deg, #7a1420, #b91c1c, #dc2626);
+      color: #fff; padding: 54px 0 46px; text-align: center; position: relative; overflow: hidden;
+    }
+    .greve-hero::after {
+      content:''; position:absolute; inset:0;
+      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.12), transparent 60%);
+    }
+    .greve-hero-inner { max-width: 760px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+    .greve-hero h1 { font-size: 2.5rem; font-weight: 900; letter-spacing: -.03em; margin-bottom: 10px; }
+    .greve-hero .accroche { font-size: 1rem; color: rgba(255,255,255,.9); line-height: 1.6; max-width: 600px; margin: 0 auto 26px; }
+    .greve-dates { display:inline-block; font-size:.82rem; font-weight:700; background:rgba(255,255,255,.15); padding:6px 16px; border-radius:999px; margin-bottom:24px; }
+
+    /* Compteur */
+    .counter-box { display:flex; flex-direction:column; align-items:center; gap:6px; margin-bottom:8px; }
+    .counter-num { font-size: 3.6rem; font-weight: 900; letter-spacing: -.04em; line-height: 1; }
+    .counter-label { font-size: .9rem; color: rgba(255,255,255,.85); font-weight: 600; }
+    .progress-wrap { max-width: 460px; margin: 18px auto 0; }
+    .progress-track { height: 12px; background: rgba(255,255,255,.2); border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #fff; border-radius: 999px; transition: width 1s ease-out; width: 0; }
+    .progress-meta { display:flex; justify-content:space-between; font-size:.74rem; color:rgba(255,255,255,.8); margin-top:6px; }
+
+    .hero-cta-row { display:flex; gap:12px; justify-content:center; margin-top:28px; flex-wrap:wrap; }
+    .btn-hero {
+      background:#fff; color:#b91c1c; border:none; border-radius:999px; padding:14px 30px;
+      font-family:inherit; font-size:.95rem; font-weight:800; cursor:pointer; transition:transform .12s, box-shadow .12s;
+    }
+    .btn-hero:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,.18); }
+    .btn-hero.ghost { background:rgba(255,255,255,.12); color:#fff; border:1.5px solid rgba(255,255,255,.4); }
+
+    .closed-banner { background:rgba(0,0,0,.18); border-radius:12px; padding:14px 18px; font-size:.88rem; margin-top:18px; }
+
+    /* Conteneur */
+    .page-inner { max-width: 880px; margin: 0 auto; padding: 44px 24px 80px; }
+    .section-title { font-size:1.4rem; font-weight:900; color:var(--ink); margin-bottom:6px; letter-spacing:-.02em; }
+    .section-sub { font-size:.9rem; color:var(--muted); margin-bottom:24px; }
+
+    /* Formulaire */
+    .form-card { background:#fff; border-radius:18px; padding:32px 30px; box-shadow:0 2px 14px rgba(20,32,51,.07); margin-bottom:40px; }
+    .field { margin-bottom:18px; }
+    .field-label { font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px; display:block; }
+    .field-label .req { color:#dc2626; }
+    .field-input, .field-select {
+      width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px;
+      font-family:inherit; font-size:.92rem; outline:none; box-sizing:border-box; transition:border-color .15s; background:#fff;
+    }
+    .field-input:focus, .field-select:focus { border-color:var(--blue); }
+    .field-hint { font-size:.76rem; color:var(--muted); margin-top:5px; line-height:1.5; }
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media (max-width:560px){ .field-row { grid-template-columns:1fr; } }
+
+    .rpps-status { font-size:.78rem; margin-top:6px; min-height:18px; color:var(--muted); }
+    .rpps-status.ok  { color:#16a34a; font-weight:600; }
+    .rpps-status.err { color:#dc2626; font-weight:600; }
+
+    .check-inline { display:flex; align-items:center; gap:8px; font-size:.86rem; color:var(--ink); cursor:pointer; }
+    .check-inline input { width:17px; height:17px; accent-color:var(--blue); }
+
+    /* Mode d'exercice pills */
+    .pill-row { display:flex; flex-wrap:wrap; gap:8px; }
+    .pill {
+      padding:9px 16px; border:1.5px solid var(--line); border-radius:999px; background:#fff;
+      font-size:.85rem; font-weight:600; color:var(--ink); cursor:pointer; transition:all .12s;
+    }
+    .pill:hover { border-color:var(--blue); }
+    .pill.sel { background:var(--blue); color:#fff; border-color:var(--blue); }
+
+    /* Motifs checkboxes */
+    .motif-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media (max-width:560px){ .motif-grid { grid-template-columns:1fr; } }
+    .motif-item {
+      display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1.5px solid var(--line);
+      border-radius:10px; cursor:pointer; font-size:.85rem; line-height:1.4; transition:all .12s;
+    }
+    .motif-item:hover { border-color:var(--blue); background:#f8fbff; }
+    .motif-item.sel { border-color:var(--blue); background:#f0f6ff; }
+    .motif-item input { margin-top:2px; width:16px; height:16px; accent-color:var(--blue); flex-shrink:0; }
+
+    .rgpd-box { background:#f8fafc; border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:20px 0; font-size:.8rem; color:var(--muted); line-height:1.6; }
+    .rgpd-box strong { color:var(--ink); }
+
+    .btn-submit-greve {
+      width:100%; background:linear-gradient(135deg,#dc2626,#b91c1c); color:#fff; border:none; border-radius:12px;
+      padding:16px; font-family:inherit; font-size:1rem; font-weight:800; cursor:pointer; transition:opacity .15s; margin-top:8px;
+    }
+    .btn-submit-greve:hover { opacity:.93; }
+    .btn-submit-greve:disabled { opacity:.5; cursor:not-allowed; }
+
+    /* Confirmation */
+    .confirm-card { background:#fff; border-radius:18px; padding:40px 34px; text-align:center; box-shadow:0 2px 14px rgba(20,32,51,.07); }
+    .confirm-card .big { font-size:3rem; margin-bottom:12px; }
+    .confirm-card h2 { font-size:1.5rem; font-weight:900; color:var(--ink); margin-bottom:8px; }
+    .confirm-ref { display:inline-block; font-family:monospace; font-size:1rem; background:#f0f6ff; color:#1a4a80; padding:8px 16px; border-radius:8px; margin:14px 0; font-weight:700; letter-spacing:.05em; }
+    .adhesion-cta { background:linear-gradient(135deg,#2a6db8,#38a8b5); color:#fff; border-radius:14px; padding:22px; margin-top:26px; }
+    .adhesion-cta h3 { font-size:1.05rem; font-weight:800; margin-bottom:6px; }
+    .adhesion-cta p { font-size:.85rem; color:rgba(255,255,255,.9); margin-bottom:14px; line-height:1.55; }
+
+    /* FAQ */
+    .faq-item { background:#fff; border:1px solid var(--line); border-radius:12px; margin-bottom:10px; overflow:hidden; }
+    .faq-q { padding:16px 20px; font-weight:700; font-size:.92rem; color:var(--ink); cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .faq-q:hover { background:var(--surface); }
+    .faq-a { padding:0 20px; max-height:0; overflow:hidden; transition:max-height .25s, padding .25s; font-size:.88rem; color:var(--muted); line-height:1.65; }
+    .faq-item.open .faq-a { padding:0 20px 18px; max-height:400px; }
+    .faq-item.open .faq-q .chev { transform:rotate(180deg); }
+    .chev { transition:transform .2s; color:var(--muted); }
+
+    .links-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+    .link-chip { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1.5px solid var(--line); border-radius:999px; padding:8px 16px; font-size:.84rem; font-weight:600; color:var(--blue); text-decoration:none; transition:all .12s; }
+    .link-chip:hover { border-color:var(--blue); background:#f0f6ff; }
+
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; padding:13px 24px; border-radius:10px; font-size:.88rem; font-weight:600; z-index:300; opacity:0; transition:opacity .25s; pointer-events:none; }
+    .toast.show { opacity:1; }
+    .toast.error { background:#c0392b; }
+
+    /* Attestation cachée (rendue en PDF) */
+    #attestation-render { position:fixed; left:-9999px; top:0; width:794px; background:#fff; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="greve.html" class="active">Médecins en Grève</a>
+        <a href="bureau.html">Bureau</a>
+      </nav>
+      <a href="connexion.html" id="header-login-link" style="font-size:.85rem;font-weight:700;color:var(--blue-dark);text-decoration:none;white-space:nowrap;">Se connecter</a>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="greve-hero">
+    <div class="greve-hero-inner">
+      <h1>✊ Médecins en Grève</h1>
+      <p class="accroche" id="hero-accroche">Chargement de la mobilisation…</p>
+      <div class="greve-dates" id="hero-dates" style="display:none"></div>
+
+      <div class="counter-box">
+        <div class="counter-num" id="counter-num">—</div>
+        <div class="counter-label">médecins déjà mobilisés</div>
+      </div>
+      <div class="progress-wrap" id="progress-wrap" style="display:none">
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-meta"><span id="progress-current">0</span><span id="progress-goal">Objectif</span></div>
+      </div>
+
+      <div class="hero-cta-row" id="hero-cta">
+        <button class="btn-hero" onclick="scrollToForm()">Déclarer mon intention de grève</button>
+      </div>
+      <div class="closed-banner" id="closed-banner" style="display:none"></div>
+    </div>
+  </section>
+
+  <div class="page-inner">
+
+    <!-- FORMULAIRE -->
+    <div id="form-section">
+      <h2 class="section-title">Déclarer ma participation</h2>
+      <p class="section-sub">Votre identité professionnelle sert uniquement à vérifier votre inscription au RPPS et à éviter les doublons. <strong>Vos nom et prénom ne sont jamais conservés.</strong></p>
+
+      <div class="form-card">
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Numéro RPPS <span class="req" id="rpps-req">*</span></label>
+            <input class="field-input" id="f-rpps" inputmode="numeric" maxlength="11" placeholder="Ex. 10001234567" oninput="onRppsInput()">
+            <div class="rpps-status" id="rpps-status"></div>
+            <label class="check-inline" style="margin-top:8px">
+              <input type="checkbox" id="f-interne" onchange="toggleInterne()">
+              <span>Je suis interne / externe sans RPPS</span>
+            </label>
+          </div>
+          <div class="field">
+            <label class="field-label">Nom d'exercice <span class="req">*</span></label>
+            <input class="field-input" id="f-nom" placeholder="Pour vérification RPPS — non stocké">
+            <label class="field-label" style="margin-top:14px">Prénom d'exercice <span class="req">*</span></label>
+            <input class="field-input" id="f-prenom" placeholder="Pour vérification RPPS — non stocké">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Spécialité</label>
+            <select class="field-select" id="f-specialite">
+              <option value="">Choisissez…</option>
+              <option>Médecine générale</option>
+              <option>Pédiatrie</option>
+              <option>Psychiatrie</option>
+              <option>Cardiologie</option>
+              <option>Dermatologie</option>
+              <option>Gynécologie</option>
+              <option>Ophtalmologie</option>
+              <option>ORL</option>
+              <option>Radiologie</option>
+              <option>Anesthésie-réanimation</option>
+              <option>Chirurgie</option>
+              <option>Rhumatologie</option>
+              <option>Gastro-entérologie</option>
+              <option>Endocrinologie</option>
+              <option>Néphrologie</option>
+              <option>Pneumologie</option>
+              <option>Autre spécialité</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Code postal d'exercice</label>
+            <input class="field-input" id="f-cp" inputmode="numeric" maxlength="5" placeholder="Ex. 75011">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Mode d'exercice <span style="font-weight:400;text-transform:none;color:var(--muted)">(optionnel — pour nos statistiques)</span></label>
+          <div class="pill-row" id="mode-pills">
+            <div class="pill" data-mode="liberal">Libéral</div>
+            <div class="pill" data-mode="hospitalier">Hospitalier (public)</div>
+            <div class="pill" data-mode="salarie">Salarié (CLCC, ESPIC, privé)</div>
+            <div class="pill" data-mode="mixte">Mixte</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Motifs de votre mobilisation <span style="font-weight:400;text-transform:none;color:var(--muted)">(optionnel)</span></label>
+          <div class="motif-grid" id="motif-grid"></div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Adresse email <span style="font-weight:400;text-transform:none;color:var(--muted)">(pour recevoir l'attestation)</span></label>
+            <input class="field-input" id="f-email" type="email" placeholder="vous@exemple.fr">
+          </div>
+          <div class="field">
+            <label class="field-label">Téléphone <span style="font-weight:400;text-transform:none;color:var(--muted)">(optionnel)</span></label>
+            <input class="field-input" id="f-tel" type="tel" placeholder="06 12 34 56 78">
+          </div>
+        </div>
+
+        <div class="rgpd-box">
+          <strong>🔒 Protection de vos données (RGPD)</strong><br>
+          Le responsable de traitement est <strong>Générations Médecins Île-de-France</strong>. Votre numéro RPPS et vos coordonnées sont conservés uniquement pour comptabiliser la mobilisation et vous envoyer votre attestation. Vos nom et prénom ne sont pas stockés. Vous disposez d'un droit d'accès, de rectification et de suppression de vos données : <a href="mailto:contact@generations-medecins.fr">contact@generations-medecins.fr</a>.
+          <label class="check-inline" style="margin-top:12px">
+            <input type="checkbox" id="f-consent-info">
+            <span>J'accepte d'être tenu informé par email de l'évolution du mouvement et des actions de Générations Médecins (désinscription possible à tout moment).</span>
+          </label>
+        </div>
+
+        <button class="btn-submit-greve" id="btn-submit" onclick="submitGreve()">✊ Je déclare ma participation</button>
+      </div>
+    </div>
+
+    <!-- CONFIRMATION (cachée au départ) -->
+    <div id="confirm-section" style="display:none">
+      <div class="confirm-card">
+        <div class="big">✊</div>
+        <h2>Merci, votre participation est enregistrée !</h2>
+        <p style="color:var(--muted);font-size:.92rem;line-height:1.6">Vous faites désormais partie du mouvement. Votre attestation de grève vous a été envoyée par email<span id="confirm-email-extra"></span>.</p>
+        <div class="confirm-ref" id="confirm-ref"></div>
+        <div>
+          <button class="btn btn-outline" onclick="downloadAttestation()">📄 Télécharger mon attestation</button>
+        </div>
+        <div class="adhesion-cta">
+          <h3>💪 Amplifions notre voix ensemble</h3>
+          <p>La grève, c'est un signal. L'adhésion, c'est la force dans la durée. Générations Médecins défend la médecine libérale toute l'année — rejoignez-nous.</p>
+          <a href="adherer.html" class="btn btn-white">Adhérer à Générations Médecins →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIENS / ARTICLES -->
+    <div id="links-section" style="display:none;margin-top:44px">
+      <h2 class="section-title">Pour aller plus loin</h2>
+      <div class="links-row" id="links-row"></div>
+    </div>
+
+    <!-- FAQ -->
+    <div id="faq-section" style="margin-top:48px">
+      <h2 class="section-title">Questions fréquentes</h2>
+      <p class="section-sub">Tout ce qu'il faut savoir sur la mobilisation.</p>
+      <div id="faq-list"></div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="greve.html">Médecins en Grève</a>
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="bureau.html">Bureau</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Zone de rendu de l'attestation (invisible, capturée en PDF) -->
+  <div id="attestation-render"></div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+  (function () {
+    const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    const $ = id => document.getElementById(id);
+    let campagne = null;
+    let selectedMode = null;
+    let rppsVerified = false;
+    let lastPdfBlob = null;
+    let lastRef = null;
+
+    function toast(msg, isErr) {
+      const t = $('toast');
+      t.textContent = msg; t.className = 'toast show' + (isErr ? ' error' : '');
+      setTimeout(() => t.className = 'toast', 3200);
+    }
+    function esc(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+
+    // Référence unique lisible : GM-GREVE-2026-AB3K9 (même format que le serveur)
+    function genRef() {
+      const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+      let code = '';
+      for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
+      return `GM-GREVE-${new Date().getFullYear()}-${code}`;
+    }
+
+    window.scrollToForm = () => $('form-section').scrollIntoView({ behavior:'smooth' });
+
+    // ── Init : charge la campagne active ──────────────────────────────────────
+    async function init() {
+      const { data, error } = await sb.from('greve_campagnes')
+        .select('*').eq('actif', true).order('created_at', { ascending:false }).limit(1);
+      if (error || !data || !data.length) {
+        // Pas de campagne active → on prend la plus récente pour l'affichage, form fermé
+        const { data: any } = await sb.from('greve_campagnes').select('*').order('created_at',{ascending:false}).limit(1);
+        campagne = any && any[0];
+        renderClosed();
+        return;
+      }
+      campagne = data[0];
+      renderCampagne();
+    }
+
+    function renderClosed() {
+      $('hero-accroche').textContent = campagne?.accroche || 'Aucune mobilisation en cours actuellement.';
+      $('counter-num').textContent = (campagne?.declaration_count || 0).toLocaleString('fr-FR');
+      $('hero-cta').style.display = 'none';
+      $('closed-banner').style.display = 'block';
+      $('closed-banner').textContent = '⏸ Les déclarations sont actuellement fermées. Revenez prochainement.';
+      $('form-section').style.display = 'none';
+      if (campagne) renderFaq();
+    }
+
+    function renderCampagne() {
+      document.title = campagne.titre + ' — Générations Médecins';
+      $('hero-accroche').textContent = campagne.accroche || '';
+
+      if (campagne.date_debut && campagne.date_fin) {
+        $('hero-dates').style.display = 'inline-block';
+        $('hero-dates').textContent = '📅 Du ' + fmtDate(campagne.date_debut) + ' au ' + fmtDate(campagne.date_fin);
+      }
+
+      // Compteur animé
+      animateCounter($('counter-num'), campagne.declaration_count || 0);
+
+      // Jauge objectif
+      if (campagne.objectif > 0) {
+        $('progress-wrap').style.display = 'block';
+        const pct = Math.min(100, Math.round((campagne.declaration_count / campagne.objectif) * 100));
+        setTimeout(() => $('progress-fill').style.width = pct + '%', 200);
+        $('progress-current').textContent = (campagne.declaration_count||0).toLocaleString('fr-FR') + ' déclarés';
+        $('progress-goal').textContent = 'Objectif : ' + campagne.objectif.toLocaleString('fr-FR');
+      }
+
+      renderMotifs();
+      renderFaq();
+      renderLinks();
+    }
+
+    function fmtDate(d){ return new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}); }
+
+    function animateCounter(el, target) {
+      const dur = 1100, t0 = performance.now();
+      function step(t){
+        const p = Math.min(1, (t-t0)/dur);
+        const ease = 1 - Math.pow(1-p, 3);
+        el.textContent = Math.round(target*ease).toLocaleString('fr-FR');
+        if (p<1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    function renderMotifs() {
+      const motifs = campagne.motifs || [];
+      $('motif-grid').innerHTML = motifs.map(m => `
+        <label class="motif-item" data-id="${esc(m.id)}">
+          <input type="checkbox" value="${esc(m.id)}" onchange="this.closest('.motif-item').classList.toggle('sel', this.checked)">
+          <span>${esc(m.label)}</span>
+        </label>`).join('');
+    }
+
+    function renderFaq() {
+      const faq = campagne?.faq || [];
+      $('faq-list').innerHTML = faq.map((f,i) => `
+        <div class="faq-item" id="faq-${i}">
+          <div class="faq-q" onclick="document.getElementById('faq-${i}').classList.toggle('open')">
+            <span>${esc(f.q)}</span><span class="chev">▾</span>
+          </div>
+          <div class="faq-a">${esc(f.r)}</div>
+        </div>`).join('');
+    }
+
+    function renderLinks() {
+      const liens = campagne.liens || [];
+      if (!liens.length) return;
+      $('links-section').style.display = 'block';
+      $('links-row').innerHTML = liens.map(l =>
+        `<a class="link-chip" href="${esc(l.url)}" target="_blank" rel="noopener">📄 ${esc(l.label)}</a>`).join('');
+    }
+
+    // ── Mode d'exercice pills ─────────────────────────────────────────────────
+    document.querySelectorAll('#mode-pills .pill').forEach(p => {
+      p.addEventListener('click', () => {
+        const was = p.classList.contains('sel');
+        document.querySelectorAll('#mode-pills .pill').forEach(x => x.classList.remove('sel'));
+        if (!was) { p.classList.add('sel'); selectedMode = p.dataset.mode; }
+        else selectedMode = null;
+      });
+    });
+
+    // ── RPPS : interne toggle + vérif Annuaire Santé ──────────────────────────
+    window.toggleInterne = function() {
+      const on = $('f-interne').checked;
+      $('f-rpps').disabled = on;
+      $('rpps-req').style.display = on ? 'none' : 'inline';
+      $('rpps-status').textContent = '';
+      $('rpps-status').className = 'rpps-status';
+      if (on) { $('f-rpps').value = ''; rppsVerified = false; }
+    };
+
+    let rppsTimer = null;
+    window.onRppsInput = function() {
+      const v = $('f-rpps').value.replace(/\D/g,'').slice(0,11);
+      $('f-rpps').value = v;
+      rppsVerified = false;
+      $('rpps-status').textContent = '';
+      $('rpps-status').className = 'rpps-status';
+      clearTimeout(rppsTimer);
+      if (v.length >= 8) rppsTimer = setTimeout(() => verifyRpps(v), 600);
+    };
+
+    async function verifyRpps(rpps) {
+      const st = $('rpps-status');
+      st.textContent = '🔍 Vérification dans l\'Annuaire Santé…';
+      st.className = 'rpps-status';
+      try {
+        const url = `https://api.annuaire.sante.fr/fhir/v1/PractitionerRole` +
+          `?practitioner.identifier=urn%3Aoid%3A1.2.250.1.71.4.2.1%7C${encodeURIComponent(rpps)}&_count=1`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('indispo');
+        const data = await res.json();
+        if (data.total > 0 || (data.entry && data.entry.length)) {
+          rppsVerified = true;
+          st.textContent = '✓ RPPS vérifié dans l\'Annuaire Santé';
+          st.className = 'rpps-status ok';
+        } else {
+          rppsVerified = false;
+          st.textContent = '⚠️ RPPS introuvable dans l\'Annuaire Santé. Vérifiez votre numéro.';
+          st.className = 'rpps-status err';
+        }
+      } catch {
+        // Annuaire indisponible → on n'empêche pas, mais on prévient
+        rppsVerified = true; // best effort : la contrainte anti-doublon reste côté serveur
+        st.textContent = 'ℹ️ Annuaire momentanément indisponible — votre déclaration reste possible.';
+        st.className = 'rpps-status';
+      }
+    }
+
+    // ── Soumission ────────────────────────────────────────────────────────────
+    window.submitGreve = async function() {
+      if (!campagne) { toast('Aucune campagne active', true); return; }
+      const interne = $('f-interne').checked;
+      const rpps = $('f-rpps').value.replace(/\D/g,'');
+      const nom = $('f-nom').value.trim();
+      const prenom = $('f-prenom').value.trim();
+      const email = $('f-email').value.trim();
+
+      if (!interne && rpps.length < 8) { toast('Renseignez un numéro RPPS valide (ou cochez interne/externe)', true); return; }
+      if (!nom || !prenom) { toast('Nom et prénom requis pour la vérification', true); return; }
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast('Adresse email invalide', true); return; }
+      if (email === '' ) {
+        if (!confirm('Sans email, vous ne recevrez pas votre attestation de grève. Continuer quand même ?')) return;
+      }
+
+      const motifs = Array.from(document.querySelectorAll('#motif-grid input:checked')).map(c => c.value);
+      const cp = $('f-cp').value.replace(/\D/g,'').slice(0,5);
+
+      const btn = $('btn-submit');
+      btn.disabled = true; btn.textContent = '⏳ Enregistrement…';
+
+      try {
+        // Génère la référence côté client → le PDF en pièce jointe et la confirmation
+        // affichent exactement le même numéro (le serveur valide ce format).
+        const ref = genRef();
+        lastRef = ref;
+
+        // Génère l'attestation PDF (mémorise lastPdfBlob pour le téléchargement local)
+        const pdfBase64 = await buildAttestationPdf({
+          ref, specialite: $('f-specialite').value, cp,
+        }, true);
+
+        const res = await fetch('/.netlify/functions/soumettre-greve', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({
+            campagneId: campagne.id,
+            ref,
+            rpps: interne ? null : rpps,
+            estInterne: interne,
+            specialite: $('f-specialite').value || null,
+            cp: cp || null,
+            modeExercice: selectedMode,
+            motifs,
+            email: email || null,
+            tel: $('f-tel').value.trim() || null,
+            consentementInfo: $('f-consent-info').checked,
+            pdfBase64: email ? pdfBase64 : null,
+          }),
+        });
+        const out = await res.json();
+        if (!res.ok) { toast(out.error || 'Erreur', true); btn.disabled=false; btn.textContent='✊ Je déclare ma participation'; return; }
+
+        lastRef = out.ref || ref;
+
+        // Affiche la confirmation
+        $('form-section').style.display = 'none';
+        $('confirm-section').style.display = 'block';
+        $('confirm-ref').textContent = out.ref;
+        $('confirm-email-extra').textContent = email ? '' : ' (aucun email fourni — pensez à télécharger votre attestation ci-dessous)';
+        if (!out.emailEnvoye && email) {
+          $('confirm-email-extra').textContent = " (l'envoi par email a rencontré un souci — utilisez le téléchargement ci-dessous)";
+        }
+        window.scrollTo({ top:0, behavior:'smooth' });
+      } catch(e) {
+        toast('Erreur réseau : ' + e.message, true);
+        btn.disabled=false; btn.textContent='✊ Je déclare ma participation';
+      }
+    };
+
+    // ── Génération de l'attestation PDF ───────────────────────────────────────
+    async function buildAttestationPdf(info, returnBase64) {
+      const dateStr = new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+      const html = `
+        <div style="width:794px;padding:60px 64px;font-family:Inter,Arial,sans-serif;color:#152033;box-sizing:border-box">
+          <div style="display:flex;align-items:center;gap:14px;border-bottom:3px solid #b91c1c;padding-bottom:18px;margin-bottom:34px">
+            <div style="width:54px;height:54px;border-radius:12px;background:linear-gradient(135deg,#2a6db8,#38a8b5);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:20px">GM</div>
+            <div>
+              <div style="font-size:20px;font-weight:900">Générations Médecins Île-de-France</div>
+              <div style="font-size:13px;color:#64748b">Mouvement médical indépendant</div>
+            </div>
+          </div>
+          <h1 style="font-size:26px;font-weight:900;text-align:center;margin:0 0 6px;letter-spacing:-.02em">ATTESTATION DE GRÈVE</h1>
+          <p style="text-align:center;color:#b91c1c;font-weight:700;font-size:14px;margin:0 0 40px">${esc(campagne.titre)}</p>
+          <p style="font-size:15px;line-height:1.9;margin:0 0 24px">
+            Je soussigné(e), médecin inscrit(e) au Répertoire Partagé des Professionnels de Santé (RPPS),
+            déclare par la présente participer au mouvement de grève
+            <strong>« ${esc(campagne.titre)} »</strong>${campagne.date_debut ? ', à compter du <strong>'+fmtDate(campagne.date_debut)+'</strong>' : ''}.
+          </p>
+          <table style="width:100%;font-size:14px;border-collapse:collapse;margin:30px 0">
+            <tr><td style="padding:9px 0;color:#64748b;width:200px">Spécialité</td><td style="padding:9px 0;font-weight:600">${esc(info.specialite)||'—'}</td></tr>
+            <tr><td style="padding:9px 0;color:#64748b">Code postal d'exercice</td><td style="padding:9px 0;font-weight:600">${esc(info.cp)||'—'}</td></tr>
+            <tr><td style="padding:9px 0;color:#64748b">Date de déclaration</td><td style="padding:9px 0;font-weight:600">${dateStr}</td></tr>
+            <tr><td style="padding:9px 0;color:#64748b">Référence</td><td style="padding:9px 0;font-weight:700;font-family:monospace;letter-spacing:.04em">${esc(info.ref)}</td></tr>
+          </table>
+          <div style="background:#fef2f2;border-left:4px solid #b91c1c;padding:16px 20px;border-radius:6px;font-size:13px;color:#7f1d1d;line-height:1.6;margin:30px 0">
+            Cette attestation est un document militant délivré par Générations Médecins Île-de-France. Elle témoigne de l'engagement de son porteur dans le mouvement social des médecins libéraux.
+          </div>
+          <div style="margin-top:50px;display:flex;justify-content:space-between;align-items:flex-end">
+            <div style="font-size:12px;color:#94a3b8">Délivré le ${dateStr}<br>generations-medecins.fr</div>
+            <div style="text-align:center">
+              <div style="font-family:'Brush Script MT',cursive;font-size:22px;color:#1a4a80">Générations Médecins</div>
+              <div style="border-top:1px solid #cbd5e1;margin-top:4px;padding-top:4px;font-size:11px;color:#94a3b8">Le Bureau</div>
+            </div>
+          </div>
+        </div>`;
+
+      const render = $('attestation-render');
+      render.innerHTML = html;
+      const canvas = await html2canvas(render.firstElementChild, { scale:1.6, backgroundColor:'#fff', logging:false });
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ unit:'mm', format:'a4', orientation:'portrait' });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const imgH = (canvas.height * pageW) / canvas.width;
+      pdf.addImage(canvas.toDataURL('image/jpeg',0.9), 'JPEG', 0, 0, pageW, imgH);
+      render.innerHTML = '';
+
+      lastPdfBlob = pdf.output('blob');
+      if (returnBase64) {
+        return await new Promise(resolve => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result);
+          r.readAsDataURL(lastPdfBlob);
+        });
+      }
+    }
+
+    window.downloadAttestation = function() {
+      if (!lastPdfBlob) { toast('Attestation indisponible', true); return; }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(lastPdfBlob);
+      a.download = `attestation-greve-${lastRef||''}.pdf`;
+      a.click();
+    };
+
+    init();
+  })();
+  </script>
+  <script src="auth-header.js"></script>
+</body>
+</html>
