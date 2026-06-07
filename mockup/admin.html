@@ -374,6 +374,18 @@
 
     /* Badge lecture seule */
     .readonly-badge { display:none; align-items:center; gap:6px; background:#fef9c3; border:1px solid #fde047; border-radius:999px; padding:5px 12px; font-size:.77rem; font-weight:700; color:#854d0e; }
+
+    /* Ligne d'historique (overlay) */
+    .hist-row { display:flex; align-items:center; gap:14px; padding:14px 16px; border:1.5px solid var(--line); border-radius:12px; cursor:pointer; transition:all .15s; }
+    .hist-row:hover { border-color:#2563eb; background:#f8fbff; }
+    .hist-row.viewing { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+    .hist-count { font-size:1.5rem; font-weight:900; color:#1a3a8a; letter-spacing:-.03em; min-width:70px; text-align:center; }
+    .hist-info { flex:1; min-width:0; }
+    .hist-title { font-size:.92rem; font-weight:800; color:var(--ink); margin-bottom:2px; }
+    .hist-meta { font-size:.78rem; color:var(--muted); }
+    .hist-badge { flex-shrink:0; font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; padding:3px 10px; border-radius:999px; }
+    .hist-badge.open { background:#dcfce7; color:#15803d; }
+    .hist-badge.closed { background:#f1f5f9; color:#64748b; }
   </style>
 </head>
 <body style="visibility:hidden">
@@ -807,6 +819,10 @@
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Export CSV
             </button>
+            <button class="g-btn g-btn-outline" onclick="greveOpenHistory()">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+              Historique <span id="g-history-count" style="opacity:.7"></span>
+            </button>
             <button class="g-btn g-btn-danger" onclick="greveReset()">
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
               Nouvelle campagne
@@ -818,13 +834,16 @@
 
         <div id="greve-content" style="display:none">
 
-          <!-- Timeline des campagnes -->
-          <div class="camp-timeline-wrap">
-            <div class="camp-timeline-label">
-              📁 Historique des campagnes
-              <span id="camp-count-label" style="font-weight:400;color:var(--muted)"></span>
-            </div>
+          <!-- Bandeau campagnes en cours (affiché seulement s'il y en a plusieurs) -->
+          <div class="camp-timeline-wrap" id="camp-active-wrap" style="display:none">
+            <div class="camp-timeline-label">● Campagnes en cours</div>
             <div class="camp-timeline" id="camp-timeline"></div>
+          </div>
+
+          <!-- Bandeau "vous consultez une archive" -->
+          <div id="camp-archive-bar" style="display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#fffbeb;border:1px solid #fde047;border-radius:12px;padding:12px 16px;margin-bottom:24px">
+            <div style="font-size:.86rem;color:#854d0e;font-weight:600">📁 Vous consultez une campagne archivée <span id="camp-archive-name" style="font-weight:800"></span></div>
+            <button class="g-btn g-btn-outline" style="padding:6px 14px;font-size:.8rem" onclick="greveBackToActive()">← Revenir à la campagne en cours</button>
           </div>
 
           <!-- Stats -->
@@ -921,6 +940,20 @@
             <div id="g-declarations" style="font-size:.85rem"></div>
           </div>
 
+        </div>
+
+        <!-- Overlay Historique des campagnes -->
+        <div id="greve-history-overlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:500;backdrop-filter:blur(2px)" onclick="if(event.target===this)greveCloseHistory()">
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(680px,92vw);max-height:84vh;overflow-y:auto;background:#fff;border-radius:18px;box-shadow:0 24px 60px rgba(15,23,42,.3)">
+            <div style="position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:20px 24px;display:flex;justify-content:space-between;align-items:center;border-radius:18px 18px 0 0">
+              <div>
+                <div style="font-weight:800;font-size:1.1rem;color:var(--ink)">📁 Historique des campagnes</div>
+                <div style="font-size:.82rem;color:var(--muted)" id="g-history-sub"></div>
+              </div>
+              <button onclick="greveCloseHistory()" style="background:none;border:none;font-size:1.4rem;color:var(--muted);cursor:pointer;line-height:1">✕</button>
+            </div>
+            <div id="g-history-list" style="padding:16px 24px 24px;display:flex;flex-direction:column;gap:10px"></div>
+          </div>
         </div>
       </div>
 
@@ -3176,28 +3209,98 @@
     renderGreveStats();
     renderGreveDeclarations();
     updateGreveEditMode();
+    refreshHistoryIfOpen();
   };
 
+  // Bandeau du haut : uniquement les campagnes EN COURS (et seulement si >1).
+  // Une seule campagne active → pas de bandeau (inutile). Les archives vont dans l'overlay.
   function renderCampagneSwitcher() {
-    const el = document.getElementById('camp-timeline');
-    const label = document.getElementById('camp-count-label');
-    if (!el) return;
-    const total = greveAllCampagnes.length;
-    if (label) label.textContent = `· ${total} campagne${total > 1 ? 's' : ''}`;
+    const actives = greveAllCampagnes.filter(c => c.actif);
+    const archived = greveAllCampagnes.filter(c => !c.actif);
 
-    el.innerHTML = greveAllCampagnes.map(c => {
-      const isViewing = c.id === greveViewingId;
-      const count = (c.declaration_count || 0).toLocaleString('fr-FR');
-      const dates = (c.date_debut || c.date_fin)
-        ? `${fmtDateShort(c.date_debut)}${c.date_fin ? ' → ' + fmtDateShort(c.date_fin) : ''}` : '';
-      return `<div class="camp-chip${isViewing ? ' viewing' : ''}" onclick="switchCampagne('${c.id}')">
-        <div class="camp-chip-badge ${c.actif ? 'open' : 'closed'}">${c.actif ? '● En cours' : '📁 Archivée'}</div>
-        <div class="camp-chip-count">${count}</div>
-        <div class="camp-chip-title">${esc(c.titre)}</div>
-        ${dates ? `<div class="camp-chip-meta">${dates}</div>` : ''}
-      </div>`;
-    }).join('');
+    // Bouton Historique
+    const histCount = document.getElementById('g-history-count');
+    if (histCount) histCount.textContent = archived.length ? `(${archived.length})` : '';
+
+    // Bandeau "campagnes en cours" : affiché seulement s'il y en a plusieurs
+    const wrap = document.getElementById('camp-active-wrap');
+    const el = document.getElementById('camp-timeline');
+    if (actives.length > 1) {
+      wrap.style.display = 'block';
+      el.innerHTML = actives.map(c => campChip(c)).join('');
+    } else {
+      wrap.style.display = 'none';
+    }
+
+    // Bandeau "vous consultez une archive"
+    const archiveBar = document.getElementById('camp-archive-bar');
+    const viewing = greveAllCampagnes.find(c => c.id === greveViewingId);
+    if (viewing && !viewing.actif) {
+      archiveBar.style.display = 'flex';
+      document.getElementById('camp-archive-name').textContent = '« ' + viewing.titre + ' »';
+    } else {
+      archiveBar.style.display = 'none';
+    }
   }
+
+  function campChip(c) {
+    const isViewing = c.id === greveViewingId;
+    const count = (c.declaration_count || 0).toLocaleString('fr-FR');
+    const dates = (c.date_debut || c.date_fin)
+      ? `${fmtDateShort(c.date_debut)}${c.date_fin ? ' → ' + fmtDateShort(c.date_fin) : ''}` : '';
+    return `<div class="camp-chip${isViewing ? ' viewing' : ''}" onclick="switchCampagne('${c.id}')">
+      <div class="camp-chip-badge ${c.actif ? 'open' : 'closed'}">${c.actif ? '● En cours' : '📁 Archivée'}</div>
+      <div class="camp-chip-count">${count}</div>
+      <div class="camp-chip-title">${esc(c.titre)}</div>
+      ${dates ? `<div class="camp-chip-meta">${dates}</div>` : ''}
+    </div>`;
+  }
+
+  // ── Overlay Historique ────────────────────────────────────────────────────
+  window.greveOpenHistory = function() {
+    renderHistoryList();
+    document.getElementById('greve-history-overlay').style.display = 'block';
+  };
+  window.greveCloseHistory = function() {
+    document.getElementById('greve-history-overlay').style.display = 'none';
+  };
+  function refreshHistoryIfOpen() {
+    if (document.getElementById('greve-history-overlay').style.display === 'block') renderHistoryList();
+  }
+  function renderHistoryList() {
+    const archived = greveAllCampagnes.filter(c => !c.actif);
+    const sub = document.getElementById('g-history-sub');
+    if (sub) sub.textContent = archived.length
+      ? `${archived.length} campagne${archived.length > 1 ? 's' : ''} archivée${archived.length > 1 ? 's' : ''} — cliquez pour consulter`
+      : 'Aucune campagne archivée pour le moment.';
+
+    document.getElementById('g-history-list').innerHTML = archived.length
+      ? archived.map(c => {
+          const isViewing = c.id === greveViewingId;
+          const count = (c.declaration_count || 0).toLocaleString('fr-FR');
+          const dates = (c.date_debut || c.date_fin)
+            ? `${fmtDateShort(c.date_debut)}${c.date_fin ? ' → ' + fmtDateShort(c.date_fin) : ''}`
+            : 'Créée le ' + fmtDateShort(c.created_at);
+          return `<div class="hist-row${isViewing ? ' viewing' : ''}" onclick="greveViewArchive('${c.id}')">
+            <div class="hist-count">${count}</div>
+            <div class="hist-info">
+              <div class="hist-title">${esc(c.titre)}</div>
+              <div class="hist-meta">${dates} · objectif ${(c.objectif||0).toLocaleString('fr-FR')}</div>
+            </div>
+            <div class="hist-badge closed">📁 Archivée</div>
+          </div>`;
+        }).join('')
+      : '<div style="text-align:center;padding:32px;color:var(--muted);font-size:.88rem">Aucune campagne archivée.<br>Les campagnes clôturées via « Nouvelle campagne » apparaîtront ici.</div>';
+  }
+  window.greveViewArchive = async function(id) {
+    greveCloseHistory();
+    await switchCampagne(id);
+    document.getElementById('section-greve').scrollIntoView({ behavior:'smooth', block:'start' });
+  };
+  window.greveBackToActive = async function() {
+    const active = greveAllCampagnes.find(c => c.actif) || greveAllCampagnes[0];
+    if (active) await switchCampagne(active.id);
+  };
 
   function updateGreveEditMode() {
     const readonly = !greveCampagne.actif;
