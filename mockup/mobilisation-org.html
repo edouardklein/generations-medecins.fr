@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pharmaciens en Action — Mobilisation Santé</title>
+  <meta name="description" content="Déclarez votre participation à la mobilisation des pharmaciens d'officine.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /*
+     * CSS variables injectées dynamiquement depuis organisations.couleur / couleur2
+     * Dans ce mockup, elles sont hardcodées pour les pharmaciens (vert teal).
+     * En production : document.documentElement.style.setProperty('--org-c1', org.couleur)
+     */
+    :root {
+      --org-c1: #0f766e;
+      --org-c2: #14b8a6;
+      --org-grad: linear-gradient(135deg, #0f766e, #14b8a6);
+    }
+
+    body { background: #f0f4f8; }
+
+    /* ── Hero ─────────────────────────────────────────────────────────────── */
+    .org-hero {
+      background: var(--org-grad);
+      color: #fff; padding: 54px 0 46px; text-align: center; position: relative; overflow: hidden;
+    }
+    .org-hero::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0px, rgba(255,255,255,.025) 1px, transparent 1px, transparent 60px),
+        radial-gradient(ellipse at 70% 0%, rgba(255,255,255,.15) 0%, transparent 60%);
+    }
+    .org-hero-inner { max-width:760px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
+    .org-hero-emoji { font-size:3rem; margin-bottom:12px; }
+    .org-hero h1 { font-size:clamp(2rem,5vw,2.8rem); font-weight:900; letter-spacing:-.03em; margin-bottom:10px; }
+    .org-hero .accroche { font-size:.98rem; color:rgba(255,255,255,.85); line-height:1.6; max-width:560px; margin:0 auto 24px; }
+
+    /* Compteur */
+    .counter-box { display:flex; flex-direction:column; align-items:center; gap:5px; margin-bottom:6px; }
+    .counter-num { font-size:3.6rem; font-weight:900; letter-spacing:-.04em; line-height:1; }
+    .counter-label { font-size:.88rem; color:rgba(255,255,255,.8); font-weight:600; }
+    .progress-wrap { max-width:420px; margin:16px auto 0; }
+    .progress-track { height:9px; background:rgba(255,255,255,.2); border-radius:999px; overflow:hidden; }
+    .progress-fill { height:100%; background:rgba(255,255,255,.9); border-radius:999px; width:0; transition:width 1.2s cubic-bezier(.22,.61,.36,1); }
+
+    /* ── Barre admin ─────────────────────────────────────────────────────── */
+    .admin-topbar {
+      display:none; /* visible uniquement si org_membre.role = 'admin' */
+      background:rgba(0,0,0,.75); backdrop-filter:blur(6px);
+      padding:10px 24px; justify-content:space-between; align-items:center;
+      gap:12px; flex-wrap:wrap;
+    }
+    .admin-topbar.visible { display:flex; }
+    .admin-topbar-left { display:flex; align-items:center; gap:10px; }
+    .admin-badge {
+      font-size:.7rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+      background:rgba(255,255,255,.15); color:#fff; border:1px solid rgba(255,255,255,.3);
+      border-radius:999px; padding:4px 11px;
+    }
+    .admin-topbar-left span { font-size:.82rem; color:rgba(255,255,255,.8); }
+    .admin-topbar a {
+      font-size:.82rem; font-weight:700; color:#fff; text-decoration:none;
+      background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:8px;
+      padding:7px 16px; transition:background .12s;
+    }
+    .admin-topbar a:hover { background:rgba(255,255,255,.28); }
+
+    /* ── Hub back link ───────────────────────────────────────────────────── */
+    .hub-back {
+      max-width:880px; margin:0 auto; padding:18px 24px 0;
+      font-size:.82rem; color:var(--muted);
+    }
+    .hub-back a { color:var(--org-c1); font-weight:700; text-decoration:none; }
+    .hub-back a:hover { text-decoration:underline; }
+
+    /* ── Conteneur ────────────────────────────────────────────────────────── */
+    .page-inner { max-width:880px; margin:0 auto; padding:36px 24px 80px; }
+    .section-title { font-size:1.35rem; font-weight:900; color:var(--ink); margin-bottom:6px; letter-spacing:-.02em; }
+    .section-sub   { font-size:.9rem; color:var(--muted); margin-bottom:24px; }
+
+    /* ── Formulaire ──────────────────────────────────────────────────────── */
+    .form-card { background:#fff; border-radius:18px; padding:32px 30px; box-shadow:0 2px 14px rgba(20,32,51,.07); margin-bottom:40px; }
+    .field { margin-bottom:18px; }
+    label { font-size:.82rem; font-weight:700; color:var(--ink); display:block; margin-bottom:5px; }
+    input[type=text], input[type=email], select {
+      width:100%; padding:11px 14px; border:1.5px solid var(--line); border-radius:10px;
+      font-family:inherit; font-size:.92rem; color:var(--ink); outline:none; transition:border .12s;
+    }
+    input:focus, select:focus { border-color:var(--org-c1); }
+
+    .req { color:#e11d48; margin-left:2px; }
+
+    .id-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media(max-width:560px) { .id-row { grid-template-columns:1fr; } }
+
+    /* Statut vérification identifiant */
+    .id-status { font-size:.78rem; margin-top:5px; min-height:18px; font-weight:600; }
+    .id-status.ok  { color:#16a34a; }
+    .id-status.err { color:#dc2626; }
+
+    /* ── RGPD ────────────────────────────────────────────────────────────── */
+    .rgpd-box {
+      background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px;
+      padding:16px 18px; font-size:.78rem; color:#64748b; line-height:1.6; margin-bottom:24px;
+    }
+    .rgpd-box strong { color:var(--ink); }
+
+    /* ── Submit ──────────────────────────────────────────────────────────── */
+    .btn-submit-org {
+      width:100%; padding:16px; border-radius:12px; font-family:inherit; font-size:1rem;
+      font-weight:800; border:none; cursor:pointer; transition:all .15s;
+      background:var(--org-grad); color:#fff; letter-spacing:-.01em;
+    }
+    .btn-submit-org:hover { filter:brightness(1.08); transform:translateY(-1px); box-shadow:0 6px 20px rgba(0,0,0,.15); }
+    .btn-submit-org:disabled { opacity:.6; transform:none; cursor:not-allowed; }
+
+    /* ── Confirmation ────────────────────────────────────────────────────── */
+    .confirm-card {
+      background:#fff; border-radius:20px; padding:44px 32px; text-align:center;
+      box-shadow:0 4px 24px rgba(20,32,51,.09); margin-bottom:40px;
+    }
+    .confirm-card .big { font-size:3.5rem; margin-bottom:12px; }
+    .confirm-card h2 { font-size:1.45rem; font-weight:900; color:var(--ink); margin-bottom:10px; }
+    .confirm-ref {
+      font-family:monospace; font-size:.85rem; color:var(--muted); letter-spacing:.06em;
+      background:#f1f5f9; border-radius:8px; padding:8px 16px; display:inline-block; margin-top:8px;
+    }
+    .hub-cta-after {
+      background:linear-gradient(135deg,rgba(15,118,110,.08),rgba(20,184,166,.06));
+      border:1px solid rgba(15,118,110,.2); border-radius:14px; padding:20px 24px; margin-top:20px;
+    }
+    .hub-cta-after p { font-size:.88rem; color:var(--muted); margin-bottom:12px; }
+    .btn-hub-back { background:var(--org-c1); color:#fff; border:none; padding:10px 20px; border-radius:999px; font-family:inherit; font-weight:700; font-size:.85rem; cursor:pointer; text-decoration:none; display:inline-block; }
+
+    /* ── Toast ───────────────────────────────────────────────────────────── */
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); opacity:0; transition:all .25s; background:var(--ink); color:#fff; padding:12px 22px; border-radius:999px; font-size:.88rem; font-weight:600; z-index:9999; pointer-events:none; white-space:nowrap; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.error { background:#dc2626; }
+
+    /* ── Powered by ──────────────────────────────────────────────────────── */
+    .powered-by {
+      text-align:center; padding:20px 0 40px; font-size:.75rem; color:#94a3b8;
+    }
+    .powered-by a { color:#1a3a8a; font-weight:700; text-decoration:none; }
+  </style>
+</head>
+<body>
+
+  <!-- BARRE ADMIN (visible si l'utilisateur est admin de cet univers) -->
+  <div class="admin-topbar" id="admin-topbar">
+    <div class="admin-topbar-left">
+      <span class="admin-badge">Admin</span>
+      <span id="admin-org-name">Pharmaciens en Action</span>
+    </div>
+    <a href="admin.html?org=pharmaciens" id="admin-link">Tableau de bord →</a>
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <a href="mobilisation-hub.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span id="org-nom-header">Pharmaciens en Action</span>
+      </a>
+      <nav>
+        <a href="mobilisation-hub.html">← Toutes les professions</a>
+        <a href="espace-membre.html">Mon espace</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="org-hero">
+    <div class="org-hero-inner">
+      <div class="org-hero-emoji" id="org-emoji">💊</div>
+      <h1 id="org-titre">Pharmaciens en Action</h1>
+      <p class="accroche" id="org-desc">Déclarez votre participation à la mobilisation des pharmaciens d'officine. Recevez votre attestation officielle.</p>
+      <div class="counter-box">
+        <div class="counter-num" id="counter-num">0</div>
+        <div class="counter-label">pharmaciens mobilisés</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BACK -->
+  <div class="hub-back">
+    <a href="mobilisation-hub.html">← Hub Mobilisation Santé</a>
+  </div>
+
+  <div class="page-inner">
+
+    <!-- FORMULAIRE -->
+    <div id="form-section">
+      <h2 class="section-title">Déclarer ma participation</h2>
+      <p class="section-sub">Votre déclaration est anonymisée — seule une empreinte numérique de votre identifiant est conservée.</p>
+
+      <div class="form-card">
+        <!-- Identifiant professionnel -->
+        <div class="field">
+          <label for="f-id">Numéro <span id="id-type-label">FINESS</span> <span class="req">*</span></label>
+          <input type="text" id="f-id" placeholder="Votre identifiant professionnel" oninput="onIdInput()" autocomplete="off" inputmode="numeric">
+          <div class="id-status" id="id-status"></div>
+        </div>
+
+        <div class="id-row">
+          <div class="field">
+            <label for="f-cp">Code postal d'exercice</label>
+            <input type="text" id="f-cp" placeholder="75001" maxlength="5" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label for="f-email">Email <span style="font-weight:400;color:var(--muted)">(optionnel)</span></label>
+            <input type="email" id="f-email" placeholder="pour recevoir votre attestation">
+          </div>
+        </div>
+
+        <!-- RGPD -->
+        <div class="rgpd-box">
+          <strong>Vie privée :</strong> Votre identifiant est transformé en empreinte numérique irréversible (SHA-256) directement dans votre navigateur — il ne quitte jamais votre appareil. Seule cette empreinte est transmise. Votre email, s'il est fourni, est utilisé uniquement pour l'envoi de votre attestation et n'est pas conservé dans notre base de données.
+        </div>
+
+        <button class="btn-submit-org" id="btn-submit" onclick="submitDeclaration()">
+          💊 Je déclare ma participation
+        </button>
+      </div>
+    </div>
+
+    <!-- CONFIRMATION -->
+    <div id="confirm-section" style="display:none">
+      <div class="confirm-card">
+        <div class="big">💊</div>
+        <h2>Merci, votre participation est enregistrée !</h2>
+        <p style="color:var(--muted);font-size:.9rem">Vous faites partie du mouvement.</p>
+        <div class="confirm-ref" id="confirm-ref"></div>
+        <div class="hub-cta-after">
+          <p>Découvrez les autres professions mobilisées.</p>
+          <a href="mobilisation-hub.html" class="btn-hub-back">← Hub Mobilisation Santé</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- POWERED BY -->
+  <div class="powered-by">
+    Plateforme propulsée par <a href="index.html">Générations Médecins Île-de-France</a>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="mobilisation-hub.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Mobilisation Santé</span>
+        </a>
+        <p class="footer-copy">Hub interprofessionnel · Générations Médecins</p>
+      </div>
+      <div class="footer-links">
+        <a href="mobilisation-hub.html">Toutes les professions</a>
+        <a href="greve.html">Médecins en Grève</a>
+        <a href="index.html">generations-medecins.fr</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+  (function () {
+    const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    const $ = id => document.getElementById(id);
+
+    // Slug de l'organisation — en prod: lu depuis l'URL (?org=pharmaciens)
+    const ORG_SLUG = new URLSearchParams(location.search).get('org') || 'pharmaciens';
+
+    let org = null;
+    let campagne = null;
+    let idVerified = false;
+    let idTimer = null;
+
+    function toast(msg, isErr) {
+      const t = $('toast');
+      t.textContent = msg; t.className = 'toast show' + (isErr ? ' error' : '');
+      setTimeout(() => t.className = 'toast', 3200);
+    }
+
+    // ── Chargement de l'organisation ────────────────────────────────────────
+    async function init() {
+      const { data: orgData } = await sb
+        .from('organisations')
+        .select('*')
+        .eq('slug', ORG_SLUG)
+        .single();
+
+      if (orgData) {
+        org = orgData;
+        applyBranding(org);
+      }
+
+      // Campagne active pour cet org
+      const { data: campData } = await sb
+        .from('greve_campagnes')
+        .select('*')
+        .eq('org_id', org?.id)
+        .eq('archived', false)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      campagne = campData;
+      if (campagne) renderCounter(campagne.declaration_count || 0);
+
+      // Vérifier si l'utilisateur est admin de cet org
+      checkAdminAccess();
+    }
+
+    function applyBranding(o) {
+      document.documentElement.style.setProperty('--org-c1', o.couleur);
+      document.documentElement.style.setProperty('--org-c2', o.couleur2);
+      document.documentElement.style.setProperty('--org-grad',
+        `linear-gradient(135deg,${o.couleur},${o.couleur2})`);
+      if ($('org-emoji'))        $('org-emoji').textContent   = o.emoji;
+      if ($('org-titre'))        $('org-titre').textContent   = o.nom;
+      if ($('org-desc'))         $('org-desc').textContent    = o.description || '';
+      if ($('org-nom-header'))   $('org-nom-header').textContent = o.nom;
+      if ($('id-type-label'))    $('id-type-label').textContent  = o.id_type;
+      if ($('admin-org-name'))   $('admin-org-name').textContent = o.nom;
+      document.title = o.nom + ' — Mobilisation Santé';
+    }
+
+    function renderCounter(count) {
+      $('counter-num').textContent = count.toLocaleString('fr-FR');
+      if (campagne?.objectif) {
+        $('progress-fill').style.width = Math.min(100, count / campagne.objectif * 100) + '%';
+      }
+    }
+
+    async function checkAdminAccess() {
+      if (!org) return;
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) return;
+      const { data: member } = await sb
+        .from('org_membres')
+        .select('role')
+        .eq('org_id', org.id)
+        .eq('user_id', session.user.id)
+        .single();
+      if (member?.role === 'admin') {
+        $('admin-topbar').classList.add('visible');
+        $('admin-link').href = 'admin.html?org=' + ORG_SLUG;
+      }
+    }
+
+    // ── Hash identifiant côté client ─────────────────────────────────────────
+    async function hashId(id) {
+      if (!campagne) return null;
+      const data = new TextEncoder().encode(id.trim() + '|' + campagne.id);
+      const buf = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+
+    // ── Vérification identifiant ──────────────────────────────────────────────
+    window.onIdInput = function() {
+      const v = $('f-id').value.replace(/\D/g,'');
+      $('f-id').value = v;
+      idVerified = false;
+      $('id-status').textContent = '';
+      $('id-status').className = 'id-status';
+      clearTimeout(idTimer);
+      if (v.length >= 8) idTimer = setTimeout(() => verifyId(v), 600);
+    };
+
+    async function verifyId(id) {
+      const st = $('id-status');
+      const idType = org?.id_type || 'FINESS';
+      st.textContent = `🔍 Vérification ${idType}…`;
+
+      // Pour RPPS : Annuaire Santé API
+      // Pour ADELI/FINESS : validation locale (format)
+      if (idType === 'RPPS') {
+        try {
+          const url = `https://api.annuaire.sante.fr/fhir/v1/PractitionerRole?practitioner.identifier=urn%3Aoid%3A1.2.250.1.71.4.2.1%7C${encodeURIComponent(id)}&_count=1`;
+          const res = await fetch(url);
+          if (!res.ok) throw new Error();
+          const data = await res.json();
+          idVerified = data.total > 0 || (data.entry?.length > 0);
+          st.textContent = idVerified ? '✓ RPPS vérifié' : '⚠️ RPPS introuvable';
+          st.className = 'id-status ' + (idVerified ? 'ok' : 'err');
+        } catch {
+          idVerified = true;
+          st.textContent = 'ℹ️ Annuaire indisponible — déclaration possible';
+          st.className = 'id-status';
+        }
+      } else {
+        // ADELI / FINESS : validation format
+        idVerified = id.length >= 9;
+        st.textContent = idVerified ? `✓ ${idType} valide` : `⚠️ Format ${idType} invalide`;
+        st.className = 'id-status ' + (idVerified ? 'ok' : 'err');
+      }
+    }
+
+    // ── Soumission ────────────────────────────────────────────────────────────
+    window.submitDeclaration = async function() {
+      if (!campagne) { toast('Aucune campagne active', true); return; }
+      const id    = $('f-id').value.replace(/\D/g,'');
+      const email = $('f-email').value.trim();
+      const cp    = $('f-cp').value.replace(/\D/g,'').slice(0,5);
+
+      if (id.length < 8) { toast('Renseignez votre identifiant professionnel', true); return; }
+
+      const btn = $('btn-submit');
+      btn.disabled = true; btn.textContent = '⏳ Enregistrement…';
+
+      const idHash = await hashId(id);
+      const ref = 'ORG-' + Date.now().toString(36).toUpperCase();
+
+      const body = {
+        orgSlug:   ORG_SLUG,
+        campaignId: campagne.id,
+        idHash,
+        cp,
+        email:     email || null,
+        ref,
+        source:    'web'
+      };
+
+      try {
+        const res = await fetch('/.netlify/functions/soumettre-org', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Erreur serveur');
+        $('confirm-ref').textContent = 'Réf. ' + ref;
+        $('form-section').style.display   = 'none';
+        $('confirm-section').style.display = 'block';
+      } catch (e) {
+        toast(e.message, true);
+        btn.disabled = false; btn.textContent = '💊 Je déclare ma participation';
+      }
+    };
+
+    init();
+  })();
+  </script>
+  <script src="auth-header.js"></script>
+</body>
+</html>
