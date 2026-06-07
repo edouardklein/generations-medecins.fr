@@ -3134,9 +3134,14 @@
     document.getElementById('greve-actions').style.visibility = 'hidden';
 
     // Toutes les campagnes, de la plus récente à la plus ancienne
-    const { data: allCamps } = await sb.from('greve_campagnes')
-      .select('id, titre, actif, date_debut, date_fin, objectif, declaration_count, optin_count, created_at')
+    const { data: allCamps, error: campErr } = await sb.from('greve_campagnes')
+      .select('*')
       .order('created_at', { ascending: false });
+    if (campErr) {
+      document.getElementById('greve-loading').innerHTML =
+        '<span style="color:#dc2626">Erreur de chargement : ' + esc(campErr.message) + '</span>';
+      return;
+    }
     greveAllCampagnes = allCamps || [];
 
     if (!greveAllCampagnes.length) {
@@ -3425,8 +3430,9 @@
     }).select().single();
     if (error) { toast('Erreur : ' + error.message, 'error'); return; }
     toast('✓ Nouvelle campagne créée (fermée — activez-la quand vous êtes prêt)');
-    greveCampagne = data;
-    loadGreve();
+    // Recharge la liste puis bascule sur la nouvelle campagne
+    await loadGreve();
+    if (data && data.id) await switchCampagne(data.id, true);
   };
 
   // ── Veille automatisée ──────────────────────────────────────────
