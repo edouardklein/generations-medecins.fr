@@ -927,6 +927,15 @@
               <button class="g-btn-add g-edit-only" onclick="greveAddFaq()">+ Question</button>
             </div>
 
+            <!-- Bouton archiver -->
+            <div id="g-archive-btn" style="border-top:1px solid var(--line);padding-top:16px;margin-top:4px">
+              <button class="g-btn g-btn-danger" onclick="greveArchiveCurrent()" style="font-size:.82rem;padding:8px 16px">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                Archiver cette campagne
+              </button>
+              <span style="font-size:.76rem;color:var(--muted);margin-left:10px">La campagne passera en lecture seule dans l'historique.</span>
+            </div>
+
           </div>
 
           <!-- Déclarations -->
@@ -3183,8 +3192,10 @@
       return;
     }
 
-    // Par défaut : afficher la campagne active (ou la plus récente)
-    const defaultCamp = greveAllCampagnes.find(c => c.actif) || greveAllCampagnes[0];
+    // Par défaut : campagne active, sinon fermée non-archivée, sinon la plus récente
+    const defaultCamp = greveAllCampagnes.find(c => c.actif && !c.archived)
+      || greveAllCampagnes.find(c => !c.archived)
+      || greveAllCampagnes[0];
     await switchCampagne(defaultCamp.id, true);
 
     document.getElementById('greve-loading').style.display = 'none';
@@ -3215,19 +3226,19 @@
   // Bandeau du haut : uniquement les campagnes EN COURS (et seulement si >1).
   // Une seule campagne active → pas de bandeau (inutile). Les archives vont dans l'overlay.
   function renderCampagneSwitcher() {
-    const actives = greveAllCampagnes.filter(c => c.actif);
-    const archived = greveAllCampagnes.filter(c => !c.actif);
+    const current = greveAllCampagnes.filter(c => !c.archived); // ouvertes OU fermées mais pas archivées
+    const archived = greveAllCampagnes.filter(c => c.archived);
 
     // Bouton Historique
     const histCount = document.getElementById('g-history-count');
     if (histCount) histCount.textContent = archived.length ? `(${archived.length})` : '';
 
-    // Bandeau "campagnes en cours" : affiché seulement s'il y en a plusieurs
+    // Bandeau switcher : affiché seulement s'il y a plusieurs campagnes non-archivées
     const wrap = document.getElementById('camp-active-wrap');
     const el = document.getElementById('camp-timeline');
-    if (actives.length > 1) {
+    if (current.length > 1) {
       wrap.style.display = 'block';
-      el.innerHTML = actives.map(c => campChip(c)).join('');
+      el.innerHTML = current.map(c => campChip(c)).join('');
     } else {
       wrap.style.display = 'none';
     }
@@ -3235,7 +3246,7 @@
     // Bandeau "vous consultez une archive"
     const archiveBar = document.getElementById('camp-archive-bar');
     const viewing = greveAllCampagnes.find(c => c.id === greveViewingId);
-    if (viewing && !viewing.actif) {
+    if (viewing && viewing.archived) {
       archiveBar.style.display = 'flex';
       document.getElementById('camp-archive-name').textContent = '« ' + viewing.titre + ' »';
     } else {
@@ -3249,7 +3260,7 @@
     const dates = (c.date_debut || c.date_fin)
       ? `${fmtDateShort(c.date_debut)}${c.date_fin ? ' → ' + fmtDateShort(c.date_fin) : ''}` : '';
     return `<div class="camp-chip${isViewing ? ' viewing' : ''}" onclick="switchCampagne('${c.id}')">
-      <div class="camp-chip-badge ${c.actif ? 'open' : 'closed'}">${c.actif ? '● En cours' : '📁 Archivée'}</div>
+      <div class="camp-chip-badge ${c.actif ? 'open' : 'closed'}">${c.actif ? '● Ouverte' : '⏸ Fermée'}</div>
       <div class="camp-chip-count">${count}</div>
       <div class="camp-chip-title">${esc(c.titre)}</div>
       ${dates ? `<div class="camp-chip-meta">${dates}</div>` : ''}
@@ -3268,7 +3279,7 @@
     if (document.getElementById('greve-history-overlay').style.display === 'block') renderHistoryList();
   }
   function renderHistoryList() {
-    const archived = greveAllCampagnes.filter(c => !c.actif);
+    const archived = greveAllCampagnes.filter(c => c.archived);
     const sub = document.getElementById('g-history-sub');
     if (sub) sub.textContent = archived.length
       ? `${archived.length} campagne${archived.length > 1 ? 's' : ''} archivée${archived.length > 1 ? 's' : ''} — cliquez pour consulter`
@@ -3298,12 +3309,14 @@
     document.getElementById('section-greve').scrollIntoView({ behavior:'smooth', block:'start' });
   };
   window.greveBackToActive = async function() {
-    const active = greveAllCampagnes.find(c => c.actif) || greveAllCampagnes[0];
-    if (active) await switchCampagne(active.id);
+    const current = greveAllCampagnes.find(c => c.actif && !c.archived)
+      || greveAllCampagnes.find(c => !c.archived)
+      || greveAllCampagnes[0];
+    if (current) await switchCampagne(current.id);
   };
 
   function updateGreveEditMode() {
-    const readonly = !greveCampagne.actif;
+    const readonly = !!greveCampagne.archived;
     // Badge et heading
     document.getElementById('g-readonly-badge').style.display = readonly ? 'flex' : 'none';
     document.getElementById('g-camp-heading').textContent = readonly
@@ -3312,6 +3325,10 @@
     // Bouton Enregistrer : masqué pour les campagnes archivées
     const saveBtn = document.querySelector('#greve-actions .g-btn-primary');
     if (saveBtn) saveBtn.style.display = readonly ? 'none' : '';
+
+    // Bouton Archiver dans le footer : masqué si déjà archivée
+    const archiveBtn = document.getElementById('g-archive-btn');
+    if (archiveBtn) archiveBtn.style.display = readonly ? 'none' : '';
 
     // Champs du formulaire
     ['g-titre','g-accroche','g-debut','g-fin','g-objectif'].forEach(id => {
@@ -3426,6 +3443,7 @@
       objectif: parseInt(document.getElementById('g-objectif').value, 10) || 0,
       actif: document.getElementById('g-actif').checked,
       motifs, liens, faq,
+      archived: false, // Enregistrer ne peut pas archiver une campagne
     };
     const { error } = await sb.from('greve_campagnes').update(payload).eq('id', greveCampagne.id);
     if (error) { toast('Erreur : ' + error.message, 'error'); return; }
@@ -3437,6 +3455,19 @@
     return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
       .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 30);
   }
+
+  // — Archiver manuellement la campagne en cours (sans créer une nouvelle) —
+  window.greveArchiveCurrent = async function() {
+    if (!greveCampagne || greveCampagne.archived) return;
+    const msg = `Archiver « ${greveCampagne.titre} » ?\n\nElle passera en lecture seule dans l'historique. Le toggle ouvert/fermé ne sert qu'à ouvrir ou fermer les déclarations — utilisez "Archiver" pour clôturer définitivement.`;
+    if (!confirm(msg)) return;
+    const { error } = await sb.from('greve_campagnes')
+      .update({ actif: false, archived: true })
+      .eq('id', greveCampagne.id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('✓ Campagne archivée');
+    await loadGreve();
+  };
 
   // — Stats —
   function renderGreveStats() {
@@ -3508,17 +3539,17 @@
 
   // — Nouvelle campagne : archive la courante, en crée une nouvelle —
   window.greveReset = async function(firstOne) {
-    const activeCamp = greveAllCampagnes.find(c => c.actif);
+    const currentCamp = greveAllCampagnes.find(c => !c.archived);
     if (!firstOne) {
-      const msg = activeCamp
-        ? `Archiver « ${activeCamp.titre} » (${(activeCamp.declaration_count||0).toLocaleString('fr-FR')} déclarations) et créer une nouvelle campagne ?\n\nL'historique est conservé et consultable dans la timeline.`
+      const msg = currentCamp
+        ? `Archiver définitivement « ${currentCamp.titre} » (${(currentCamp.declaration_count||0).toLocaleString('fr-FR')} déclarations) et créer une nouvelle campagne ?\n\nLa campagne sera déplacée dans l'historique (lecture seule).`
         : 'Créer une nouvelle campagne ?';
       if (!confirm(msg)) return;
     }
 
-    // Désactive toutes les campagnes actives
-    if (activeCamp) {
-      await sb.from('greve_campagnes').update({ actif: false }).eq('id', activeCamp.id);
+    // Archive la campagne courante
+    if (currentCamp) {
+      await sb.from('greve_campagnes').update({ actif: false, archived: true }).eq('id', currentCamp.id);
     }
     // Duplique la config dans une nouvelle campagne (compteur à zéro)
     const base = greveCampagne || {};
