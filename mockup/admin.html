@@ -356,6 +356,24 @@
     .g-btn-danger:hover   { background:#fef2f2; border-color:#dc2626; }
     .g-btn-add { display:inline-flex; align-items:center; gap:5px; font-size:.8rem; font-weight:700; color:#2563eb; background:#eff6ff; border:1.5px dashed #bfdbfe; border-radius:8px; padding:7px 14px; cursor:pointer; font-family:inherit; transition:all .12s; }
     .g-btn-add:hover { background:#dbeafe; border-color:#2563eb; }
+    /* ── Historique des campagnes (timeline) ─────────────────────────────── */
+    .camp-timeline-wrap { margin-bottom:28px; }
+    .camp-timeline-label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+    .camp-timeline { display:flex; gap:10px; overflow-x:auto; padding-bottom:4px; }
+    .camp-timeline::-webkit-scrollbar { height:4px; }
+    .camp-timeline::-webkit-scrollbar-thumb { background:#e2e8f0; border-radius:2px; }
+    .camp-chip { flex-shrink:0; min-width:200px; max-width:240px; border:1.5px solid var(--line); border-radius:14px; padding:14px 16px; cursor:pointer; background:#fff; transition:all .15s; position:relative; }
+    .camp-chip:hover:not(.viewing) { border-color:#93c5fd; background:#f8fbff; transform:translateY(-1px); }
+    .camp-chip.viewing { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.12); background:#eff6ff; }
+    .camp-chip-badge { display:inline-flex; align-items:center; gap:4px; font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-bottom:5px; padding:2px 8px; border-radius:999px; }
+    .camp-chip-badge.open { background:#dcfce7; color:#15803d; }
+    .camp-chip-badge.closed { background:#f1f5f9; color:#64748b; }
+    .camp-chip-title { font-size:.86rem; font-weight:800; color:var(--ink); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .camp-chip-meta { font-size:.74rem; color:var(--muted); line-height:1.5; }
+    .camp-chip-count { font-size:1.3rem; font-weight:900; color:#1a3a8a; margin-bottom:3px; letter-spacing:-.03em; }
+
+    /* Badge lecture seule */
+    .readonly-badge { display:none; align-items:center; gap:6px; background:#fef9c3; border:1px solid #fde047; border-radius:999px; padding:5px 12px; font-size:.77rem; font-weight:700; color:#854d0e; }
   </style>
 </head>
 <body style="visibility:hidden">
@@ -800,6 +818,15 @@
 
         <div id="greve-content" style="display:none">
 
+          <!-- Timeline des campagnes -->
+          <div class="camp-timeline-wrap">
+            <div class="camp-timeline-label">
+              📁 Historique des campagnes
+              <span id="camp-count-label" style="font-weight:400;color:var(--muted)"></span>
+            </div>
+            <div class="camp-timeline" id="camp-timeline"></div>
+          </div>
+
           <!-- Stats -->
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:28px">
             <div class="stat-card"><div class="stat-label">Déclarations</div><div class="stat-value" id="gs-total">0</div></div>
@@ -822,8 +849,11 @@
 
           <!-- Paramétrage de la campagne -->
           <div class="stat-card" style="margin-bottom:24px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
-              <div style="font-weight:800;font-size:1.05rem;color:var(--ink)">Campagne en cours</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="font-weight:800;font-size:1.05rem;color:var(--ink)" id="g-camp-heading">Campagne en cours</div>
+                <div class="readonly-badge" id="g-readonly-badge">📁 Archivée — lecture seule</div>
+              </div>
               <div class="ios-toggle-wrap">
                 <span class="ios-toggle-label off" id="g-label-closed">Fermé</span>
                 <label class="ios-toggle">
@@ -861,28 +891,33 @@
             <div style="margin-bottom:14px">
               <label style="font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:block;margin-bottom:7px">Motifs proposés</label>
               <div id="g-motifs-list" style="display:flex;flex-direction:column;gap:7px;margin-bottom:8px"></div>
-              <button class="g-btn-add" onclick="greveAddMotif()">+ Motif</button>
+              <button class="g-btn-add g-edit-only" onclick="greveAddMotif()">+ Motif</button>
             </div>
 
             <!-- Liens -->
             <div style="margin-bottom:14px">
               <label style="font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:block;margin-bottom:7px">Liens / articles</label>
               <div id="g-liens-list" style="display:flex;flex-direction:column;gap:7px;margin-bottom:8px"></div>
-              <button class="g-btn-add" onclick="greveAddLien()">+ Lien</button>
+              <button class="g-btn-add g-edit-only" onclick="greveAddLien()">+ Lien</button>
             </div>
 
             <!-- FAQ -->
             <div style="margin-bottom:18px">
               <label style="font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:block;margin-bottom:7px">FAQ</label>
               <div id="g-faq-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px"></div>
-              <button class="g-btn-add" onclick="greveAddFaq()">+ Question</button>
+              <button class="g-btn-add g-edit-only" onclick="greveAddFaq()">+ Question</button>
             </div>
 
           </div>
 
-          <!-- Déclarations récentes -->
+          <!-- Déclarations -->
           <div class="stat-card">
-            <div style="font-weight:800;font-size:1.05rem;color:var(--ink);margin-bottom:14px">Dernières déclarations</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap">
+              <div style="font-weight:800;font-size:1.05rem;color:var(--ink)">
+                Déclarations <span id="g-decl-camp-name" style="font-weight:500;color:var(--muted);font-size:.9rem"></span>
+              </div>
+              <div style="font-size:.8rem;color:var(--muted)" id="g-decl-meta"></div>
+            </div>
             <div id="g-declarations" style="font-size:.85rem"></div>
           </div>
 
@@ -3085,37 +3120,105 @@
 
   let greveCampagne = null;
   let greveDecls = [];
+  let greveAllCampagnes = [];
+  let greveViewingId = null;
+
+  function fmtDateShort(d) {
+    if (!d) return '';
+    return new Date(d).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' });
+  }
 
   async function loadGreve() {
     document.getElementById('greve-loading').style.display = 'block';
     document.getElementById('greve-content').style.display = 'none';
     document.getElementById('greve-actions').style.visibility = 'hidden';
 
-    // Campagne active (sinon la plus récente)
-    let { data: camps } = await sb.from('greve_campagnes').select('*').eq('actif', true).order('created_at', { ascending: false }).limit(1);
-    if (!camps || !camps.length) {
-      ({ data: camps } = await sb.from('greve_campagnes').select('*').order('created_at', { ascending: false }).limit(1));
-    }
-    greveCampagne = camps && camps[0];
+    // Toutes les campagnes, de la plus récente à la plus ancienne
+    const { data: allCamps } = await sb.from('greve_campagnes')
+      .select('id, titre, actif, date_debut, date_fin, objectif, declaration_count, optin_count, created_at')
+      .order('created_at', { ascending: false });
+    greveAllCampagnes = allCamps || [];
 
-    if (!greveCampagne) {
+    if (!greveAllCampagnes.length) {
       document.getElementById('greve-loading').innerHTML =
-        'Aucune campagne. <button class="btn btn-primary" style="margin-left:10px" onclick="greveReset(true)">Créer une première campagne</button>';
+        'Aucune campagne. <button class="g-btn g-btn-primary" style="margin-top:12px" onclick="greveReset(true)">Créer la première campagne</button>';
       return;
     }
 
-    // Déclarations
-    const { data: decls } = await sb.from('greve_declarations')
-      .select('*').eq('campagne_id', greveCampagne.id).order('created_at', { ascending: false });
-    greveDecls = decls || [];
-
-    fillGreveForm();
-    renderGreveStats();
-    renderGreveDeclarations();
+    // Par défaut : afficher la campagne active (ou la plus récente)
+    const defaultCamp = greveAllCampagnes.find(c => c.actif) || greveAllCampagnes[0];
+    await switchCampagne(defaultCamp.id, true);
 
     document.getElementById('greve-loading').style.display = 'none';
     document.getElementById('greve-content').style.display = 'block';
     document.getElementById('greve-actions').style.visibility = 'visible';
+  }
+
+  window.switchCampagne = async function(id, skipRender) {
+    if (id === greveViewingId && !skipRender) return;
+    greveViewingId = id;
+
+    // Charge les données complètes de la campagne sélectionnée
+    const { data: fullCamp } = await sb.from('greve_campagnes').select('*').eq('id', id).single();
+    greveCampagne = fullCamp;
+
+    const { data: decls } = await sb.from('greve_declarations')
+      .select('*').eq('campagne_id', id).order('created_at', { ascending: false });
+    greveDecls = decls || [];
+
+    renderCampagneSwitcher();
+    fillGreveForm();
+    renderGreveStats();
+    renderGreveDeclarations();
+    updateGreveEditMode();
+  };
+
+  function renderCampagneSwitcher() {
+    const el = document.getElementById('camp-timeline');
+    const label = document.getElementById('camp-count-label');
+    if (!el) return;
+    const total = greveAllCampagnes.length;
+    if (label) label.textContent = `· ${total} campagne${total > 1 ? 's' : ''}`;
+
+    el.innerHTML = greveAllCampagnes.map(c => {
+      const isViewing = c.id === greveViewingId;
+      const count = (c.declaration_count || 0).toLocaleString('fr-FR');
+      const dates = (c.date_debut || c.date_fin)
+        ? `${fmtDateShort(c.date_debut)}${c.date_fin ? ' → ' + fmtDateShort(c.date_fin) : ''}` : '';
+      return `<div class="camp-chip${isViewing ? ' viewing' : ''}" onclick="switchCampagne('${c.id}')">
+        <div class="camp-chip-badge ${c.actif ? 'open' : 'closed'}">${c.actif ? '● En cours' : '📁 Archivée'}</div>
+        <div class="camp-chip-count">${count}</div>
+        <div class="camp-chip-title">${esc(c.titre)}</div>
+        ${dates ? `<div class="camp-chip-meta">${dates}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  function updateGreveEditMode() {
+    const readonly = !greveCampagne.actif;
+    // Badge et heading
+    document.getElementById('g-readonly-badge').style.display = readonly ? 'flex' : 'none';
+    document.getElementById('g-camp-heading').textContent = readonly
+      ? 'Campagne archivée' : 'Campagne en cours';
+
+    // Bouton Enregistrer : masqué pour les campagnes archivées
+    const saveBtn = document.querySelector('#greve-actions .g-btn-primary');
+    if (saveBtn) saveBtn.style.display = readonly ? 'none' : '';
+
+    // Champs du formulaire
+    ['g-titre','g-accroche','g-debut','g-fin','g-objectif'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.readOnly = readonly;
+      el.disabled = (el.tagName === 'INPUT' && el.type === 'number') ? readonly : false;
+      el.style.opacity = readonly ? '.65' : '';
+      el.style.pointerEvents = readonly ? 'none' : '';
+    });
+    const toggle = document.getElementById('g-actif');
+    if (toggle) toggle.disabled = readonly;
+
+    // Boutons ajouter (motif/lien/faq)
+    document.querySelectorAll('.g-edit-only').forEach(el => el.style.display = readonly ? 'none' : '');
   }
 
   function fillGreveForm() {
@@ -3253,8 +3356,17 @@
   }
 
   function renderGreveDeclarations() {
+    const campLabel = document.getElementById('g-decl-camp-name');
+    const metaLabel = document.getElementById('g-decl-meta');
+    if (campLabel) campLabel.textContent = '— ' + esc(greveCampagne.titre);
+    if (metaLabel) {
+      const total = greveDecls.length;
+      metaLabel.textContent = total > 30
+        ? `Affichage des 30 premières sur ${total.toLocaleString('fr-FR')} — exportez pour tout voir`
+        : `${total} déclaration${total > 1 ? 's' : ''}`;
+    }
     const recent = greveDecls.slice(0, 30);
-    if (!recent.length) { document.getElementById('g-declarations').innerHTML = '<span style="color:var(--muted)">Aucune déclaration</span>'; return; }
+    if (!recent.length) { document.getElementById('g-declarations').innerHTML = '<span style="color:var(--muted)">Aucune déclaration pour cette campagne</span>'; return; }
     document.getElementById('g-declarations').innerHTML = `
       <table style="width:100%;border-collapse:collapse">
         <tr style="text-align:left;color:var(--muted);font-size:.74rem;text-transform:uppercase;letter-spacing:.04em">
@@ -3271,29 +3383,36 @@
       </table>`;
   }
 
-  // — Export CSV des emails opt-in —
+  // — Export CSV (campagne actuellement affichée) —
   window.greveExportCsv = function() {
     if (!greveDecls.length) { toast('Aucune déclaration à exporter', 'error'); return; }
+    const campTitle = (greveCampagne.titre || 'campagne').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 30);
     const rows = [['ref','specialite','cp','mode_exercice','date'].join(',')]
       .concat(greveDecls.map(d => [d.ref, d.specialite||'', d.cp||'', d.mode_exercice||'', d.created_at.slice(0,10)]
         .map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')));
     const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `greve-declarations-${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `greve-${campTitle}-${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
     toast(`✓ ${greveDecls.length} déclarations exportées`);
   };
 
-  // — Réinitialiser : clôture la campagne et en crée une nouvelle (historique conservé) —
+  // — Nouvelle campagne : archive la courante, en crée une nouvelle —
   window.greveReset = async function(firstOne) {
-    if (!firstOne && !confirm('Créer une NOUVELLE campagne ?\n\nLa campagne actuelle sera clôturée et conservée dans l\'historique. Le compteur public repartira de zéro avec la nouvelle campagne.')) return;
-
-    // Désactive l'éventuelle campagne active
-    if (greveCampagne) {
-      await sb.from('greve_campagnes').update({ actif: false }).eq('id', greveCampagne.id);
+    const activeCamp = greveAllCampagnes.find(c => c.actif);
+    if (!firstOne) {
+      const msg = activeCamp
+        ? `Archiver « ${activeCamp.titre} » (${(activeCamp.declaration_count||0).toLocaleString('fr-FR')} déclarations) et créer une nouvelle campagne ?\n\nL'historique est conservé et consultable dans la timeline.`
+        : 'Créer une nouvelle campagne ?';
+      if (!confirm(msg)) return;
     }
-    // Duplique la config (titre/motifs/faq) dans une nouvelle campagne, compteur à zéro
+
+    // Désactive toutes les campagnes actives
+    if (activeCamp) {
+      await sb.from('greve_campagnes').update({ actif: false }).eq('id', activeCamp.id);
+    }
+    // Duplique la config dans une nouvelle campagne (compteur à zéro)
     const base = greveCampagne || {};
     const { data, error } = await sb.from('greve_campagnes').insert({
       titre: base.titre || 'Nouvelle mobilisation',
