@@ -38,12 +38,13 @@ INSERT INTO organisations (slug, nom, profession, description, couleur, couleur2
   ('kines',            'Kinés en Grève',                 'Masseurs-kinésithérapeutes', 'Espace de mobilisation pour les masseurs-kinésithérapeutes libéraux.',             '#b45309', '#f59e0b', '🏃',  'ADELI', false),
   ('psychologues',     'Psychologues en Grève',          'Psychologues',               'Espace de mobilisation pour les psychologues (titre protégé depuis 1985).',        '#312e81', '#6366f1', '🧠',  'ADELI', false)
 ON CONFLICT (slug) DO UPDATE SET
-  nom        = EXCLUDED.nom,
-  profession = EXCLUDED.profession,
-  couleur    = EXCLUDED.couleur,
-  couleur2   = EXCLUDED.couleur2,
-  emoji      = EXCLUDED.emoji,
-  id_type    = EXCLUDED.id_type;
+  nom         = EXCLUDED.nom,
+  profession  = EXCLUDED.profession,
+  description = EXCLUDED.description,
+  couleur     = EXCLUDED.couleur,
+  couleur2    = EXCLUDED.couleur2,
+  emoji       = EXCLUDED.emoji,
+  id_type     = EXCLUDED.id_type;
 
 -- ── Table org_membres (admins / viewers par organisation) ────────────────────
 CREATE TABLE IF NOT EXISTS org_membres (
