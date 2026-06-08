@@ -203,36 +203,18 @@
       {
         groupe: 'Professions médicales',
         items: [
-          { slug:'medecins',           nom:'Médecins en Grève',               profession:'Médecins libéraux',             emoji:'✊', c1:'#1a3a8a', c2:'#2563eb', id_type:'RPPS',  href:'greve.html',                    actif:true  },
-          { slug:'chirurgiens-dent',   nom:'Chirurgiens-Dentistes en Grève',   profession:'Chirurgiens-dentistes',         emoji:'🦷', c1:'#0e7490', c2:'#06b6d4', id_type:'RPPS',  href:'mobilisation-org.html?org=chirurgiens-dent',  actif:false },
-          { slug:'sages-femmes',       nom:'Sages-Femmes en Grève',            profession:'Sages-femmes',                  emoji:'🤱', c1:'#be185d', c2:'#ec4899', id_type:'RPPS',  href:'mobilisation-org.html?org=sages-femmes',      actif:false },
-          { slug:'pharmaciens',        nom:'Pharmaciens en Grève',             profession:'Pharmaciens d\'officine',       emoji:'💊', c1:'#0f766e', c2:'#14b8a6', id_type:'FINESS',href:'mobilisation-org.html?org=pharmaciens',       actif:false },
+          { slug:'medecins',          nom:'Médecins en Grève',              profession:'Médecins libéraux',       emoji:'✊', c1:'#1a3a8a', c2:'#2563eb', href:'greve.html',                                   actif:true  },
+          { slug:'chirurgiens-dent',  nom:'Chirurgiens-Dentistes en Grève', profession:'Chirurgiens-dentistes',   emoji:'🦷', c1:'#0e7490', c2:'#06b6d4', href:'mobilisation-org.html?org=chirurgiens-dent',   actif:false },
+          { slug:'sages-femmes',      nom:'Sages-Femmes en Grève',          profession:'Sages-femmes',            emoji:'🤱', c1:'#be185d', c2:'#ec4899', href:'mobilisation-org.html?org=sages-femmes',       actif:false },
+          { slug:'pharmaciens',       nom:'Pharmaciens en Grève',           profession:'Pharmaciens d\'officine', emoji:'💊', c1:'#0f766e', c2:'#14b8a6', href:'mobilisation-org.html?org=pharmaciens',        actif:false },
         ]
       },
       {
         groupe: 'Professions paramédicales',
         items: [
-          { slug:'infirmiers',         nom:'Infirmiers en Grève',              profession:'Infirmiers libéraux (IDEL)',    emoji:'🩺', c1:'#7c3aed', c2:'#a855f7', id_type:'ADELI', href:'mobilisation-org.html?org=infirmiers',        actif:false },
-          { slug:'kines',              nom:'Kinés en Grève',                   profession:'Masseurs-kinésithérapeutes',    emoji:'🏃', c1:'#b45309', c2:'#f59e0b', id_type:'ADELI', href:'mobilisation-org.html?org=kines',             actif:false },
-          { slug:'orthophonistes',     nom:'Orthophonistes en Grève',          profession:'Orthophonistes',                emoji:'🗣️', c1:'#0369a1', c2:'#38bdf8', id_type:'ADELI', href:'mobilisation-org.html?org=orthophonistes',    actif:false },
-          { slug:'orthoptistes',       nom:'Orthoptistes en Grève',            profession:'Orthoptistes',                  emoji:'👁️', c1:'#047857', c2:'#34d399', id_type:'ADELI', href:'mobilisation-org.html?org=orthoptistes',      actif:false },
-          { slug:'podologues',         nom:'Pédicures-Podologues en Grève',    profession:'Pédicures-podologues',          emoji:'🦶', c1:'#c2410c', c2:'#fb923c', id_type:'ADELI', href:'mobilisation-org.html?org=podologues',        actif:false },
-          { slug:'ergotherapeutes',    nom:'Ergothérapeutes en Grève',         profession:'Ergothérapeutes',               emoji:'🖐️', c1:'#166534', c2:'#4ade80', id_type:'ADELI', href:'mobilisation-org.html?org=ergotherapeutes',   actif:false },
-          { slug:'psychomotriciens',   nom:'Psychomotriciens en Grève',        profession:'Psychomotriciens',              emoji:'🧘', c1:'#5b21b6', c2:'#8b5cf6', id_type:'ADELI', href:'mobilisation-org.html?org=psychomotriciens',  actif:false },
-          { slug:'manipulateurs-erm',  nom:'Manipulateurs ERM en Grève',       profession:'Manipulateurs électroradiol.',  emoji:'🔬', c1:'#1d4ed8', c2:'#60a5fa', id_type:'ADELI', href:'mobilisation-org.html?org=manipulateurs-erm', actif:false },
-          { slug:'audioprothesistes',  nom:'Audioprothésistes en Grève',       profession:'Audioprothésistes',             emoji:'👂', c1:'#9a3412', c2:'#f97316', id_type:'ADELI', href:'mobilisation-org.html?org=audioprothesistes', actif:false },
-          { slug:'opticiens',          nom:'Opticiens-Lunetiers en Grève',     profession:'Opticiens-lunetiers',           emoji:'👓', c1:'#15803d', c2:'#22c55e', id_type:'ADELI', href:'mobilisation-org.html?org=opticiens',         actif:false },
-          { slug:'prothesistes',       nom:'Prothésistes en Grève',            profession:'Prothésistes & orthésistes',    emoji:'🦾', c1:'#374151', c2:'#6b7280', id_type:'ADELI', href:'mobilisation-org.html?org=prothesistes',      actif:false },
-          { slug:'dieteticiens',       nom:'Diététiciens en Grève',            profession:'Diététiciens-nutritionnistes',  emoji:'🥗', c1:'#065f46', c2:'#10b981', id_type:'ADELI', href:'mobilisation-org.html?org=dieteticiens',      actif:false },
-          { slug:'techniciens-labo',   nom:'Techniciens de Labo en Grève',     profession:'Techniciens de laboratoire',    emoji:'🧪', c1:'#1e3a5f', c2:'#3b82f6', id_type:'ADELI', href:'mobilisation-org.html?org=techniciens-labo',  actif:false },
-        ]
-      },
-      {
-        groupe: 'Autres professions réglementées',
-        items: [
-          { slug:'osteopathes',        nom:'Ostéopathes en Grève',             profession:'Ostéopathes',                   emoji:'🦴', c1:'#78350f', c2:'#d97706', id_type:'RPPS',  href:'mobilisation-org.html?org=osteopathes',       actif:false },
-          { slug:'chiropracteurs',     nom:'Chiropracteurs en Grève',          profession:'Chiropracteurs',                emoji:'💆', c1:'#4c1d95', c2:'#7c3aed', id_type:'RPPS',  href:'mobilisation-org.html?org=chiropracteurs',    actif:false },
-          { slug:'psychologues',       nom:'Psychologues en Grève',            profession:'Psychologues',                  emoji:'🧠', c1:'#312e81', c2:'#6366f1', id_type:'ADELI', href:'mobilisation-org.html?org=psychologues',      actif:false },
+          { slug:'infirmiers',        nom:'Infirmiers en Grève',            profession:'Infirmiers libéraux (IDEL)',      emoji:'🩺', c1:'#7c3aed', c2:'#a855f7', href:'mobilisation-org.html?org=infirmiers',  actif:false },
+          { slug:'kines',             nom:'Kinés en Grève',                 profession:'Masseurs-kinésithérapeutes',      emoji:'🏃', c1:'#b45309', c2:'#f59e0b', href:'mobilisation-org.html?org=kines',       actif:false },
+          { slug:'psychologues',      nom:'Psychologues en Grève',          profession:'Psychologues',                    emoji:'🧠', c1:'#312e81', c2:'#6366f1', href:'mobilisation-org.html?org=psychologues', actif:false },
         ]
       }
     ];

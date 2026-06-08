@@ -29,28 +29,14 @@ CREATE TABLE IF NOT EXISTS organisations (
 
 INSERT INTO organisations (slug, nom, profession, description, couleur, couleur2, emoji, id_type, actif) VALUES
   -- Professions médicales
-  ('medecins',          'Médecins en Grève',                'Médecins libéraux',             'Mobilisation des médecins libéraux portée par Générations Médecins Île-de-France.',    '#1a3a8a', '#2563eb', '✊',  'RPPS',  true),
-  ('chirurgiens-dent',  'Chirurgiens-Dentistes en Grève',   'Chirurgiens-dentistes',         'Espace de mobilisation pour les chirurgiens-dentistes libéraux.',                     '#0e7490', '#06b6d4', '🦷',  'RPPS',  false),
-  ('sages-femmes',      'Sages-Femmes en Grève',            'Sages-femmes',                  'Espace de mobilisation pour les sages-femmes libérales.',                            '#be185d', '#ec4899', '🤱',  'RPPS',  false),
-  ('pharmaciens',       'Pharmaciens en Grève',             'Pharmaciens d''officine',       'Espace de mobilisation pour les pharmaciens d''officine.',                           '#0f766e', '#14b8a6', '💊',  'FINESS',false),
+  ('medecins',         'Médecins en Grève',              'Médecins libéraux',          'Mobilisation des médecins libéraux portée par Générations Médecins Île-de-France.', '#1a3a8a', '#2563eb', '✊',  'RPPS',  true),
+  ('chirurgiens-dent', 'Chirurgiens-Dentistes en Grève', 'Chirurgiens-dentistes',      'Espace de mobilisation pour les chirurgiens-dentistes libéraux.',                   '#0e7490', '#06b6d4', '🦷',  'RPPS',  false),
+  ('sages-femmes',     'Sages-Femmes en Grève',          'Sages-femmes',               'Espace de mobilisation pour les sages-femmes libérales.',                          '#be185d', '#ec4899', '🤱',  'RPPS',  false),
+  ('pharmaciens',      'Pharmaciens en Grève',           'Pharmaciens d''officine',    'Espace de mobilisation pour les pharmaciens d''officine.',                         '#0f766e', '#14b8a6', '💊',  'FINESS',false),
   -- Professions paramédicales
-  ('infirmiers',        'Infirmiers en Grève',              'Infirmiers libéraux (IDEL)',     'Espace de mobilisation pour les infirmiers libéraux.',                               '#7c3aed', '#a855f7', '🩺',  'ADELI', false),
-  ('kines',             'Kinés en Grève',                   'Masseurs-kinésithérapeutes',    'Espace de mobilisation pour les masseurs-kinésithérapeutes libéraux.',               '#b45309', '#f59e0b', '🏃',  'ADELI', false),
-  ('orthophonistes',    'Orthophonistes en Grève',          'Orthophonistes',                'Espace de mobilisation pour les orthophonistes libéraux.',                           '#0369a1', '#38bdf8', '🗣️',  'ADELI', false),
-  ('orthoptistes',      'Orthoptistes en Grève',            'Orthoptistes',                  'Espace de mobilisation pour les orthoptistes libéraux.',                             '#047857', '#34d399', '👁️',  'ADELI', false),
-  ('podologues',        'Pédicures-Podologues en Grève',    'Pédicures-podologues',          'Espace de mobilisation pour les pédicures-podologues libéraux.',                    '#c2410c', '#fb923c', '🦶',  'ADELI', false),
-  ('ergotherapeutes',   'Ergothérapeutes en Grève',         'Ergothérapeutes',               'Espace de mobilisation pour les ergothérapeutes libéraux.',                         '#166534', '#4ade80', '🖐️',  'ADELI', false),
-  ('psychomotriciens',  'Psychomotriciens en Grève',        'Psychomotriciens',              'Espace de mobilisation pour les psychomotriciens libéraux.',                        '#5b21b6', '#8b5cf6', '🧘',  'ADELI', false),
-  ('manipulateurs-erm', 'Manipulateurs ERM en Grève',       'Manipulateurs électroradiol.',  'Espace de mobilisation pour les manipulateurs en électroradiologie médicale.',      '#1d4ed8', '#60a5fa', '🔬',  'ADELI', false),
-  ('audioprothesistes', 'Audioprothésistes en Grève',       'Audioprothésistes',             'Espace de mobilisation pour les audioprothésistes libéraux.',                       '#9a3412', '#f97316', '👂',  'ADELI', false),
-  ('opticiens',         'Opticiens-Lunetiers en Grève',     'Opticiens-lunetiers',           'Espace de mobilisation pour les opticiens-lunetiers.',                              '#15803d', '#22c55e', '👓',  'ADELI', false),
-  ('prothesistes',      'Prothésistes en Grève',            'Prothésistes & orthésistes',    'Espace de mobilisation pour les prothésistes et orthésistes.',                     '#374151', '#6b7280', '🦾',  'ADELI', false),
-  ('dieteticiens',      'Diététiciens en Grève',            'Diététiciens-nutritionnistes',  'Espace de mobilisation pour les diététiciens libéraux.',                            '#065f46', '#10b981', '🥗',  'ADELI', false),
-  ('techniciens-labo',  'Techniciens de Labo en Grève',     'Techniciens de laboratoire',    'Espace de mobilisation pour les techniciens de biologie médicale.',                '#1e3a5f', '#3b82f6', '🧪',  'ADELI', false),
-  -- Autres professions réglementées
-  ('osteopathes',       'Ostéopathes en Grève',             'Ostéopathes',                   'Espace de mobilisation pour les ostéopathes (titre réglementé depuis 2002).',       '#78350f', '#d97706', '🦴',  'RPPS',  false),
-  ('chiropracteurs',    'Chiropracteurs en Grève',          'Chiropracteurs',                'Espace de mobilisation pour les chiropracteurs (titre réglementé depuis 2002).',    '#4c1d95', '#7c3aed', '💆',  'RPPS',  false),
-  ('psychologues',      'Psychologues en Grève',            'Psychologues',                  'Espace de mobilisation pour les psychologues (titre protégé depuis 1985).',         '#312e81', '#6366f1', '🧠',  'ADELI', false)
+  ('infirmiers',       'Infirmiers en Grève',            'Infirmiers libéraux (IDEL)', 'Espace de mobilisation pour les infirmiers libéraux.',                             '#7c3aed', '#a855f7', '🩺',  'ADELI', false),
+  ('kines',            'Kinés en Grève',                 'Masseurs-kinésithérapeutes', 'Espace de mobilisation pour les masseurs-kinésithérapeutes libéraux.',             '#b45309', '#f59e0b', '🏃',  'ADELI', false),
+  ('psychologues',     'Psychologues en Grève',          'Psychologues',               'Espace de mobilisation pour les psychologues (titre protégé depuis 1985).',        '#312e81', '#6366f1', '🧠',  'ADELI', false)
 ON CONFLICT (slug) DO UPDATE SET
   nom        = EXCLUDED.nom,
   profession = EXCLUDED.profession,
