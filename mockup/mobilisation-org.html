@@ -180,7 +180,7 @@
       <p class="accroche" id="org-desc"></p>
       <div class="counter-box">
         <div class="counter-num" id="counter-num">0</div>
-        <div class="counter-label">pharmaciens mobilisés</div>
+        <div class="counter-label" id="counter-label">professionnels mobilisés</div>
       </div>
       <div class="progress-wrap">
         <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
@@ -225,7 +225,7 @@
         </div>
 
         <button class="btn-submit-org" id="btn-submit" onclick="submitDeclaration()">
-          💊 Je déclare ma participation
+          ✊ Je déclare ma participation
         </button>
       </div>
     </div>
@@ -233,7 +233,7 @@
     <!-- CONFIRMATION -->
     <div id="confirm-section" style="display:none">
       <div class="confirm-card">
-        <div class="big">💊</div>
+        <div class="big" id="confirm-emoji">✊</div>
         <h2>Merci, votre participation est enregistrée !</h2>
         <p style="color:var(--muted);font-size:.9rem">Vous faites partie du mouvement.</p>
         <div class="confirm-ref" id="confirm-ref"></div>
@@ -333,6 +333,9 @@
       if ($('org-nom-header'))   $('org-nom-header').textContent = o.nom;
       if ($('id-type-label'))    $('id-type-label').textContent  = o.id_type;
       if ($('admin-org-name'))   $('admin-org-name').textContent = o.nom;
+      if ($('counter-label'))    $('counter-label').textContent  = (o.profession || 'professionnels') + ' mobilisés';
+      if ($('confirm-emoji'))    $('confirm-emoji').textContent  = o.emoji;
+      if ($('btn-submit'))       $('btn-submit').textContent     = (o.emoji || '✊') + ' Je déclare ma participation';
       document.title = o.nom + ' — Mobilisation Santé';
     }
 

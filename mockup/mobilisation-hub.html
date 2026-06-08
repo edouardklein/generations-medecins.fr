@@ -233,8 +233,9 @@
           const count = live?.declaration_count || 0;
           totalDeclarations += count;
           const isOpen = live ? live.actif : p.actif;
-          const statusLabel = !live ? 'Bientôt disponible' : (isOpen ? 'Campagne ouverte' : 'Campagne fermée');
-          const statusClass = !live ? 'soon' : (isOpen ? 'open' : 'closed');
+          const nocamp = live?._nocamp;
+          const statusLabel = !live ? 'Bientôt disponible' : nocamp ? 'Plateforme active' : (isOpen ? 'Campagne ouverte' : 'Campagne fermée');
+          const statusClass = !live ? 'soon' : nocamp ? 'open' : (isOpen ? 'open' : 'closed');
           const isDormant = !live;
 
           const cardTag = isDormant ? 'div' : 'a';
@@ -278,25 +279,36 @@
       // Rendu immédiat avec données statiques
       renderHub({});
 
-      // Puis enrichi avec Supabase
-      const { data } = await sb
-        .from('greve_campagnes')
-        .select('org_id, actif, declaration_count, organisations(slug)')
-        .eq('archived', false)
-        .order('created_at', { ascending: false });
+      // Charge en parallèle : organisations actives + campagnes en cours
+      const [{ data: orgsData }, { data: campsData }] = await Promise.all([
+        sb.from('organisations').select('slug, actif'),
+        sb.from('greve_campagnes')
+          .select('org_id, actif, declaration_count, organisations(slug)')
+          .eq('archived', false)
+          .order('created_at', { ascending: false }),
+      ]);
 
-      if (!data) return;
+      // Map slug → organisation (pour savoir si actif sans campagne)
+      const orgMap = {};
+      for (const o of (orgsData || [])) orgMap[o.slug] = o;
 
-      // Déduplique par org (on garde la campagne la plus récente)
-      const liveMap = {};
-      for (const c of data) {
+      // Map slug → campagne (stats live)
+      const campMap = {};
+      for (const c of (campsData || [])) {
         const slug = c.organisations?.slug || 'medecins';
-        if (!liveMap[slug]) liveMap[slug] = c;
+        if (!campMap[slug]) campMap[slug] = c;
       }
-
       // Cas spécial médecins (org_id = null)
-      const gmCamp = data.find(c => c.org_id === null);
-      if (gmCamp) liveMap['medecins'] = gmCamp;
+      const gmCamp = (campsData || []).find(c => c.org_id === null);
+      if (gmCamp) campMap['medecins'] = gmCamp;
+
+      // liveMap : org actif = entrée présente (avec ou sans campagne)
+      const liveMap = {};
+      for (const [slug, org] of Object.entries(orgMap)) {
+        if (org.actif) liveMap[slug] = campMap[slug] || { actif: false, declaration_count: 0, _nocamp: true };
+      }
+      // Médecins : toujours actifs via campMap
+      if (campMap['medecins']) liveMap['medecins'] = campMap['medecins'];
 
       renderHub(liveMap);
     }
