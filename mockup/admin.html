@@ -447,6 +447,9 @@
       <button class="sidebar-link" onclick="showSection('greve')" id="nav-greve">
         <span class="icon">✊</span><span>Médecins en Grève</span>
       </button>
+      <button class="sidebar-link super-admin-only" onclick="showSection('ecosysteme')" id="nav-ecosysteme" style="display:none">
+        <span class="icon">🌐</span><span>Écosystème</span>
+      </button>
 
       <div class="sidebar-section-label">Navigation</div>
       <a class="sidebar-link" href="espace-membre.html">
@@ -962,6 +965,84 @@
               <button onclick="greveCloseHistory()" style="background:none;border:none;font-size:1.4rem;color:var(--muted);cursor:pointer;line-height:1">✕</button>
             </div>
             <div id="g-history-list" style="padding:16px 24px 24px;display:flex;flex-direction:column;gap:10px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Écosystème multi-professions (super-admin) -->
+      <div id="section-ecosysteme" class="section-panel">
+        <div class="main-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+          <div>
+            <div class="main-title">🌐 Écosystème multi-professions</div>
+            <div class="main-sub">Gérez toutes les plateformes de mobilisation et affectez leurs administrateurs</div>
+          </div>
+        </div>
+
+        <div id="eco-loading" style="text-align:center;padding:48px;color:var(--muted)">Chargement…</div>
+
+        <div id="eco-content" style="display:none">
+          <!-- Vue d'ensemble : compteurs -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:28px">
+            <div class="stat-card"><div class="stat-label">Plateformes</div><div class="stat-value" id="eco-total-orgs">0</div></div>
+            <div class="stat-card"><div class="stat-label">Actives</div><div class="stat-value" id="eco-active-orgs" style="color:#2d7a1a">0</div></div>
+            <div class="stat-card"><div class="stat-label">Déclarations totales</div><div class="stat-value" id="eco-total-decls">0</div></div>
+            <div class="stat-card"><div class="stat-label">Admins délégués</div><div class="stat-value" id="eco-total-admins">0</div></div>
+          </div>
+
+          <!-- Liste des organisations -->
+          <div id="eco-orgs-list" style="display:flex;flex-direction:column;gap:14px"></div>
+        </div>
+
+        <!-- Overlay gestion d'une organisation -->
+        <div id="eco-org-overlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:500;backdrop-filter:blur(2px)" onclick="if(event.target===this)ecoCloseOrg()">
+          <div style="position:absolute;right:0;top:0;bottom:0;width:560px;max-width:100vw;background:#fff;overflow-y:auto;box-shadow:-8px 0 40px rgba(0,0,0,.15)">
+            <div id="eco-org-overlay-head" style="padding:24px 28px;color:#fff">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div>
+                  <div style="font-size:1.3rem;font-weight:900" id="eco-org-name">—</div>
+                  <div style="font-size:.84rem;opacity:.85" id="eco-org-prof">—</div>
+                </div>
+                <button onclick="ecoCloseOrg()" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:1.1rem;cursor:pointer;width:32px;height:32px;border-radius:8px">✕</button>
+              </div>
+            </div>
+            <div style="padding:24px 28px">
+              <!-- État activation -->
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1.5px solid var(--line);border-radius:12px;margin-bottom:20px">
+                <div>
+                  <div style="font-weight:700;font-size:.9rem;color:var(--ink)">Plateforme active</div>
+                  <div style="font-size:.78rem;color:var(--muted)">Visible publiquement sur le hub</div>
+                </div>
+                <label class="ios-toggle">
+                  <input type="checkbox" id="eco-org-actif" onchange="ecoToggleActif()">
+                  <span class="ios-slider"></span>
+                </label>
+              </div>
+
+              <!-- Liens rapides -->
+              <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap">
+                <a class="g-btn g-btn-outline" id="eco-org-front" href="#" target="_blank">Page publique ↗</a>
+                <a class="g-btn g-btn-outline" id="eco-org-admin" href="#" target="_blank">Admin de la plateforme ↗</a>
+              </div>
+
+              <!-- Admins / équipe -->
+              <div style="font-weight:800;font-size:.95rem;color:var(--ink);margin-bottom:6px">Administrateurs & équipe</div>
+              <div style="font-size:.8rem;color:var(--muted);margin-bottom:14px">Personnes pouvant gérer les campagnes de cette plateforme.</div>
+              <div id="eco-org-team" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px"></div>
+
+              <!-- Affecter quelqu'un -->
+              <div style="border-top:1px solid var(--line);padding-top:16px">
+                <div style="font-weight:700;font-size:.84rem;color:var(--ink);margin-bottom:10px">Affecter un administrateur</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <input type="email" id="eco-invite-email" placeholder="email@organisation.fr"
+                    style="flex:1;min-width:200px;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;font-family:inherit;font-size:.86rem">
+                  <select id="eco-invite-role" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;font-family:inherit;font-size:.86rem;background:#fff">
+                    <option value="admin">Administrateur</option>
+                    <option value="viewer">Lecteur</option>
+                  </select>
+                  <button class="g-btn g-btn-primary" onclick="ecoInvite()">Affecter →</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1499,6 +1580,7 @@
     if (id === 'mass-mailing') { loadMassMailing(); }
     if (id === 'doctrine') { loadDoctrine(); }
     if (id === 'greve') { loadGreve(); }
+    if (id === 'ecosysteme') { loadEcosysteme(); }
   };
 
   // ── Logout ──────────────────────────────────────────────────
@@ -3567,6 +3649,166 @@
     // Recharge la liste puis bascule sur la nouvelle campagne
     await loadGreve();
     if (data && data.id) await switchCampagne(data.id, true);
+  };
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ÉCOSYSTÈME MULTI-PROFESSIONS (super-admin)
+  // ══════════════════════════════════════════════════════════════════════════
+  let ecoOrgs = [];
+  let ecoCampMap = {};   // org_id -> { count, active }
+  let ecoTeamMap = {};   // org_id -> [membres]
+  let ecoCurrentOrg = null;
+
+  async function loadEcosysteme() {
+    document.getElementById('eco-loading').style.display = 'block';
+    document.getElementById('eco-content').style.display = 'none';
+
+    // Toutes les organisations (super-admin voit aussi les inactives via service role / RLS bypass)
+    const { data: orgs, error } = await sb.from('organisations').select('*').order('created_at');
+    if (error) {
+      document.getElementById('eco-loading').innerHTML =
+        '<span style="color:#dc2626">Erreur : ' + esc(error.message) + '</span>';
+      return;
+    }
+    ecoOrgs = orgs || [];
+
+    // Campagnes (pour compteurs par org)
+    const { data: camps } = await sb.from('greve_campagnes')
+      .select('org_id, actif, archived, declaration_count');
+    ecoCampMap = {};
+    (camps || []).forEach(c => {
+      const k = c.org_id || 'medecins-null';
+      if (!ecoCampMap[k]) ecoCampMap[k] = { count: 0, active: false };
+      ecoCampMap[k].count += (c.declaration_count || 0);
+      if (c.actif && !c.archived) ecoCampMap[k].active = true;
+    });
+
+    // Équipes par org
+    const { data: membres } = await sb.from('org_membres')
+      .select('*, user:user_id(email)');
+    ecoTeamMap = {};
+    (membres || []).forEach(m => {
+      (ecoTeamMap[m.org_id] = ecoTeamMap[m.org_id] || []).push(m);
+    });
+
+    renderEcosysteme();
+    document.getElementById('eco-loading').style.display = 'none';
+    document.getElementById('eco-content').style.display = 'block';
+  }
+
+  function renderEcosysteme() {
+    const totalDecls = Object.values(ecoCampMap).reduce((s, v) => s + v.count, 0);
+    const activeCount = ecoOrgs.filter(o => o.actif).length;
+    const totalAdmins = Object.values(ecoTeamMap).reduce((s, arr) => s + arr.filter(m => m.role === 'admin').length, 0);
+
+    document.getElementById('eco-total-orgs').textContent   = ecoOrgs.length;
+    document.getElementById('eco-active-orgs').textContent  = activeCount;
+    document.getElementById('eco-total-decls').textContent  = totalDecls.toLocaleString('fr-FR');
+    document.getElementById('eco-total-admins').textContent = totalAdmins;
+
+    document.getElementById('eco-orgs-list').innerHTML = ecoOrgs.map(o => {
+      const stats = ecoCampMap[o.id] || ecoCampMap['medecins-null'] || { count: 0, active: false };
+      const team  = ecoTeamMap[o.id] || [];
+      const isGM  = o.slug === 'medecins';
+      const adminCount = team.filter(m => m.role === 'admin').length;
+      return `<div style="display:flex;align-items:center;gap:16px;padding:16px 18px;background:#fff;border:1.5px solid var(--line);border-radius:14px;${o.actif ? '' : 'opacity:.7'}">
+        <div style="width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;background:linear-gradient(135deg,${o.couleur},${o.couleur2});flex-shrink:0">${o.emoji||'✊'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:.98rem;color:var(--ink)">${esc(o.nom)}</div>
+          <div style="font-size:.8rem;color:var(--muted)">${esc(o.profession)} · ${(stats.count||0).toLocaleString('fr-FR')} décl. · ${adminCount} admin${adminCount>1?'s':''}</div>
+        </div>
+        <span style="font-size:.7rem;font-weight:800;padding:4px 11px;border-radius:999px;${o.actif ? 'background:#dcfce7;color:#15803d' : 'background:#f1f5f9;color:#94a3b8'}">${o.actif ? '● Active' : 'Inactive'}</span>
+        <button class="g-btn g-btn-outline" style="padding:8px 16px;font-size:.82rem" onclick="ecoOpenOrg('${o.id}')">Gérer →</button>
+      </div>`;
+    }).join('');
+  }
+
+  window.ecoOpenOrg = function(orgId) {
+    const o = ecoOrgs.find(x => x.id === orgId);
+    if (!o) return;
+    ecoCurrentOrg = o;
+    document.getElementById('eco-org-name').textContent = o.nom;
+    document.getElementById('eco-org-prof').textContent = o.profession;
+    document.getElementById('eco-org-overlay-head').style.background = `linear-gradient(135deg,${o.couleur},${o.couleur2})`;
+    document.getElementById('eco-org-actif').checked = !!o.actif;
+
+    const front = o.slug === 'medecins' ? 'greve.html' : 'mobilisation-org.html?org=' + o.slug;
+    const admin = o.slug === 'medecins' ? 'admin.html' : 'mobilisation-admin.html?org=' + o.slug;
+    document.getElementById('eco-org-front').href = front;
+    document.getElementById('eco-org-admin').href = admin;
+
+    renderEcoTeam();
+    document.getElementById('eco-org-overlay').style.display = 'block';
+  };
+
+  window.ecoCloseOrg = function() {
+    document.getElementById('eco-org-overlay').style.display = 'none';
+    ecoCurrentOrg = null;
+  };
+
+  function renderEcoTeam() {
+    const team = ecoTeamMap[ecoCurrentOrg.id] || [];
+    const el = document.getElementById('eco-org-team');
+    if (!team.length) {
+      el.innerHTML = '<span style="color:var(--muted);font-size:.84rem">Aucun administrateur affecté. Utilisez le formulaire ci-dessous.</span>';
+      return;
+    }
+    el.innerHTML = team.map(m => {
+      const email = m.user?.email || m.email || '—';
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px">
+        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,${ecoCurrentOrg.couleur},${ecoCurrentOrg.couleur2});display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.8rem;flex-shrink:0">${email.slice(0,2).toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.85rem;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(email)}</div>
+          <div style="font-size:.74rem;color:var(--muted)">${m.accepted_at ? 'Accepté' : 'En attente'}</div>
+        </div>
+        <span style="font-size:.7rem;font-weight:800;padding:3px 10px;border-radius:999px;${m.role==='admin'?'background:#dbeafe;color:#1d4ed8':'background:#f1f5f9;color:#64748b'}">${m.role==='admin'?'Admin':'Lecteur'}</span>
+        <button class="btn-sm btn-sm-danger" style="font-size:.74rem;padding:5px 11px;border-radius:7px;border:1.5px solid #fca5a5;background:#fff;color:#dc2626;cursor:pointer;font-family:inherit" onclick="ecoRemoveMember('${m.id}')">Retirer</button>
+      </div>`;
+    }).join('');
+  }
+
+  window.ecoToggleActif = async function() {
+    if (!ecoCurrentOrg) return;
+    const newVal = document.getElementById('eco-org-actif').checked;
+    const { error } = await sb.from('organisations').update({ actif: newVal }).eq('id', ecoCurrentOrg.id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); document.getElementById('eco-org-actif').checked = !newVal; return; }
+    ecoCurrentOrg.actif = newVal;
+    const o = ecoOrgs.find(x => x.id === ecoCurrentOrg.id); if (o) o.actif = newVal;
+    toast(newVal ? '✓ Plateforme activée' : '✓ Plateforme désactivée');
+    renderEcosysteme();
+  };
+
+  window.ecoInvite = async function() {
+    if (!ecoCurrentOrg) return;
+    const email = document.getElementById('eco-invite-email').value.trim().toLowerCase();
+    const role  = document.getElementById('eco-invite-role').value;
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast('Email invalide', 'error'); return; }
+    const token = crypto.randomUUID();
+    const { error } = await sb.from('org_membres').insert({
+      org_id: ecoCurrentOrg.id, email, role, invite_token: token,
+    });
+    if (error?.code === '23505') { toast('Déjà affecté à cette plateforme', 'error'); return; }
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+
+    fetch('/.netlify/functions/inviter-org-admin', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, orgNom: ecoCurrentOrg.nom, role, token, orgSlug: ecoCurrentOrg.slug }),
+    }).catch(() => {});
+
+    toast(`✓ ${email} affecté à ${ecoCurrentOrg.nom}`);
+    document.getElementById('eco-invite-email').value = '';
+    await loadEcosysteme();
+    ecoTeamMap[ecoCurrentOrg.id] = ecoTeamMap[ecoCurrentOrg.id] || [];
+    renderEcoTeam();
+  };
+
+  window.ecoRemoveMember = async function(id) {
+    if (!confirm('Retirer cet accès ?')) return;
+    const { error } = await sb.from('org_membres').delete().eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('✓ Accès retiré');
+    await loadEcosysteme();
+    if (ecoCurrentOrg) renderEcoTeam();
   };
 
   // ── Veille automatisée ──────────────────────────────────────────
