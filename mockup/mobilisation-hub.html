@@ -56,6 +56,9 @@
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap:16px;
     }
+    .orgs-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+    @media(max-width:900px) { .orgs-grid.cols-4 { grid-template-columns: repeat(2, 1fr); } }
+    @media(max-width:540px) { .orgs-grid.cols-4 { grid-template-columns: 1fr; } }
 
     /* ── Carte ───────────────────────────────────────────────────────────── */
     .org-card {
@@ -258,10 +261,11 @@
             </${cardTag}>`;
         }).join('');
 
+        const extraCls = groupe.items.length === 4 ? ' cols-4' : '';
         return `
           <div class="prof-group">
             <div class="prof-group-title">${groupe.groupe}</div>
-            <div class="orgs-grid">${cards}</div>
+            <div class="orgs-grid${extraCls}">${cards}</div>
           </div>`;
       }).join('');
 
