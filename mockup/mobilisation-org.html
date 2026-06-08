@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pharmaciens en Action — Mobilisation Santé</title>
+  <title>Mobilisation Santé</title>
   <meta name="description" content="Déclarez votre participation à la mobilisation des pharmaciens d'officine.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
@@ -154,16 +154,16 @@
   <div class="admin-topbar" id="admin-topbar">
     <div class="admin-topbar-left">
       <span class="admin-badge">Admin</span>
-      <span id="admin-org-name">Pharmaciens en Action</span>
+      <span id="admin-org-name">Chargement…</span>
     </div>
-    <a href="admin.html?org=pharmaciens" id="admin-link">Tableau de bord →</a>
+    <a href="#" id="admin-link">Tableau de bord →</a>
   </div>
 
   <header>
     <div class="header-inner">
       <a href="mobilisation-hub.html" class="logo">
         <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
-        <span id="org-nom-header">Pharmaciens en Action</span>
+        <span id="org-nom-header">Chargement…</span>
       </a>
       <nav>
         <a href="mobilisation-hub.html">← Toutes les professions</a>
@@ -176,8 +176,8 @@
   <section class="org-hero">
     <div class="org-hero-inner">
       <div class="org-hero-emoji" id="org-emoji">💊</div>
-      <h1 id="org-titre">Pharmaciens en Action</h1>
-      <p class="accroche" id="org-desc">Déclarez votre participation à la mobilisation des pharmaciens d'officine. Recevez votre attestation officielle.</p>
+      <h1 id="org-titre">Chargement…</h1>
+      <p class="accroche" id="org-desc"></p>
       <div class="counter-box">
         <div class="counter-num" id="counter-num">0</div>
         <div class="counter-label">pharmaciens mobilisés</div>
@@ -355,7 +355,7 @@
         .single();
       if (member?.role === 'admin') {
         $('admin-topbar').classList.add('visible');
-        $('admin-link').href = 'admin.html?org=' + ORG_SLUG;
+        $('admin-link').href = 'mobilisation-admin.html?org=' + ORG_SLUG;
       }
     }
 

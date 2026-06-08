@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Mobilisation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background:#f0f4f8; }
+
+    /* ── Topbar org ─────────────────────────────────────────────────────── */
+    .org-topbar {
+      height:52px; display:flex; align-items:center; justify-content:space-between;
+      padding:0 24px; gap:16px;
+      background:var(--org-grad, linear-gradient(135deg,#1a3a8a,#2563eb));
+      color:#fff;
+    }
+    .org-topbar-left { display:flex; align-items:center; gap:10px; font-size:.88rem; font-weight:700; }
+    .org-topbar-badge {
+      font-size:.68rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+      background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3);
+      border-radius:999px; padding:3px 10px;
+    }
+    .org-topbar a { font-size:.8rem; color:rgba(255,255,255,.85); text-decoration:none; font-weight:600; }
+    .org-topbar a:hover { color:#fff; }
+
+    /* ── Layout ──────────────────────────────────────────────────────────── */
+    .page-wrap { max-width:960px; margin:0 auto; padding:32px 24px 80px; }
+
+    /* ── Accès refusé ────────────────────────────────────────────────────── */
+    #access-denied { display:none; text-align:center; padding:80px 24px; }
+    #access-denied h2 { font-size:1.3rem; font-weight:900; color:var(--ink); margin-bottom:10px; }
+    #access-denied p  { color:var(--muted); font-size:.9rem; }
+
+    /* ── Header section ──────────────────────────────────────────────────── */
+    .admin-header {
+      display:flex; justify-content:space-between; align-items:flex-start;
+      gap:16px; flex-wrap:wrap; margin-bottom:28px;
+    }
+    .admin-title  { font-size:1.45rem; font-weight:900; color:var(--ink); letter-spacing:-.025em; }
+    .admin-sub    { font-size:.88rem; color:var(--muted); margin-top:3px; }
+    .admin-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    /* ── Boutons ─────────────────────────────────────────────────────────── */
+    .g-btn { display:inline-flex; align-items:center; gap:7px; border:none; border-radius:10px; padding:9px 18px; font-family:inherit; font-size:.86rem; font-weight:700; cursor:pointer; transition:all .15s; text-decoration:none; white-space:nowrap; }
+    .g-btn-primary { background:var(--org-grad,linear-gradient(135deg,#1a3a8a,#2563eb)); color:#fff; box-shadow:0 3px 10px rgba(37,99,235,.2); }
+    .g-btn-primary:hover { filter:brightness(1.1); transform:translateY(-1px); }
+    .g-btn-outline { background:#fff; color:var(--ink); border:1.5px solid var(--line); }
+    .g-btn-outline:hover { border-color:var(--org-c1,#2563eb); color:var(--org-c1,#2563eb); background:#f8fbff; }
+    .g-btn-danger  { background:#fff; color:#dc2626; border:1.5px solid #fca5a5; }
+    .g-btn-danger:hover { background:#fef2f2; border-color:#dc2626; }
+    .g-btn-add { display:inline-flex; align-items:center; gap:5px; font-size:.8rem; font-weight:700; color:var(--org-c1,#2563eb); background:var(--org-bg,#eff6ff); border:1.5px dashed var(--org-line,#bfdbfe); border-radius:8px; padding:7px 14px; cursor:pointer; font-family:inherit; transition:all .12s; }
+    .g-btn-add:hover { filter:brightness(.95); border-style:solid; }
+
+    /* ── iOS toggle ──────────────────────────────────────────────────────── */
+    .ios-toggle-wrap { display:flex; align-items:center; gap:10px; }
+    .ios-toggle-label { font-size:.82rem; font-weight:700; color:#94a3b8; transition:color .2s; white-space:nowrap; }
+    .ios-toggle-label.on  { color:#16a34a; }
+    .ios-toggle-label.off { color:#64748b; }
+    .ios-toggle { position:relative; display:inline-block; width:50px; height:28px; flex-shrink:0; }
+    .ios-toggle input { opacity:0; width:0; height:0; }
+    .ios-slider { position:absolute; cursor:pointer; inset:0; background:#cbd5e1; border-radius:999px; transition:.25s; }
+    .ios-slider:before { content:''; position:absolute; width:20px; height:20px; left:4px; bottom:4px; background:#fff; border-radius:50%; transition:.25s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    input:checked + .ios-slider { background:#22c55e; }
+    input:checked + .ios-slider:before { transform:translateX(22px); }
+
+    /* ── Readonly ────────────────────────────────────────────────────────── */
+    .readonly-badge { display:none; align-items:center; gap:6px; background:#fef9c3; border:1px solid #fde047; border-radius:999px; padding:5px 12px; font-size:.77rem; font-weight:700; color:#854d0e; }
+
+    /* ── Cards ───────────────────────────────────────────────────────────── */
+    .card { background:#fff; border-radius:16px; padding:24px; box-shadow:0 2px 12px rgba(20,32,51,.06); margin-bottom:20px; }
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:14px; margin-bottom:20px; }
+    .stat-box  { background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:16px; text-align:center; }
+    .stat-val  { font-size:1.8rem; font-weight:900; color:var(--org-c1,#1a3a8a); letter-spacing:-.03em; }
+    .stat-lbl  { font-size:.74rem; color:var(--muted); font-weight:600; margin-top:4px; }
+
+    /* ── Camp switcher / historique ──────────────────────────────────────── */
+    .camp-timeline-wrap { background:#f8fafc; border:1.5px solid var(--line); border-radius:14px; padding:16px; margin-bottom:20px; overflow-x:auto; }
+    .camp-timeline-label { font-size:.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px; }
+    .camp-timeline { display:flex; gap:12px; }
+    .camp-chip { flex-shrink:0; min-width:180px; max-width:220px; border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; background:#fff; transition:all .15s; }
+    .camp-chip:hover:not(.viewing) { border-color:#93c5fd; background:#f8fbff; transform:translateY(-1px); }
+    .camp-chip.viewing { border-color:var(--org-c1,#2563eb); box-shadow:0 0 0 3px rgba(37,99,235,.1); background:#eff6ff; }
+    .camp-chip-badge { display:inline-flex; align-items:center; gap:4px; font-size:.66rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; padding:2px 7px; border-radius:999px; }
+    .camp-chip-badge.open   { background:#dcfce7; color:#15803d; }
+    .camp-chip-badge.closed { background:#f1f5f9; color:#64748b; }
+    .camp-chip-count { font-size:1.2rem; font-weight:900; color:var(--org-c1,#1a3a8a); margin-bottom:2px; letter-spacing:-.03em; }
+    .camp-chip-title { font-size:.82rem; font-weight:800; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .camp-chip-meta  { font-size:.72rem; color:var(--muted); line-height:1.4; margin-top:2px; }
+
+    /* ── Historique overlay ──────────────────────────────────────────────── */
+    .hist-row { display:flex; align-items:center; gap:14px; padding:14px 16px; border:1.5px solid var(--line); border-radius:12px; cursor:pointer; transition:all .15s; margin-bottom:10px; }
+    .hist-row:hover { border-color:var(--org-c1,#2563eb); background:#f8fbff; }
+    .hist-row.viewing { border-color:var(--org-c1,#2563eb); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+    .hist-count { font-size:1.5rem; font-weight:900; color:var(--org-c1,#1a3a8a); min-width:56px; letter-spacing:-.03em; }
+    .hist-info { flex:1; }
+    .hist-title { font-size:.9rem; font-weight:800; color:var(--ink); }
+    .hist-meta  { font-size:.78rem; color:var(--muted); }
+    .hist-badge { font-size:.7rem; font-weight:800; padding:3px 10px; border-radius:999px; background:#f1f5f9; color:#64748b; }
+
+    /* ── Délégation ──────────────────────────────────────────────────────── */
+    .deleg-row { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px; background:#fff; margin-bottom:8px; }
+    .deleg-avatar { width:36px; height:36px; border-radius:50%; background:var(--org-grad,linear-gradient(135deg,#1a3a8a,#2563eb)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:.9rem; flex-shrink:0; }
+    .deleg-info { flex:1; }
+    .deleg-name  { font-size:.88rem; font-weight:700; color:var(--ink); }
+    .deleg-role  { font-size:.75rem; color:var(--muted); }
+    .role-badge  { font-size:.7rem; font-weight:800; padding:3px 10px; border-radius:999px; }
+    .role-badge.admin  { background:#dbeafe; color:#1d4ed8; }
+    .role-badge.viewer { background:#f1f5f9; color:#64748b; }
+    .deleg-actions { display:flex; gap:8px; flex-shrink:0; }
+    .btn-sm { font-size:.76rem; font-weight:700; padding:5px 12px; border-radius:7px; border:none; cursor:pointer; font-family:inherit; transition:all .12s; }
+    .btn-sm-outline { background:#fff; color:var(--ink); border:1.5px solid var(--line); }
+    .btn-sm-outline:hover { border-color:var(--org-c1,#2563eb); }
+    .btn-sm-danger  { background:#fff; color:#dc2626; border:1.5px solid #fca5a5; }
+    .btn-sm-danger:hover { background:#fef2f2; }
+
+    .invite-form { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+    .invite-form input  { flex:1; min-width:200px; padding:10px 13px; border:1.5px solid var(--line); border-radius:9px; font-family:inherit; font-size:.88rem; outline:none; }
+    .invite-form input:focus { border-color:var(--org-c1,#2563eb); }
+    .invite-form select { padding:10px 13px; border:1.5px solid var(--line); border-radius:9px; font-family:inherit; font-size:.88rem; outline:none; background:#fff; }
+    .invite-form select:focus { border-color:var(--org-c1,#2563eb); }
+
+    /* ── Champs form ─────────────────────────────────────────────────────── */
+    .field-lbl { font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); display:block; margin-bottom:5px; }
+    .f-input, .f-textarea { width:100%; padding:10px 12px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:.9rem; box-sizing:border-box; outline:none; transition:border-color .12s; }
+    .f-input:focus, .f-textarea:focus { border-color:var(--org-c1,#2563eb); }
+    .f-textarea { resize:vertical; }
+    .fields-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:14px; }
+    @media(max-width:600px){ .fields-row { grid-template-columns:1fr 1fr; } }
+
+    /* ── Toast ───────────────────────────────────────────────────────────── */
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); opacity:0; transition:all .25s; background:var(--ink); color:#fff; padding:12px 22px; border-radius:999px; font-size:.88rem; font-weight:600; z-index:9999; pointer-events:none; white-space:nowrap; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.error { background:#dc2626; }
+
+    /* ── Section nav tabs ────────────────────────────────────────────────── */
+    .tab-bar { display:flex; gap:4px; background:#f1f5f9; border-radius:12px; padding:4px; margin-bottom:28px; }
+    .tab-btn { flex:1; padding:9px 16px; border:none; border-radius:9px; font-family:inherit; font-size:.85rem; font-weight:700; cursor:pointer; transition:all .12s; background:none; color:var(--muted); }
+    .tab-btn.active { background:#fff; color:var(--ink); box-shadow:0 1px 4px rgba(0,0,0,.1); }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR ORG -->
+  <div class="org-topbar" id="org-topbar">
+    <div class="org-topbar-left">
+      <span class="org-topbar-badge">Admin</span>
+      <span id="org-topbar-name">Chargement…</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <a href="" id="org-front-link">← Page publique</a>
+      <a href="mobilisation-hub.html">Hub professions</a>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <a href="mobilisation-hub.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span id="header-org-name">Admin Mobilisation</span>
+      </a>
+      <nav>
+        <a href="mobilisation-hub.html">← Hub</a>
+        <a href="espace-membre.html">Mon espace</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Accès refusé -->
+  <div id="access-denied">
+    <h2>Accès restreint</h2>
+    <p>Vous devez être administrateur de cet espace pour accéder à cette page.<br>Contactez le responsable de votre organisation.</p>
+  </div>
+
+  <!-- Contenu admin -->
+  <div class="page-wrap" id="admin-wrap" style="display:none">
+
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="showTab('campagne')" id="tab-campagne">✊ Campagne</button>
+      <button class="tab-btn" onclick="showTab('declarations')" id="tab-declarations">📋 Déclarations</button>
+      <button class="tab-btn" onclick="showTab('equipe')" id="tab-equipe">👥 Équipe</button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         TAB : CAMPAGNE
+    ══════════════════════════════════════════════════════════════════════════ -->
+    <div id="panel-campagne">
+
+      <div class="admin-header">
+        <div>
+          <div class="admin-title" id="camp-section-title">Campagne</div>
+          <div class="admin-sub">Paramétrage, statistiques, gestion des campagnes</div>
+        </div>
+        <div class="admin-actions" id="camp-actions" style="visibility:hidden">
+          <button class="g-btn g-btn-primary" onclick="campSave()">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Enregistrer
+          </button>
+          <button class="g-btn g-btn-outline" onclick="campExportCsv()">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+          <button class="g-btn g-btn-outline" onclick="openHistory()">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+            Historique <span id="hist-count-badge" style="opacity:.7"></span>
+          </button>
+          <button class="g-btn g-btn-danger" onclick="campReset()">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Nouvelle campagne
+          </button>
+        </div>
+      </div>
+
+      <div id="camp-loading" style="text-align:center;padding:60px;color:var(--muted)">Chargement…</div>
+
+      <div id="camp-content" style="display:none">
+
+        <!-- Bandeau multi-campagnes (si >1 non-archivées) -->
+        <div class="camp-timeline-wrap" id="camp-timeline-wrap" style="display:none">
+          <div class="camp-timeline-label">● Campagnes en cours</div>
+          <div class="camp-timeline" id="camp-timeline"></div>
+        </div>
+
+        <!-- Bandeau archive -->
+        <div id="camp-archive-bar" style="display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#fffbeb;border:1px solid #fde047;border-radius:12px;padding:12px 16px;margin-bottom:20px">
+          <div style="font-size:.86rem;color:#854d0e;font-weight:600">📁 Vous consultez une campagne archivée <span id="camp-archive-name" style="font-weight:800"></span></div>
+          <button class="g-btn g-btn-outline" style="padding:6px 14px;font-size:.8rem" onclick="campBackToActive()">← Revenir à la campagne en cours</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stat-grid">
+          <div class="stat-box"><div class="stat-val" id="gs-total">0</div><div class="stat-lbl">Déclarations</div></div>
+          <div class="stat-box"><div class="stat-val" id="gs-objectif">0</div><div class="stat-lbl">Objectif</div></div>
+          <div class="stat-box"><div class="stat-val" id="gs-pct">—</div><div class="stat-lbl">Progression</div></div>
+          <div class="stat-box"><div class="stat-val" id="gs-optin">0</div><div class="stat-lbl">Emails opt-in</div></div>
+        </div>
+
+        <!-- Répartitions -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+          <div class="card" style="margin-bottom:0">
+            <div class="field-lbl" style="margin-bottom:10px">Par code postal (top 8)</div>
+            <div id="gs-cp" style="font-size:.85rem;line-height:2"></div>
+          </div>
+          <div class="card" style="margin-bottom:0">
+            <div class="field-lbl" style="margin-bottom:10px">Par mode d'exercice</div>
+            <div id="gs-modes" style="font-size:.85rem;line-height:2"></div>
+          </div>
+        </div>
+
+        <!-- Paramétrage campagne -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="font-weight:800;font-size:1.05rem;color:var(--ink)" id="camp-heading">Campagne en cours</div>
+              <div class="readonly-badge" id="camp-readonly-badge">📁 Archivée — lecture seule</div>
+            </div>
+            <div class="ios-toggle-wrap">
+              <span class="ios-toggle-label off" id="lbl-closed">Fermé</span>
+              <label class="ios-toggle">
+                <input type="checkbox" id="c-actif">
+                <span class="ios-slider"></span>
+              </label>
+              <span class="ios-toggle-label" id="lbl-open">Ouvert</span>
+            </div>
+          </div>
+
+          <div style="margin-bottom:14px">
+            <label class="field-lbl">Titre du mouvement</label>
+            <input id="c-titre" class="f-input">
+          </div>
+          <div style="margin-bottom:14px">
+            <label class="field-lbl">Accroche (hero)</label>
+            <textarea id="c-accroche" class="f-textarea" rows="3"></textarea>
+          </div>
+          <div class="fields-row">
+            <div><label class="field-lbl">Ouverture</label><input id="c-debut" type="date" class="f-input"></div>
+            <div><label class="field-lbl">Clôture</label><input id="c-fin" type="date" class="f-input"></div>
+            <div><label class="field-lbl">Objectif</label><input id="c-objectif" type="number" min="0" class="f-input"></div>
+          </div>
+
+          <!-- Motifs -->
+          <div style="margin-bottom:14px">
+            <label class="field-lbl">Motifs proposés</label>
+            <div id="c-motifs-list" style="display:flex;flex-direction:column;gap:7px;margin-bottom:8px"></div>
+            <button class="g-btn-add g-edit-only" onclick="addMotif()">+ Motif</button>
+          </div>
+          <!-- Liens -->
+          <div style="margin-bottom:14px">
+            <label class="field-lbl">Liens / articles</label>
+            <div id="c-liens-list" style="display:flex;flex-direction:column;gap:7px;margin-bottom:8px"></div>
+            <button class="g-btn-add g-edit-only" onclick="addLien()">+ Lien</button>
+          </div>
+          <!-- FAQ -->
+          <div style="margin-bottom:18px">
+            <label class="field-lbl">FAQ</label>
+            <div id="c-faq-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px"></div>
+            <button class="g-btn-add g-edit-only" onclick="addFaq()">+ Question</button>
+          </div>
+
+          <!-- Footer card -->
+          <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:14px;flex-wrap:wrap;gap:10px">
+            <button class="g-btn g-btn-danger" id="camp-archive-btn" onclick="campArchiveCurrent()" style="font-size:.82rem;padding:8px 16px">
+              📁 Archiver cette campagne
+            </button>
+            <div style="font-size:.75rem;color:var(--muted)">Archiver = lecture seule définitive. Pour rouvrir une période, utilisez "Nouvelle campagne".</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         TAB : DÉCLARATIONS
+    ══════════════════════════════════════════════════════════════════════════ -->
+    <div id="panel-declarations" style="display:none">
+      <div class="admin-header">
+        <div>
+          <div class="admin-title">Déclarations</div>
+          <div class="admin-sub" id="decl-meta">—</div>
+        </div>
+        <button class="g-btn g-btn-outline" onclick="campExportCsv()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+      </div>
+      <div class="card">
+        <div id="decl-table"><span style="color:var(--muted)">Chargez la campagne d'abord.</span></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         TAB : ÉQUIPE & DÉLÉGATION
+    ══════════════════════════════════════════════════════════════════════════ -->
+    <div id="panel-equipe" style="display:none">
+      <div class="admin-header">
+        <div>
+          <div class="admin-title">Équipe & délégation</div>
+          <div class="admin-sub">Gérez les accès admin de votre espace. Vous pouvez déléguer l'administration à d'autres personnes.</div>
+        </div>
+      </div>
+
+      <!-- Liste membres -->
+      <div class="card">
+        <div class="field-lbl" style="margin-bottom:14px">Membres de l'équipe</div>
+        <div id="equipe-list"><span style="color:var(--muted);font-size:.88rem">Chargement…</span></div>
+
+        <!-- Inviter -->
+        <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--line)">
+          <div class="field-lbl" style="margin-bottom:10px">Inviter une personne</div>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px;line-height:1.55">
+            La personne recevra un email d'invitation. Elle pourra accepter et accéder à cet espace admin sans avoir besoin d'un compte Générations Médecins.
+          </p>
+          <div class="invite-form">
+            <input type="email" id="invite-email" placeholder="prenom.nom@organisation.fr">
+            <select id="invite-role">
+              <option value="admin">Administrateur (peut tout faire)</option>
+              <option value="viewer">Lecteur (consultation seule)</option>
+            </select>
+            <button class="g-btn g-btn-primary" onclick="inviteMembre()">Envoyer l'invitation →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Note délégation totale -->
+      <div style="background:#f8fafc;border:1.5px solid var(--line);border-radius:14px;padding:20px 22px;font-size:.84rem;color:var(--muted);line-height:1.6">
+        <strong style="color:var(--ink)">À propos de la délégation :</strong> Un administrateur délégué a exactement les mêmes droits que vous — il peut créer des campagnes, archiver, exporter, et inviter d'autres membres. Seul le super-admin Générations Médecins peut révoquer tous les accès. Si vous quittez l'organisation, désignez un successeur avant de supprimer votre accès.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- OVERLAY HISTORIQUE -->
+  <div id="history-overlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:500;backdrop-filter:blur(2px)" onclick="if(event.target===this)closeHistory()">
+    <div style="position:absolute;right:0;top:0;bottom:0;width:480px;max-width:100vw;background:#fff;padding:28px 28px;overflow-y:auto;box-shadow:-8px 0 40px rgba(0,0,0,.15)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:1.05rem;font-weight:900;color:var(--ink)">Historique des campagnes</div>
+        <button onclick="closeHistory()" style="background:none;border:none;font-size:1.4rem;color:var(--muted);cursor:pointer;line-height:1">✕</button>
+      </div>
+      <div style="font-size:.82rem;color:var(--muted);margin-bottom:20px" id="hist-sub"></div>
+      <div id="hist-list"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+  (function () {
+    const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    const $ = id => document.getElementById(id);
+
+    const ORG_SLUG = new URLSearchParams(location.search).get('org') || '';
+
+    let org = null;
+    let currentUser = null;
+    let currentMember = null;
+    let campagne = null;
+    let allCampagnes = [];
+    let decls = [];
+    let viewingId = null;
+    let equipe = [];
+
+    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function toast(msg, type) {
+      const t = $('toast'); t.textContent = msg;
+      t.className = 'toast show' + (type === 'error' ? ' error' : '');
+      setTimeout(() => t.className = 'toast', 3200);
+    }
+    function fmtDate(d) {
+      if (!d) return '';
+      return new Date(d).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' });
+    }
+    function slugify(s) {
+      return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,30);
+    }
+
+    // ── Init ─────────────────────────────────────────────────────────────────
+    async function init() {
+      if (!ORG_SLUG) { showDenied('Aucune organisation spécifiée dans l\'URL (?org=…)'); return; }
+
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) {
+        showDenied('Vous devez être connecté pour accéder à cet espace.');
+        return;
+      }
+      currentUser = session.user;
+
+      // Charge l'organisation
+      const { data: orgData } = await sb.from('organisations').select('*').eq('slug', ORG_SLUG).single();
+      if (!orgData) { showDenied('Organisation « ' + ORG_SLUG + ' » introuvable.'); return; }
+      org = orgData;
+      applyBranding(org);
+
+      // Vérifie l'accès admin
+      const { data: member } = await sb.from('org_membres')
+        .select('*').eq('org_id', org.id).eq('user_id', currentUser.id).single();
+
+      // Fallback : super-admin GM (is_admin via membres)
+      let isSuperAdmin = false;
+      if (!member) {
+        const { data: gmMembre } = await sb.from('membres')
+          .select('is_admin').eq('user_id', currentUser.id).single();
+        isSuperAdmin = !!gmMembre?.is_admin;
+      }
+
+      if (!member && !isSuperAdmin) {
+        showDenied();
+        return;
+      }
+      currentMember = member;
+
+      $('admin-wrap').style.display = 'block';
+      await loadCampagne();
+      await loadEquipe();
+    }
+
+    function showDenied(msg) {
+      const d = $('access-denied');
+      d.style.display = 'block';
+      if (msg) d.querySelector('p').textContent = msg;
+    }
+
+    function applyBranding(o) {
+      document.documentElement.style.setProperty('--org-c1', o.couleur);
+      document.documentElement.style.setProperty('--org-c2', o.couleur2);
+      document.documentElement.style.setProperty('--org-grad', `linear-gradient(135deg,${o.couleur},${o.couleur2})`);
+      document.documentElement.style.setProperty('--org-bg',   o.couleur + '18');
+      document.documentElement.style.setProperty('--org-line', o.couleur + '55');
+      document.title = 'Admin — ' + o.nom;
+      $('org-topbar-name').textContent = o.nom;
+      $('header-org-name').textContent = o.nom;
+      $('camp-section-title').textContent = o.emoji + ' ' + o.nom;
+      $('org-front-link').href = 'mobilisation-org.html?org=' + ORG_SLUG;
+      // Topbar org-specific gradient
+      $('org-topbar').style.background = `linear-gradient(135deg,${o.couleur},${o.couleur2})`;
+    }
+
+    // ── TABS ─────────────────────────────────────────────────────────────────
+    window.showTab = function(tab) {
+      ['campagne','declarations','equipe'].forEach(t => {
+        $('panel-' + t).style.display = t === tab ? 'block' : 'none';
+        $('tab-' + t).classList.toggle('active', t === tab);
+      });
+    };
+
+    // ── CAMPAGNE ─────────────────────────────────────────────────────────────
+    async function loadCampagne() {
+      $('camp-loading').style.display = 'block';
+      $('camp-content').style.display = 'none';
+      $('camp-actions').style.visibility = 'hidden';
+
+      const { data: camps, error } = await sb.from('greve_campagnes')
+        .select('*').eq('org_id', org.id).order('created_at', { ascending: false });
+
+      if (error) {
+        $('camp-loading').innerHTML = '<span style="color:#dc2626">Erreur : ' + esc(error.message) + '</span>';
+        return;
+      }
+      allCampagnes = camps || [];
+
+      if (!allCampagnes.length) {
+        $('camp-loading').innerHTML = 'Aucune campagne. <button class="g-btn g-btn-primary" style="margin-top:12px" onclick="campReset(true)">Créer la première campagne</button>';
+        return;
+      }
+
+      const defaultCamp = allCampagnes.find(c => c.actif && !c.archived)
+        || allCampagnes.find(c => !c.archived)
+        || allCampagnes[0];
+      await switchCampagne(defaultCamp.id, true);
+
+      $('camp-loading').style.display = 'none';
+      $('camp-content').style.display = 'block';
+      $('camp-actions').style.visibility = 'visible';
+    }
+
+    window.switchCampagne = async function(id, skipRender) {
+      if (id === viewingId && !skipRender) return;
+      viewingId = id;
+      const { data: full } = await sb.from('greve_campagnes').select('*').eq('id', id).single();
+      campagne = full;
+      const { data: d } = await sb.from('greve_declarations')
+        .select('*').eq('campagne_id', id).order('created_at', { ascending: false });
+      decls = d || [];
+      renderSwitcher();
+      fillForm();
+      renderStats();
+      renderDeclarations();
+      updateEditMode();
+      if ($('history-overlay').style.display === 'block') renderHistList();
+    };
+
+    function renderSwitcher() {
+      const current  = allCampagnes.filter(c => !c.archived);
+      const archived = allCampagnes.filter(c => c.archived);
+      const hb = $('hist-count-badge');
+      if (hb) hb.textContent = archived.length ? `(${archived.length})` : '';
+
+      const wrap = $('camp-timeline-wrap');
+      if (current.length > 1) {
+        wrap.style.display = 'block';
+        $('camp-timeline').innerHTML = current.map(c => {
+          const v = c.id === viewingId;
+          return `<div class="camp-chip${v ? ' viewing' : ''}" onclick="switchCampagne('${c.id}')">
+            <div class="camp-chip-badge ${c.actif ? 'open' : 'closed'}">${c.actif ? '● Ouverte' : '⏸ Fermée'}</div>
+            <div class="camp-chip-count">${(c.declaration_count||0).toLocaleString('fr-FR')}</div>
+            <div class="camp-chip-title">${esc(c.titre)}</div>
+            ${c.date_debut ? `<div class="camp-chip-meta">${fmtDate(c.date_debut)}${c.date_fin ? ' → '+fmtDate(c.date_fin) : ''}</div>` : ''}
+          </div>`;
+        }).join('');
+      } else {
+        wrap.style.display = 'none';
+      }
+
+      const archBar = $('camp-archive-bar');
+      const viewing = allCampagnes.find(c => c.id === viewingId);
+      if (viewing?.archived) {
+        archBar.style.display = 'flex';
+        $('camp-archive-name').textContent = '« ' + viewing.titre + ' »';
+      } else {
+        archBar.style.display = 'none';
+      }
+    }
+
+    function updateEditMode() {
+      const readonly = !!campagne.archived;
+      const rb = $('camp-readonly-badge');
+      rb.style.display = readonly ? 'flex' : 'none';
+      $('camp-heading').textContent = readonly ? 'Campagne archivée' : 'Campagne en cours';
+      const saveBtn = $('camp-actions').querySelector('.g-btn-primary');
+      if (saveBtn) saveBtn.style.display = readonly ? 'none' : '';
+      const archBtn = $('camp-archive-btn');
+      if (archBtn) archBtn.style.display = readonly ? 'none' : '';
+      ['c-titre','c-accroche','c-debut','c-fin','c-objectif'].forEach(id => {
+        const el = $(id); if (!el) return;
+        el.readOnly = readonly;
+        el.disabled = (el.tagName === 'INPUT' && el.type === 'number') ? readonly : false;
+        el.style.opacity = readonly ? '.6' : '';
+        el.style.pointerEvents = readonly ? 'none' : '';
+      });
+      $('c-actif').disabled = readonly;
+      document.querySelectorAll('.g-edit-only').forEach(el => el.style.display = readonly ? 'none' : '');
+    }
+
+    function fillForm() {
+      $('c-titre').value    = campagne.titre || '';
+      $('c-accroche').value = campagne.accroche || '';
+      $('c-debut').value    = campagne.date_debut || '';
+      $('c-fin').value      = campagne.date_fin || '';
+      $('c-objectif').value = campagne.objectif || 0;
+      const actif = $('c-actif');
+      actif.checked = !!campagne.actif;
+      updateToggleLabels(actif.checked);
+      actif.onchange = () => updateToggleLabels(actif.checked);
+      renderMotifs(campagne.motifs || []);
+      renderLiens(campagne.liens || []);
+      renderFaq(campagne.faq || []);
+    }
+
+    function updateToggleLabels(on) {
+      $('lbl-open').classList.toggle('on', on);
+      $('lbl-open').classList.toggle('off', !on);
+      $('lbl-closed').classList.toggle('off', on);
+    }
+
+    function renderStats() {
+      const total = decls.length;
+      const obj   = campagne.objectif || 0;
+      $('gs-total').textContent   = total.toLocaleString('fr-FR');
+      $('gs-objectif').textContent = obj.toLocaleString('fr-FR');
+      $('gs-pct').textContent     = obj ? Math.round(total/obj*100)+'%' : '—';
+      $('gs-optin').textContent   = (campagne.optin_count || 0).toLocaleString('fr-FR');
+
+      const modes = {};
+      decls.forEach(d => { if (d.mode_exercice) modes[d.mode_exercice] = (modes[d.mode_exercice]||0)+1; });
+      const modeLabels = { liberal:'Libéral', salarie:'Salarié', mixte:'Mixte', hospitalier:'Hospitalier' };
+      $('gs-modes').innerHTML = Object.keys(modes).length
+        ? Object.entries(modes).sort((a,b)=>b[1]-a[1]).map(([k,v]) =>
+            `<div style="display:flex;justify-content:space-between"><span>${modeLabels[k]||k}</span><strong>${v}</strong></div>`).join('')
+        : '<span style="color:var(--muted)">Aucune donnée</span>';
+
+      const cps = {};
+      decls.forEach(d => { if (d.cp) cps[d.cp] = (cps[d.cp]||0)+1; });
+      $('gs-cp').innerHTML = Object.keys(cps).length
+        ? Object.entries(cps).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v]) =>
+            `<div style="display:flex;justify-content:space-between"><span>${esc(k)}</span><strong>${v}</strong></div>`).join('')
+        : '<span style="color:var(--muted)">Aucune donnée</span>';
+    }
+
+    function renderDeclarations() {
+      const total = decls.length;
+      $('decl-meta').textContent = total > 30
+        ? `30 premières sur ${total.toLocaleString('fr-FR')} — exportez pour tout voir`
+        : `${total} déclaration${total > 1 ? 's' : ''}`;
+      const recent = decls.slice(0, 30);
+      if (!recent.length) {
+        $('decl-table').innerHTML = '<span style="color:var(--muted)">Aucune déclaration pour cette campagne.</span>';
+        return;
+      }
+      $('decl-table').innerHTML = `
+        <table style="width:100%;border-collapse:collapse">
+          <tr style="text-align:left;color:var(--muted);font-size:.74rem;text-transform:uppercase;letter-spacing:.04em">
+            <th style="padding:6px 8px">Date</th>
+            <th style="padding:6px 8px">Réf</th>
+            <th style="padding:6px 8px">CP</th>
+            <th style="padding:6px 8px">Mode</th>
+          </tr>
+          ${recent.map(d => `<tr style="border-top:1px solid var(--line)">
+            <td style="padding:7px 8px">${new Date(d.created_at).toLocaleDateString('fr-FR')}</td>
+            <td style="padding:7px 8px;font-family:monospace;font-size:.78rem">${esc(d.ref)}</td>
+            <td style="padding:7px 8px">${esc(d.cp)||'—'}</td>
+            <td style="padding:7px 8px">${esc(d.mode_exercice)||'—'}</td>
+          </tr>`).join('')}
+        </table>`;
+    }
+
+    // Motifs / Liens / FAQ
+    function renderMotifs(motifs) {
+      $('c-motifs-list').innerHTML = motifs.map(m =>
+        `<div style="display:flex;gap:8px;align-items:center">
+          <input class="c-motif f-input" value="${esc(m.label||'')}" placeholder="Libellé du motif" style="flex:1">
+          <button onclick="this.closest('div').remove()" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem;padding:0 6px">✕</button>
+        </div>`).join('');
+    }
+    window.addMotif = function() {
+      const d = document.createElement('div');
+      d.innerHTML = `<div style="display:flex;gap:8px;align-items:center">
+        <input class="c-motif f-input" value="" placeholder="Libellé du motif" style="flex:1">
+        <button onclick="this.closest('div').remove()" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem;padding:0 6px">✕</button>
+      </div>`;
+      $('c-motifs-list').appendChild(d.firstElementChild);
+    };
+
+    function lienRow(label, url) {
+      return `<div style="display:flex;gap:8px;align-items:center">
+        <input class="c-lien-label f-input" value="${esc(label||'')}" placeholder="Titre" style="flex:1">
+        <input class="c-lien-url f-input" value="${esc(url||'')}" placeholder="https://…" style="flex:2">
+        <button onclick="this.closest('div').remove()" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem;padding:0 6px">✕</button>
+      </div>`;
+    }
+    function renderLiens(liens) { $('c-liens-list').innerHTML = liens.map(l => lienRow(l.label,l.url)).join(''); }
+    window.addLien = function() {
+      const d = document.createElement('div'); d.innerHTML = lienRow('','');
+      $('c-liens-list').appendChild(d.firstElementChild);
+    };
+
+    function faqRow(q, r) {
+      return `<div style="border:1px solid var(--line);border-radius:8px;padding:10px;position:relative">
+        <input class="c-faq-q f-input" value="${esc(q||'')}" placeholder="Question" style="margin-bottom:6px;font-weight:600">
+        <textarea class="c-faq-r f-textarea" rows="2" placeholder="Réponse">${esc(r||'')}</textarea>
+        <button onclick="this.closest('div').remove()" style="position:absolute;top:8px;right:8px;background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem">✕</button>
+      </div>`;
+    }
+    function renderFaq(faq) { $('c-faq-list').innerHTML = faq.map(f => faqRow(f.q,f.r)).join(''); }
+    window.addFaq = function() {
+      const d = document.createElement('div'); d.innerHTML = faqRow('','');
+      $('c-faq-list').appendChild(d.firstElementChild);
+    };
+
+    // Sauvegarde
+    window.campSave = async function() {
+      const motifs = Array.from(document.querySelectorAll('.c-motif'))
+        .map(el => el.value.trim()).filter(Boolean).map(l => ({ id:slugify(l), label:l }));
+      const liens = Array.from(document.querySelectorAll('#c-liens-list > div')).map(row => ({
+        label: row.querySelector('.c-lien-label').value.trim(),
+        url:   row.querySelector('.c-lien-url').value.trim(),
+      })).filter(l => l.label && l.url);
+      const faq = Array.from(document.querySelectorAll('#c-faq-list > div')).map(row => ({
+        q: row.querySelector('.c-faq-q').value.trim(),
+        r: row.querySelector('.c-faq-r').value.trim(),
+      })).filter(f => f.q && f.r);
+      const payload = {
+        titre:      $('c-titre').value.trim(),
+        accroche:   $('c-accroche').value.trim(),
+        date_debut: $('c-debut').value || null,
+        date_fin:   $('c-fin').value || null,
+        objectif:   parseInt($('c-objectif').value, 10) || 0,
+        actif:      $('c-actif').checked,
+        motifs, liens, faq,
+        archived: false,
+        org_id: org.id,
+      };
+      const { error } = await sb.from('greve_campagnes').update(payload).eq('id', campagne.id);
+      if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+      toast('✓ Campagne enregistrée');
+      await loadCampagne();
+    };
+
+    window.campArchiveCurrent = async function() {
+      if (!campagne || campagne.archived) return;
+      if (!confirm(`Archiver « ${campagne.titre} » ?\n\nElle passera en lecture seule dans l'historique.`)) return;
+      const { error } = await sb.from('greve_campagnes')
+        .update({ actif:false, archived:true }).eq('id', campagne.id);
+      if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+      toast('✓ Campagne archivée');
+      await loadCampagne();
+    };
+
+    window.campExportCsv = function() {
+      if (!decls.length) { toast('Aucune déclaration à exporter', 'error'); return; }
+      const name = (campagne.titre||'campagne').replace(/[^a-z0-9]/gi,'-').toLowerCase().slice(0,30);
+      const rows = [['ref','cp','mode_exercice','date'].join(',')]
+        .concat(decls.map(d => [d.ref,d.cp||'',d.mode_exercice||'',d.created_at.slice(0,10)]
+          .map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')));
+      const blob = new Blob([rows.join('\n')], { type:'text/csv;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = `${ORG_SLUG}-${name}-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+      toast(`✓ ${decls.length} déclarations exportées`);
+    };
+
+    window.campReset = async function(firstOne) {
+      const current = allCampagnes.find(c => !c.archived);
+      if (!firstOne) {
+        const msg = current
+          ? `Archiver « ${current.titre} » (${(current.declaration_count||0).toLocaleString('fr-FR')} déclarations) et créer une nouvelle campagne ?`
+          : 'Créer une nouvelle campagne ?';
+        if (!confirm(msg)) return;
+      }
+      if (current) await sb.from('greve_campagnes').update({ actif:false, archived:true }).eq('id', current.id);
+      const base = campagne || {};
+      const { data, error } = await sb.from('greve_campagnes').insert({
+        titre:    base.titre || 'Nouvelle mobilisation',
+        accroche: base.accroche || '',
+        objectif: base.objectif || 1000,
+        motifs:   base.motifs || [],
+        faq:      base.faq || [],
+        liens:    base.liens || [],
+        actif:    false,
+        org_id:   org.id,
+      }).select().single();
+      if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+      toast('✓ Nouvelle campagne créée (fermée)');
+      await loadCampagne();
+      if (data?.id) await switchCampagne(data.id, true);
+    };
+
+    window.campBackToActive = async function() {
+      const c = allCampagnes.find(c => c.actif && !c.archived) || allCampagnes.find(c => !c.archived);
+      if (c) await switchCampagne(c.id);
+    };
+
+    // Historique overlay
+    window.openHistory = function() { renderHistList(); $('history-overlay').style.display = 'block'; };
+    window.closeHistory = function() { $('history-overlay').style.display = 'none'; };
+    function renderHistList() {
+      const archived = allCampagnes.filter(c => c.archived);
+      $('hist-sub').textContent = archived.length
+        ? `${archived.length} campagne${archived.length > 1 ? 's' : ''} archivée${archived.length > 1 ? 's' : ''}`
+        : 'Aucune campagne archivée.';
+      $('hist-list').innerHTML = archived.length
+        ? archived.map(c => {
+            const v = c.id === viewingId;
+            return `<div class="hist-row${v ? ' viewing' : ''}" onclick="viewArchive('${c.id}')">
+              <div class="hist-count">${(c.declaration_count||0).toLocaleString('fr-FR')}</div>
+              <div class="hist-info">
+                <div class="hist-title">${esc(c.titre)}</div>
+                <div class="hist-meta">${fmtDate(c.date_debut)||''}${c.date_fin ? ' → '+fmtDate(c.date_fin) : ''}</div>
+              </div>
+              <div class="hist-badge">📁 Archivée</div>
+            </div>`;
+          }).join('')
+        : '<div style="text-align:center;padding:32px;color:var(--muted);font-size:.88rem">Aucune campagne archivée.</div>';
+    }
+    window.viewArchive = async function(id) {
+      closeHistory();
+      await switchCampagne(id);
+    };
+
+    // ── ÉQUIPE ────────────────────────────────────────────────────────────────
+    async function loadEquipe() {
+      const { data } = await sb.from('org_membres')
+        .select('*, user:user_id(email)')
+        .eq('org_id', org.id)
+        .order('created_at');
+      equipe = data || [];
+      renderEquipe();
+    }
+
+    function renderEquipe() {
+      if (!equipe.length) {
+        $('equipe-list').innerHTML = '<span style="color:var(--muted);font-size:.88rem">Aucun membre pour le moment. Invitez quelqu\'un ci-dessous.</span>';
+        return;
+      }
+      $('equipe-list').innerHTML = equipe.map(m => {
+        const email = m.user?.email || m.email || '—';
+        const initials = email.slice(0,2).toUpperCase();
+        const isSelf = m.user_id === currentUser?.id;
+        return `<div class="deleg-row">
+          <div class="deleg-avatar">${initials}</div>
+          <div class="deleg-info">
+            <div class="deleg-name">${esc(email)}${isSelf ? ' <span style="font-size:.72rem;color:var(--muted)">(vous)</span>' : ''}</div>
+            <div class="deleg-role">${m.accepted_at ? 'Accès accepté le ' + fmtDate(m.accepted_at) : 'Invitation en attente'}</div>
+          </div>
+          <span class="role-badge ${m.role}">${m.role === 'admin' ? 'Administrateur' : 'Lecteur'}</span>
+          <div class="deleg-actions">
+            ${m.role === 'admin' && !isSelf ? `<button class="btn-sm btn-sm-outline" onclick="toggleRole('${m.id}','viewer')">→ Lecteur</button>` : ''}
+            ${m.role === 'viewer' ? `<button class="btn-sm btn-sm-outline" onclick="toggleRole('${m.id}','admin')">→ Admin</button>` : ''}
+            ${!isSelf ? `<button class="btn-sm btn-sm-danger" onclick="removeMembre('${m.id}')">Révoquer</button>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    window.toggleRole = async function(id, newRole) {
+      const { error } = await sb.from('org_membres').update({ role: newRole }).eq('id', id);
+      if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+      toast(`✓ Rôle modifié → ${newRole}`);
+      await loadEquipe();
+    };
+
+    window.removeMembre = async function(id) {
+      if (!confirm('Révoquer cet accès ?')) return;
+      const { error } = await sb.from('org_membres').delete().eq('id', id);
+      if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+      toast('✓ Accès révoqué');
+      await loadEquipe();
+    };
+
+    window.inviteMembre = async function() {
+      const email = $('invite-email').value.trim().toLowerCase();
+      const role  = $('invite-role').value;
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        toast('Email invalide', 'error'); return;
+      }
+      // Génère un token d'invitation
+      const token = crypto.randomUUID();
+      const { error } = await sb.from('org_membres').insert({
+        org_id: org.id,
+        email,
+        role,
+        invite_token: token,
+      });
+      if (error && error.code !== '23505') { toast('Erreur : ' + error.message, 'error'); return; }
+      if (error?.code === '23505') { toast('Cette personne est déjà dans l\'équipe', 'error'); return; }
+
+      // Envoi de l'invitation via Netlify function
+      await fetch('/.netlify/functions/inviter-org-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, orgNom: org.nom, role, token, orgSlug: ORG_SLUG }),
+      }).catch(() => {});
+
+      toast(`✓ Invitation envoyée à ${email}`);
+      $('invite-email').value = '';
+      await loadEquipe();
+    };
+
+    init();
+  })();
+  </script>
+  <script src="auth-header.js"></script>
+</body>
+</html>
