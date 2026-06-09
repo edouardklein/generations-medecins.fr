@@ -1,14 +1,53 @@
 <style>
   :root {
-    --blue: #326aa2;
-    --blue-dark: #17365f;
-    --teal: #58aab3;
-    --green: #89c86a;
-    --ink: #152033;
-    --muted: #536173;
-    --line: #dce8eb;
-    --surface: #f3fafa;
-    --white: #ffffff;
+    --neutral-darkest: #060606;
+    --neutral-darker: #161616;
+    --neutral-dark: #2E2E2E;
+    --neutral: #555555;
+    --neutral-light: #868686;
+    --neutral-lighter: #BEBEBE;
+    --neutral-lightest: #EEEEEE;
+
+    --primary-darkest: #152D40;
+    --primary-darker: #1D486B;
+    --primary-dark: #236598;
+    --primary: #2884C8;
+    --primary-light: #64A0D3;
+    --primary-lighter: #95BCDE;
+    --primary-lightest: #C5D7E7;
+
+    --accent-darkest: #2C4332;
+    --accent-darker: #3B5D45;
+    --accent-dark: #4C7958;
+    --accent: #5C956C;
+    --accent-light: #6DB381;
+    --accent-lighter: #7FD297;
+    --accent-lightest: #D7E8DB;
+
+    --success-darkest: #314B36;
+    --success-darker: #4E7E58;
+    --success-dark: #6EB67D;
+    --success: #8FF0A4;
+    --success-light: #ABF0B8;
+    --success-lighter: #C4F0CB;
+    --success-lightest: #DBEFDE;
+
+    --warning-darkest: #4E4B28;
+    --warning-darker: #837E3E;
+    --warning-dark: #BCB654;
+    --warning: #F9F06B;
+    --warning-light: #F6F095;
+    --warning-lighter: #F3F0B7;
+    --warning-lightest: #F0EFD6;
+
+    --failure-darkest: #4E241E;
+    --failure-darker: #83382F;
+    --failure-dark: #BB4C40;
+    --failure: #F66151;
+    --failure-light: #F98A7B;
+    --failure-lighter: #F9AFA3;
+    --failure-lightest: #F5D1CC;
+
     --max: 1080px;
   }
 
@@ -18,10 +57,10 @@
 
   body {
     margin: 0;
-    color: var(--ink);
+    color: var(--neutral-darkest);
     background:
-      linear-gradient(180deg, rgba(243, 250, 250, 0.96), rgba(255, 255, 255, 1) 420px),
-      var(--white);
+      linear-gradient(180deg, color-mix(in srgb, var(--neutral-lightest) 96%, transparent), var(--neutral-lightest) 420px),
+      var(--neutral-lightest);
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-size: 17px;
     line-height: 1.65;
@@ -34,7 +73,7 @@
 
   h1, h2 {
     margin: 0;
-    color: var(--blue-dark);
+    color: var(--primary-darkest);
     line-height: 1.08;
     letter-spacing: 0;
   }
@@ -43,13 +82,13 @@
 
   h2 { font-size: clamp(1.75rem, 3vw, 2.45rem); }
 
-  strong { color: var(--ink); font-weight: 800; }
+  strong { color: var(--neutral-darkest); font-weight: 800; }
 
   blockquote {
     margin: 26px 0 0 0;
     padding-left: 20px;
-    border-left: 5px solid var(--green);
-    color: var(--blue-dark);
+    border-left: 5px solid var(--accent);
+    color: var(--primary-darkest);
     font-size: clamp(1.18rem, 2.2vw, 1.55rem);
     font-weight: 800;
     line-height: 1.35;
@@ -68,9 +107,9 @@
   main li {
     position: relative;
     padding: 18px 18px 18px 52px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--neutral-lighter);
     border-radius: 8px;
-    background: var(--white);
+    background: var(--neutral-lightest);
   }
 
   main li::before {
@@ -81,7 +120,7 @@
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--teal), var(--green));
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
   }
 
   .site-header {
@@ -101,7 +140,7 @@
     gap: 14px;
     text-decoration: none;
     font-weight: 800;
-    color: var(--blue-dark);
+    color: var(--primary-darkest);
     letter-spacing: 0;
   }
 
@@ -132,7 +171,7 @@
     display: inline-flex;
     align-items: center;
     text-decoration: none;
-    color: var(--blue-dark);
+    color: var(--primary-darkest);
     font-weight: 700;
     font-size: 0.95rem;
     padding: 10px 12px;
@@ -141,7 +180,7 @@
   }
 
   .nav a:hover {
-    background: var(--surface);
+    background: var(--primary-lightest);
   }
 
   .nav li.has-submenu > a {
@@ -159,7 +198,7 @@
     height: 0;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
-    border-top: 4px solid var(--blue-dark);
+    border-top: 4px solid var(--primary-darkest);
   }
 
   .submenu {
@@ -167,14 +206,14 @@
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
-    background: var(--white);
-    border: 1px solid var(--line);
+    background: var(--neutral-lightest);
+    border: 1px solid var(--neutral-lighter);
     border-radius: 8px;
     padding: 8px 0;
     min-width: 220px;
     list-style: none;
     margin: 0;
-    box-shadow: 0 8px 24px rgba(23, 54, 95, 0.08);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--primary-darkest) 8%, transparent);
     z-index: 10;
   }
 
@@ -193,12 +232,12 @@
     font-weight: 600;
     font-size: 0.95rem;
     border-radius: 0;
-    color: var(--ink);
+    color: var(--neutral-darkest);
   }
 
   .submenu a:hover {
-    background: var(--surface);
-    color: var(--blue-dark);
+    background: var(--primary-lightest);
+    color: var(--primary-darkest);
   }
 
   main {
@@ -210,7 +249,7 @@
     width: min(100% - 40px, var(--max));
     margin: 0 auto;
     padding: 28px 0 42px;
-    color: var(--muted);
+    color: var(--neutral-light);
     font-size: 0.95rem;
     text-align: center;
     display: flex;
@@ -220,7 +259,7 @@
   }
 
   .site-footer a {
-    color: var(--blue);
+    color: var(--primary);
     text-decoration: none;
     font-weight: 700;
   }

@@ -6,12 +6,12 @@
     grid-template-columns: minmax(0, 1fr) minmax(260px, 390px);
     gap: clamp(32px, 6vw, 72px);
     align-items: center;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--neutral-lighter);
   }
 
   .hero-text > p:first-child {
     margin: 0 0 16px;
-    color: var(--blue);
+    color: var(--primary);
     font-size: 0.8rem;
     font-weight: 800;
     letter-spacing: 0.12em;
@@ -20,7 +20,7 @@
 
   .hero-text > p:nth-of-type(2) {
     margin: 18px 0 0;
-    color: var(--teal);
+    color: var(--primary-light);
     font-size: clamp(1.4rem, 3vw, 2.15rem);
     font-weight: 800;
     line-height: 1.18;
@@ -29,7 +29,7 @@
   .hero-text > p:nth-of-type(3) {
     max-width: 42rem;
     margin: 22px 0 0;
-    color: var(--muted);
+    color: var(--neutral-light);
     font-size: clamp(1.05rem, 2vw, 1.25rem);
   }
 
@@ -44,8 +44,8 @@
     justify-self: center;
     width: min(100%, 360px);
     border-radius: 42px;
-    background: var(--white);
-    box-shadow: 0 24px 70px rgba(23, 54, 95, 0.12);
+    background: var(--neutral-lightest);
+    box-shadow: 0 24px 70px color-mix(in srgb, var(--primary-darkest) 12%, transparent);
   }
 
   .hero-text a,
@@ -63,20 +63,20 @@
 
   .hero-text a:first-of-type,
   .closing a {
-    color: var(--white);
-    background: var(--blue);
-    box-shadow: 0 14px 34px rgba(50, 106, 162, 0.22);
+    color: var(--neutral-lightest);
+    background: var(--primary);
+    box-shadow: 0 14px 34px color-mix(in srgb, var(--primary) 22%, transparent);
   }
 
   .hero-text a:last-of-type {
-    color: var(--blue-dark);
-    border: 1px solid rgba(50, 106, 162, 0.24);
-    background: rgba(255, 255, 255, 0.82);
+    color: var(--primary-darkest);
+    border: 1px solid color-mix(in srgb, var(--primary) 24%, transparent);
+    background: color-mix(in srgb, var(--neutral-lightest) 82%, transparent);
   }
 
   main > section:not(.hero):not(.closing) {
     padding: clamp(56px, 8vw, 92px) 0;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--neutral-lighter);
   }
 
   .section-grid {
@@ -107,13 +107,13 @@
   .closing p {
     max-width: 42rem;
     margin: 18px auto 0;
-    color: var(--muted);
+    color: var(--neutral-light);
     font-size: clamp(1.08rem, 2vw, 1.22rem);
   }
 
   .closing > p:last-of-type {
     margin-top: 22px;
-    color: var(--muted);
+    color: var(--neutral-light);
     font-size: 1rem;
     scroll-margin-top: 24px;
   }
@@ -121,7 +121,7 @@
   .email-obfuscated {
     unicode-bidi: bidi-override;
     direction: rtl;
-    color: var(--blue-dark);
+    color: var(--primary-darkest);
     font-weight: 800;
     white-space: nowrap;
   }
