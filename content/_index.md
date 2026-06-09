@@ -3,23 +3,21 @@ title: "Générations Médecins Île-de-France"
 ---
 
 <section class="hero">
-<div class="hero-text">
-
-Île-de-France
-
-# Générations Médecins
-
-**Redonner une voix aux médecins**
-
-Un syndicat **indépendant, démocratique et opérationnel**.
-
-[Adhérer](https://skezia.skezi.eu/cohorts/11e799a9-71bc-494a-9b61-398d9e1a33a5/cc0350b3-03af-485a-9eff-97074f163f36/public)
-[Découvrir nos actions](#actions)
-
-</div>
-
-![Logo Générations Médecins](logoGM.jpeg)
-
+  <div class="hero-brand">
+    {{< inline-svg "static/logoGM-dense.svg" >}}
+    <div class="hero-brand-text">
+      <span class="brand-text-primary">Générations</span>
+      <span class="brand-text-accent">Médecins</span>
+    </div>
+  </div>
+  <div class="hero-body">
+    <p class="hero-subtitle">Redonner une voix aux médecins</p>
+    <p class="hero-description">Un syndicat <strong>indépendant, démocratique et opérationnel</strong>.</p>
+    <p class="hero-actions">
+      <a href="https://skezia.skezi.eu/cohorts/11e799a9-71bc-494a-9b61-398d9e1a33a5/cc0350b3-03af-485a-9eff-97074f163f36/public">Adhérer</a>
+      <a href="#actions">Découvrir nos actions</a>
+    </p>
+  </div>
 </section>
 
 ## Pourquoi nous existons
