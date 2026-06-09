@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     branches:
-      - master
+      - '**'
 
 jobs:
   deploy:
@@ -37,5 +37,5 @@ jobs:
           git remote add deploy "git@deploy:${DEPLOY_REPO}" 2>/dev/null || \
             git remote set-url deploy "git@deploy:${DEPLOY_REPO}"
 
-      - name: Push to deploy
-        run: git push deploy master:deploy --force
+      - name: Push to server
+        run: git push deploy HEAD:${GITHUB_REF_NAME} --force
