@@ -1,0 +1,4 @@
+{{ $svg := readFile (.Get 0) }}
+{{ $svg = replace $svg "%PRIMARY-DARK%" "var(--primary-dark)" }}
+{{ $svg = replace $svg "%ACCENT-LIGHTER%" "var(--accent-lighter)" }}
+{{ $svg | safeHTML }}
