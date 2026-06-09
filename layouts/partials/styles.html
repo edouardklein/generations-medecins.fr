@@ -226,6 +226,17 @@
     z-index: 10;
   }
 
+  /* Hover bridge: fills the gap between the nav item and the submenu
+     so the mouse doesn't lose hover while crossing. See AGENTS.md. */
+  .submenu::before {
+    content: "";
+    position: absolute;
+    top: -4px;
+    left: 0;
+    right: 0;
+    height: 4px;
+  }
+
   .nav li.has-submenu:hover > .submenu,
   .nav li.has-submenu:focus-within > .submenu {
     display: block;
