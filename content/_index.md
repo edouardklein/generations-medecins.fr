@@ -1,5 +1,5 @@
 ---
-title: "Générations Médecins Île-de-France"
+title: "Générations Médecins"
 ---
 
 <section class="hero">

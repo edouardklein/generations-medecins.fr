@@ -1,6 +1,6 @@
 baseURL = 'https://generations-medecins.fr'
 locale = 'fr_FR'
-title = 'Générations Médecins Île-de-France'
+title = 'Générations Médecins'
 disableKinds = ['taxonomy', 'term', 'RSS']
 
 [params]

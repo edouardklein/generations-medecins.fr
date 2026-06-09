@@ -5,7 +5,7 @@ type: legal
 
 ## Éditeur du site
 
-Ce site est édité et opéré par **Générations Médecins Île-de-France**.
+Ce site est édité et opéré par **Générations Médecins**.
 
 ## Hébergement
 
