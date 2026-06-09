@@ -981,7 +981,7 @@
     // ── ÉQUIPE ────────────────────────────────────────────────────────────────
     async function loadEquipe() {
       const { data } = await sb.from('org_membres')
-        .select('*, user:user_id(email)')
+        .select('*')
         .eq('org_id', org.id)
         .order('created_at');
       equipe = data || [];

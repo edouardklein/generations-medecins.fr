@@ -3685,7 +3685,7 @@
 
     // Équipes par org
     const { data: membres } = await sb.from('org_membres')
-      .select('*, user:user_id(email)');
+      .select('*');
     ecoTeamMap = {};
     (membres || []).forEach(m => {
       (ecoTeamMap[m.org_id] = ecoTeamMap[m.org_id] || []).push(m);
