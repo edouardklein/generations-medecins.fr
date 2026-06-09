@@ -8,5 +8,5 @@ type: bureau
 ![Alexis BOURLA, Président](/bourla.png)
 ## Louise-Anne KLEIN
 **Vice-présidente Communication et Réseaux Sociaux**
-# Minh-Hanh TA 
+## Minh-Hanh TA 
 **Secrétaire**
