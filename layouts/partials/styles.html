@@ -288,6 +288,18 @@
     text-decoration: underline;
   }
 
+  /* Touch devices: hover-based dropdowns are unusable. Remove the submenu
+     entirely; clicking the parent nav item navigates to the section page.
+     See AGENTS.md. */
+  @media (hover: none) {
+    .nav li.has-submenu > a::after {
+      content: none;
+    }
+    .nav li.has-submenu > .submenu {
+      display: none !important;
+    }
+  }
+
   @media (max-width: 760px) {
     body { font-size: 16px; }
 
