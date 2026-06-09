@@ -20,6 +20,8 @@ title: "Générations Médecins Île-de-France"
   </div>
 </section>
 
+## Some new section
+bla bla bla
 ## Pourquoi nous existons
 
 Un syndicat n'a de sens que s'il représente réellement ses membres.
