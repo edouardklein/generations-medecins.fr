@@ -4,7 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mobilisation Santé</title>
-  <meta name="description" content="Déclarez votre participation à la mobilisation des pharmaciens d'officine.">
+  <meta name="description" id="page-desc" content="Déclarez votre participation au mouvement de mobilisation des professionnels de santé.">
+  <meta property="og:title" id="og-title" content="Mobilisation Santé — Générations Médecins">
+  <meta property="og:description" id="og-desc" content="Rejoignez le mouvement et déclarez votre participation.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="logoGM.jpeg">
+  <meta name="twitter:card" content="summary">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
@@ -336,7 +341,18 @@
       if ($('counter-label'))    $('counter-label').textContent  = (o.profession || 'professionnels') + ' mobilisés';
       if ($('confirm-emoji'))    $('confirm-emoji').textContent  = o.emoji;
       if ($('btn-submit'))       $('btn-submit').textContent     = (o.emoji || '✊') + ' Je déclare ma participation';
+      // Meta SEO + Open Graph
+      const desc = o.description || ('Déclarez votre participation au mouvement ' + o.nom + '.');
       document.title = o.nom + ' — Mobilisation Santé';
+      const metaDesc = document.getElementById('page-desc'); if (metaDesc) metaDesc.content = desc;
+      const ogTitle  = document.getElementById('og-title');  if (ogTitle) ogTitle.content  = o.nom + ' — Mobilisation Santé';
+      const ogDesc   = document.getElementById('og-desc');   if (ogDesc)  ogDesc.content   = desc;
+      // Lien "Mon espace" → espace-org.html pour les professions non-médecins
+      const espaceLink = document.querySelector('nav a[href="espace-membre.html"]');
+      if (espaceLink && ORG_SLUG !== 'medecins') {
+        espaceLink.href = 'espace-org.html?org=' + ORG_SLUG;
+        espaceLink.textContent = 'Ma participation';
+      }
     }
 
     function renderCounter(count) {

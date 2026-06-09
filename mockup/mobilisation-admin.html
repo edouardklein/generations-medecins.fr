@@ -645,7 +645,34 @@
       allCampagnes = camps || [];
 
       if (!allCampagnes.length) {
-        $('camp-loading').innerHTML = 'Aucune campagne. <button class="g-btn g-btn-primary" style="margin-top:12px" onclick="campReset(true)">Créer la première campagne</button>';
+        $('camp-loading').innerHTML = `
+          <div style="max-width:560px;margin:0 auto;text-align:center;padding:32px 24px">
+            <div style="font-size:3rem;margin-bottom:16px">${org.emoji || '✊'}</div>
+            <h3 style="font-size:1.2rem;font-weight:900;color:var(--ink);margin-bottom:8px">Bienvenue sur ${esc(org.nom)}</h3>
+            <p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:28px">
+              Votre espace admin est prêt. Pour commencer à collecter des participations,<br>créez votre première campagne de mobilisation.
+            </p>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;text-align:left">
+              <div style="background:var(--org-bg,#eff6ff);border:1.5px solid var(--org-line,#bfdbfe);border-radius:12px;padding:14px 16px">
+                <div style="font-size:1.4rem;margin-bottom:6px">📋</div>
+                <div style="font-size:.82rem;font-weight:800;color:var(--ink);margin-bottom:3px">1. Créer la campagne</div>
+                <div style="font-size:.76rem;color:var(--muted);line-height:1.4">Titre, dates, objectif</div>
+              </div>
+              <div style="background:#f8fafc;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px">
+                <div style="font-size:1.4rem;margin-bottom:6px">🔓</div>
+                <div style="font-size:.82rem;font-weight:800;color:var(--ink);margin-bottom:3px">2. Ouvrir</div>
+                <div style="font-size:.76rem;color:var(--muted);line-height:1.4">Activer les déclarations</div>
+              </div>
+              <div style="background:#f8fafc;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px">
+                <div style="font-size:1.4rem;margin-bottom:6px">📢</div>
+                <div style="font-size:.82rem;font-weight:800;color:var(--ink);margin-bottom:3px">3. Mobiliser</div>
+                <div style="font-size:.76rem;color:var(--muted);line-height:1.4">Partager le lien public</div>
+              </div>
+            </div>
+            <button class="g-btn g-btn-primary" style="font-size:1rem;padding:14px 28px" onclick="campReset(true)">
+              Créer ma première campagne →
+            </button>
+          </div>`;
         return;
       }
 
@@ -914,7 +941,7 @@
         org_id:   org.id,
       }).select().single();
       if (error) { toast('Erreur : ' + error.message, 'error'); return; }
-      toast('✓ Nouvelle campagne créée (fermée)');
+      toast(firstOne ? '✓ Campagne créée — configurez-la puis activez-la !' : '✓ Nouvelle campagne créée (fermée)');
       await loadCampagne();
       if (data?.id) await switchCampagne(data.id, true);
     };
