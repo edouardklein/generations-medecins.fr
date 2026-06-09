@@ -1,0 +1,185 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110">
+  <style>
+    :root {
+      --neutral-darkest: #060606;
+      --neutral-darker: #161616;
+      --neutral-dark: #2E2E2E;
+      --neutral: #555555;
+      --neutral-light: #868686;
+      --neutral-lighter: #BEBEBE;
+      --neutral-lightest: #EEEEEE;
+
+      --primary-darkest: #152D40;
+      --primary-darker: #1D486B;
+      --primary-dark: #236598;
+      --primary: #2884C8;
+      --primary-light: #64A0D3;
+      --primary-lighter: #95BCDE;
+      --primary-lightest: #C5D7E7;
+
+      --accent-darkest: #2C4332;
+      --accent-darker: #3B5D45;
+      --accent-dark: #4C7958;
+      --accent: #5C956C;
+      --accent-light: #6DB381;
+      --accent-lighter: #7FD297;
+      --accent-lightest: #D7E8DB;
+
+      --success-darkest: #314B36;
+      --success-darker: #4E7E58;
+      --success-dark: #6EB67D;
+      --success: #8FF0A4;
+      --success-light: #ABF0B8;
+      --success-lighter: #C4F0CB;
+      --success-lightest: #DBEFDE;
+
+      --warning-darkest: #4E4B28;
+      --warning-darker: #837E3E;
+      --warning-dark: #BCB654;
+      --warning: #F9F06B;
+      --warning-light: #F6F095;
+      --warning-lighter: #F3F0B7;
+      --warning-lightest: #F0EFD6;
+
+      --failure-darkest: #4E241E;
+      --failure-darker: #83382F;
+      --failure-dark: #BB4C40;
+      --failure: #F66151;
+      --failure-light: #F98A7B;
+      --failure-lighter: #F9AFA3;
+      --failure-lightest: #F5D1CC;
+    }
+
+    .construction {
+      opacity: 0.0;
+      pointer-events: none;
+    }
+    .construction-point {
+      fill: var(--failure);
+    }
+    .construction-label {
+      font-size: 4px;
+      font-family: sans-serif;
+      fill: var(--failure);
+      text-anchor: start;
+    }
+    .construction-line {
+      stroke: var(--failure-light);
+      stroke-dasharray: 2 2;
+    }
+  </style>
+
+  <!-- Definitions: reusable gradients, patterns, etc. -->
+  <defs>
+    <!-- Gradient from primary (left) to accent (right), flat horizontal direction.
+         The primary color holds longer, then transitions faster to accent.
+         gradientUnits="userSpaceOnUse" makes it a global background-like gradient:
+         all elements share the same continuous color space instead of each
+         stretching the gradient to its own bounding box. -->
+    <linearGradient
+      id="gradientPrimaryAccent"
+      x1="0" y1="0" x2="100" y2="0"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop offset="20%" stop-color="var(--primary-dark)" />
+      <stop offset="80%" stop-color="var(--accent-lighter)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Ring: outer diameter fills the 100×100 viewBox, stroke is 1/5 of that diameter.
+       Dash/gap pattern: drawn 173°, gap 7°, drawn 140°, gap 30°, drawn 10°.
+       Circumference at centerline (r=40) = 2π×40 ≈ 251.33.
+       Arc length = angle × 2π × 40 / 360.
+       Values computed then tweaked by hand:
+       173° drawn ≈ 120.78
+       7°   gap   ≈ 4.89
+       140° drawn ≈ 97.74
+       30°  gap   ≈ 21.94
+       10°  drawn ≈ 5.98 -->
+  <circle
+    cx="50"
+    cy="50"
+    r="40"
+    fill="none"
+    stroke="url(#gradientPrimaryAccent)"
+    stroke-width="20"
+    stroke-dasharray="122.25 3.86 97.74 21.94 5.98"
+    stroke-dashoffset="0"
+  />
+
+  <!-- Filled shape bounded by the two Bezier curves, using the same gradient as the ring -->
+  <path
+    d="M 100 50 C 100 102.07, 50 108.07, 20 95 C 50 100, 50 100, 100 50"
+    fill="url(#gradientPrimaryAccent)"
+    stroke="none"
+  />
+
+  <!-- Patch: small wedge filling the gap between the ring's left edge
+       and the zigzag start. Hand-tweaked values kept as-is. -->
+  <path
+    d="M .2 54.4 L .2 52.5 L 20 52.5"
+    fill="url(#gradientPrimaryAccent)"
+    stroke="none"
+    stroke-width=".1"
+    stroke-linecap="butt"
+    stroke-linejoin="round"
+    opacity="1"
+  />
+
+  <!-- Zigzag path from left outer edge to the last gap endpoint.
+       Upper edge of the initial flat segment touches the patch top at y=52.5,
+       so the stroke centerline sits at y=54.5 (stroke-width=4).
+       X values computed so the diagonal slope magnitude is constant (~2.05).
+       Δx_i = Δy_i / k, where k = total Δy / total Δx = 88.5 / 43.1.
+       First summit: (32.1, 40). Valley: (41.8, 60). Second summit: (54.0, 35).
+       Down to (63.5, 54.5), then flat tail to (99.2, 45). -->
+  <path
+    d="M 0.5 54.5 L 25 54.5 L 32.1 40 L 41.8 60 L 54.0 35 L 63.5 54.5 L 68.1 45 L 99.5 45"
+    fill="none"
+    stroke="url(#gradientPrimaryAccent)"
+    stroke-width="4"
+    stroke-linecap="butt"
+    stroke-linejoin="round"
+    opacity="1"
+  />
+  <!-- Construction layer: drawn above all else, semi-transparent -->
+  <g class="construction">
+    <!-- Vertical line at the leftmost interior edge of the ring -->
+    <line x1="20" y1="0" x2="20" y2="100" class="construction-line" />
+
+    <!-- Control point C1: vertically aligned with A (x = 100). -->
+    <circle id="pt-C1" cx="100" cy="102.07" r="2" class="construction-point" />
+    <text x="103" y="103.07" class="construction-label">C1</text>
+
+    <!-- Control point C2: vertically aligned with old B (x = 50). -->
+    <circle id="pt-C2" cx="50" cy="108.07" r="2" class="construction-point" />
+    <text x="53" y="109.07" class="construction-label">C2</text>
+
+    <!-- Control point C3: on the return curve from B to A. -->
+    <circle id="pt-C3" cx="50" cy="100" r="2" class="construction-point" />
+    <text x="53" y="101" class="construction-label">C3</text>
+
+    <!-- Construction curve from A to B using C1 and C2. -->
+    <path
+      d="M 100 50 C 100 102.07, 50 108.07, 20 95"
+      fill="none"
+      class="construction-line"
+    />
+
+    <!-- Construction curve from B to A using a single control point C3. -->
+    <path
+      d="M 20 95 C 50 100, 50 100, 100 50"
+      fill="none"
+      class="construction-line"
+    />
+
+    <!-- Point A: on the horizontal midline, at the outer edge. -->
+    <circle id="pt-A" cx="100" cy="50" r="2" class="construction-point" />
+    <text x="103" y="51" class="construction-label">A</text>
+
+    <!-- Point B: same X as the leftmost interior line, moved up a few units. -->
+    <circle id="pt-B" cx="20" cy="95" r="2" class="construction-point" />
+    <text x="23" y="95" class="construction-label">B</text>
+  </g>
+
+</svg>
