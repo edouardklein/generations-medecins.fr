@@ -1,15 +1,12 @@
-# Le Bureau
-
-## Dr Klein (pas un vrai docteur, et pas vraiment du bureau)
-
-Une petite bio.
-
-![Logo Générations Médecins](/Voyages2.png)
-
-## Dr Klein Louise-Anne Vice-présidente Communication et Réseaux Sociaux
-
-
-
+---
+title: "Le Bureau"
+type: bureau
+---
+**Les membres élus de Générations Médecins Île-de-France**
+## Alexis BOURLA
+**Président**
+![Alexis BOURLA, Président](/bourla.png)
+## Louise-Anne KLEIN
+**Vice-présidente Communication et Réseaux Sociaux**
 # Minh-Hanh TA 
-## Secrétaire de GM 
-hello hello
+**Secrétaire**
