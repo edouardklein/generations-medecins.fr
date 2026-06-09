@@ -136,6 +136,34 @@
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .toast.error { background:#dc2626; }
 
+    /* ── Écran invitation ────────────────────────────────────────────────── */
+    #invite-screen { display:none; min-height:60vh; padding:60px 24px 80px; }
+    .invite-card {
+      max-width:460px; margin:0 auto;
+      background:#fff; border-radius:20px; padding:44px 36px;
+      box-shadow:0 4px 28px rgba(20,32,51,.09); text-align:center;
+    }
+    .invite-card-emoji { font-size:3.5rem; margin-bottom:14px; line-height:1; }
+    .invite-card h2 { font-size:1.4rem; font-weight:900; color:var(--ink); margin-bottom:8px; }
+    .invite-card .invite-sub { font-size:.9rem; color:var(--muted); line-height:1.65; margin-bottom:28px; }
+    .invite-auth-input {
+      width:100%; box-sizing:border-box; padding:13px 16px;
+      border:1.5px solid var(--line); border-radius:10px;
+      font-size:1rem; font-family:inherit; margin-bottom:12px; outline:none;
+      transition:border-color .12s;
+    }
+    .invite-auth-input:focus { border-color:var(--org-c1, #1a3a8a); }
+    .invite-auth-btn {
+      width:100%; padding:14px;
+      background:var(--org-grad, linear-gradient(135deg,#1a3a8a,#2563eb));
+      color:#fff; border:none; border-radius:10px;
+      font-size:1rem; font-weight:800; cursor:pointer; font-family:inherit;
+      transition:filter .15s;
+    }
+    .invite-auth-btn:hover { filter:brightness(1.08); }
+    .invite-auth-btn:disabled { opacity:.6; cursor:not-allowed; }
+    .invite-poweredby { text-align:center; font-size:.75rem; color:#94a3b8; margin-top:18px; }
+
     /* ── Section nav tabs ────────────────────────────────────────────────── */
     .tab-bar { display:flex; gap:4px; background:#f1f5f9; border-radius:12px; padding:4px; margin-bottom:28px; }
     .tab-btn { flex:1; padding:9px 16px; border:none; border-radius:9px; font-family:inherit; font-size:.85rem; font-weight:700; cursor:pointer; transition:all .12s; background:none; color:var(--muted); }
@@ -173,6 +201,39 @@
   <div id="access-denied">
     <h2>Accès restreint</h2>
     <p>Vous devez être administrateur de cet espace pour accéder à cette page.<br>Contactez le responsable de votre organisation.</p>
+  </div>
+
+  <!-- Écran invitation (invité sans session) -->
+  <div id="invite-screen">
+    <div class="invite-card">
+      <div class="invite-card-emoji" id="invite-emoji">✊</div>
+      <h2 id="invite-org-title">Invitation</h2>
+      <p class="invite-sub" id="invite-sub">
+        Vous avez été invité(e) à administrer cette plateforme de mobilisation.<br>
+        Entrez votre email pour recevoir un lien de connexion instantané.
+      </p>
+
+      <!-- Formulaire magic link -->
+      <div id="invite-form-wrap">
+        <input type="email" id="invite-auth-email" class="invite-auth-input"
+               placeholder="votre@email.fr" autocomplete="email">
+        <button class="invite-auth-btn" id="invite-auth-btn" onclick="sendInviteMagicLink()">
+          Envoyer le lien de connexion →
+        </button>
+      </div>
+
+      <!-- Confirmation envoi -->
+      <div id="invite-sent-wrap" style="display:none">
+        <div style="font-size:2.8rem;margin-bottom:14px">📬</div>
+        <p style="font-weight:800;color:var(--ink);font-size:1.05rem;margin-bottom:8px">Vérifiez votre boîte mail</p>
+        <p style="font-size:.88rem;color:var(--muted);line-height:1.65">
+          Un lien de connexion a été envoyé à<br>
+          <strong id="invite-sent-email" style="color:var(--ink)"></strong><br><br>
+          Cliquez sur ce lien — vous reviendrez ici automatiquement avec votre accès activé.
+        </p>
+      </div>
+    </div>
+    <p class="invite-poweredby">Générations Médecins · Plateforme de mobilisation santé</p>
   </div>
 
   <!-- Contenu admin -->
@@ -395,7 +456,8 @@
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     const $ = id => document.getElementById(id);
 
-    const ORG_SLUG = new URLSearchParams(location.search).get('org') || '';
+    const ORG_SLUG     = new URLSearchParams(location.search).get('org') || '';
+    const INVITE_TOKEN = new URLSearchParams(location.search).get('invite') || '';
 
     let org = null;
     let currentUser = null;
@@ -426,11 +488,22 @@
       if (!ORG_SLUG) { showDenied('Aucune organisation spécifiée dans l\'URL (?org=…)'); return; }
 
       const { data: { session } } = await sb.auth.getSession();
+
+      // Pas de session — invite token présent → écran onboarding, sinon accès refusé
       if (!session) {
-        showDenied('Vous devez être connecté pour accéder à cet espace.');
+        if (INVITE_TOKEN) {
+          await showInviteScreen();
+        } else {
+          showDenied('Vous devez être connecté pour accéder à cet espace.');
+        }
         return;
       }
       currentUser = session.user;
+
+      // Session présente + invite token → accepter l'invitation automatiquement
+      if (INVITE_TOKEN) {
+        await acceptInvite();
+      }
 
       // Charge l'organisation
       const { data: orgData } = await sb.from('organisations').select('*').eq('slug', ORG_SLUG).single();
@@ -442,12 +515,12 @@
       const { data: member } = await sb.from('org_membres')
         .select('*').eq('org_id', org.id).eq('user_id', currentUser.id).single();
 
-      // Fallback : super-admin GM (is_admin via membres)
+      // Fallback : super-admin GM (admins.role = 'super_admin')
       let isSuperAdmin = false;
       if (!member) {
-        const { data: gmMembre } = await sb.from('membres')
-          .select('is_admin').eq('user_id', currentUser.id).single();
-        isSuperAdmin = !!gmMembre?.is_admin;
+        const { data: gmAdmin } = await sb.from('admins')
+          .select('role').eq('user_id', currentUser.id).single();
+        isSuperAdmin = gmAdmin?.role === 'super_admin';
       }
 
       if (!member && !isSuperAdmin) {
@@ -465,6 +538,72 @@
       const d = $('access-denied');
       d.style.display = 'block';
       if (msg) d.querySelector('p').textContent = msg;
+    }
+
+    // ── Écran invitation (utilisateur non connecté avec token invite) ─────────
+    async function showInviteScreen() {
+      $('invite-screen').style.display = 'block';
+      // Essaie de charger le branding de l'org (marche si actif = true)
+      try {
+        const { data: o } = await sb.from('organisations')
+          .select('nom, emoji, couleur, couleur2, profession')
+          .eq('slug', ORG_SLUG).single();
+        if (o) {
+          $('invite-emoji').textContent  = o.emoji || '✊';
+          $('invite-org-title').textContent = o.nom;
+          $('invite-sub').innerHTML =
+            'Vous avez été invité(e) à administrer <strong>' + esc(o.nom) + '</strong>.<br>' +
+            'Entrez votre email pour recevoir un lien de connexion instantané.';
+          document.documentElement.style.setProperty('--org-c1', o.couleur);
+          document.documentElement.style.setProperty('--org-c2', o.couleur2);
+          document.documentElement.style.setProperty('--org-grad',
+            'linear-gradient(135deg,' + o.couleur + ',' + o.couleur2 + ')');
+          document.title = 'Invitation — ' + o.nom;
+        }
+      } catch (_) { /* org inactive ou introuvable : on affiche le générique */ }
+    }
+
+    window.sendInviteMagicLink = async function() {
+      const email = $('invite-auth-email').value.trim().toLowerCase();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        toast('Email invalide', 'error'); return;
+      }
+      const btn = $('invite-auth-btn');
+      btn.disabled = true; btn.textContent = '⏳ Envoi en cours…';
+
+      // Le lien magic redirigera vers cette même URL (org + invite token conservés)
+      const { error } = await sb.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: location.href },
+      });
+
+      if (error) {
+        toast('Erreur : ' + error.message, 'error');
+        btn.disabled = false; btn.textContent = 'Envoyer le lien de connexion →';
+        return;
+      }
+
+      $('invite-sent-email').textContent = email;
+      $('invite-form-wrap').style.display = 'none';
+      $('invite-sent-wrap').style.display  = 'block';
+    };
+
+    // Accepte l'invitation : associe user_id + accepted_at au token
+    async function acceptInvite() {
+      const { error } = await sb.from('org_membres')
+        .update({
+          user_id:     currentUser.id,
+          accepted_at: new Date().toISOString(),
+        })
+        .eq('invite_token', INVITE_TOKEN)
+        .is('accepted_at', null); // idempotent : ne ré-accepte pas si déjà fait
+
+      // Nettoie le token de l'URL (navigation propre)
+      const params = new URLSearchParams(location.search);
+      params.delete('invite');
+      history.replaceState({}, '', location.pathname + '?' + params.toString());
+
+      if (!error) toast('✓ Invitation acceptée — bienvenue !');
     }
 
     function applyBranding(o) {
