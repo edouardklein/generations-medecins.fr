@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon espace participation — Mobilisation Santé</title>
+  <meta name="description" content="Vérifiez votre participation et suivez la campagne de mobilisation de votre profession.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /*
+     * CSS variables injectées dynamiquement depuis organisations.couleur / couleur2
+     * Valeurs de fallback pour les pharmaciens (vert teal).
+     * En production : applyBranding() les remplace depuis Supabase.
+     */
+    :root {
+      --org-c1: #0f766e;
+      --org-c2: #14b8a6;
+      --org-grad: linear-gradient(135deg, #0f766e, #14b8a6);
+    }
+
+    body { background: #f0f4f8; }
+
+    /* ── Hero ─────────────────────────────────────────────────────────────── */
+    .org-hero {
+      background: var(--org-grad);
+      color: #fff; padding: 54px 0 46px; text-align: center; position: relative; overflow: hidden;
+    }
+    .org-hero::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0px, rgba(255,255,255,.025) 1px, transparent 1px, transparent 60px),
+        radial-gradient(ellipse at 70% 0%, rgba(255,255,255,.15) 0%, transparent 60%);
+    }
+    .org-hero-inner { max-width:760px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
+    .org-hero-emoji { font-size:3rem; margin-bottom:12px; }
+    .org-hero h1 { font-size:clamp(1.8rem,5vw,2.6rem); font-weight:900; letter-spacing:-.03em; margin-bottom:8px; }
+    .org-hero .eyebrow {
+      display:inline-block; font-size:.7rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+      background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); border-radius:999px;
+      padding:4px 14px; margin-bottom:16px; color:rgba(255,255,255,.9);
+    }
+    .org-hero .accroche { font-size:.96rem; color:rgba(255,255,255,.82); line-height:1.6; max-width:540px; margin:0 auto 24px; }
+
+    /* Compteur */
+    .counter-box { display:flex; flex-direction:column; align-items:center; gap:5px; margin-bottom:6px; }
+    .counter-num { font-size:3.4rem; font-weight:900; letter-spacing:-.04em; line-height:1; }
+    .counter-label { font-size:.86rem; color:rgba(255,255,255,.8); font-weight:600; }
+    .progress-wrap { max-width:420px; margin:16px auto 0; }
+    .progress-track { height:9px; background:rgba(255,255,255,.2); border-radius:999px; overflow:hidden; }
+    .progress-fill { height:100%; background:rgba(255,255,255,.9); border-radius:999px; width:0; transition:width 1.2s cubic-bezier(.22,.61,.36,1); }
+
+    /* ── Hub back link ───────────────────────────────────────────────────── */
+    .hub-back {
+      max-width:880px; margin:0 auto; padding:18px 24px 0;
+      font-size:.82rem; color:var(--muted);
+    }
+    .hub-back a { color:var(--org-c1); font-weight:700; text-decoration:none; }
+    .hub-back a:hover { text-decoration:underline; }
+
+    /* ── Conteneur ────────────────────────────────────────────────────────── */
+    .page-inner { max-width:880px; margin:0 auto; padding:36px 24px 80px; }
+    .section-title { font-size:1.3rem; font-weight:900; color:var(--ink); margin-bottom:6px; letter-spacing:-.02em; }
+    .section-sub   { font-size:.88rem; color:var(--muted); margin-bottom:24px; }
+
+    /* ── Cards ───────────────────────────────────────────────────────────── */
+    .card {
+      background:#fff; border-radius:18px; padding:32px 30px;
+      box-shadow:0 2px 14px rgba(20,32,51,.07); margin-bottom:28px;
+    }
+    .card-icon { font-size:2rem; margin-bottom:12px; }
+    .card h2 { font-size:1.15rem; font-weight:900; color:var(--ink); margin-bottom:6px; letter-spacing:-.02em; }
+    .card .card-desc { font-size:.86rem; color:var(--muted); margin-bottom:22px; line-height:1.55; }
+
+    /* ── Vérification référence ──────────────────────────────────────────── */
+    .ref-row { display:flex; gap:10px; align-items:flex-start; flex-wrap:wrap; }
+    .ref-input-wrap { flex:1; min-width:200px; }
+    .ref-input-wrap input {
+      width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px;
+      font-family:'Courier New',monospace; font-size:.95rem; font-weight:700;
+      color:var(--ink); outline:none; transition:border .12s; letter-spacing:.03em;
+      text-transform:uppercase;
+    }
+    .ref-input-wrap input::placeholder { font-weight:400; letter-spacing:0; text-transform:none; font-family:inherit; }
+    .ref-input-wrap input:focus { border-color:var(--org-c1); }
+    .btn-verif {
+      padding:12px 22px; border-radius:10px; font-family:inherit; font-size:.9rem;
+      font-weight:800; border:none; cursor:pointer; transition:all .15s; white-space:nowrap;
+      background:var(--org-grad); color:#fff;
+    }
+    .btn-verif:hover { filter:brightness(1.08); transform:translateY(-1px); box-shadow:0 5px 16px rgba(0,0,0,.14); }
+    .btn-verif:disabled { opacity:.6; transform:none; cursor:not-allowed; }
+
+    /* Résultat vérification */
+    .verif-result {
+      margin-top:16px; padding:14px 18px; border-radius:12px; font-size:.88rem; font-weight:600;
+      display:none; align-items:center; gap:10px;
+    }
+    .verif-result.ok  { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; display:flex; }
+    .verif-result.err { background:#fef2f2; border:1px solid #fecaca; color:#dc2626; display:flex; }
+    .verif-result .verif-icon { font-size:1.3rem; flex-shrink:0; }
+    .verif-result .verif-text { line-height:1.5; }
+    .verif-result .verif-text small { font-weight:400; display:block; margin-top:2px; opacity:.8; }
+
+    /* ── Campagne statut ─────────────────────────────────────────────────── */
+    .camp-meta { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:520px) { .camp-meta { grid-template-columns:1fr; } }
+    .camp-meta-item { background:#f8fafc; border-radius:12px; padding:14px 16px; }
+    .camp-meta-label { font-size:.7rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
+    .camp-meta-value { font-size:.92rem; font-weight:700; color:var(--ink); }
+
+    .badge-open {
+      display:inline-flex; align-items:center; gap:6px; font-size:.78rem; font-weight:800;
+      padding:5px 13px; border-radius:999px; margin-bottom:18px;
+    }
+    .badge-open.open   { background:#dcfce7; color:#166534; }
+    .badge-open.closed { background:#fee2e2; color:#991b1b; }
+    .badge-open.soon   { background:#fef9c3; color:#854d0e; }
+    .badge-dot { width:7px; height:7px; border-radius:50%; }
+    .badge-open.open   .badge-dot { background:#16a34a; }
+    .badge-open.closed .badge-dot { background:#dc2626; }
+    .badge-open.soon   .badge-dot { background:#ca8a04; }
+
+    /* ── CTA re-déclarer ─────────────────────────────────────────────────── */
+    .redeclare-card {
+      background: linear-gradient(135deg, rgba(var(--org-c1-rgb, 15,118,110),.06), rgba(var(--org-c2-rgb, 20,184,166),.04));
+      border:1px solid rgba(var(--org-c1-rgb, 15,118,110),.18);
+      border-radius:18px; padding:28px 30px; margin-bottom:28px;
+      display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+    }
+    .redeclare-card .rd-text h3 { font-size:1.05rem; font-weight:900; color:var(--ink); margin-bottom:4px; letter-spacing:-.02em; }
+    .redeclare-card .rd-text p  { font-size:.84rem; color:var(--muted); line-height:1.5; }
+    .btn-redeclare {
+      padding:12px 22px; border-radius:10px; font-family:inherit; font-size:.88rem;
+      font-weight:800; border:none; cursor:pointer; transition:all .15s; text-decoration:none;
+      background:var(--org-grad); color:#fff; display:inline-block; white-space:nowrap;
+    }
+    .btn-redeclare:hover { filter:brightness(1.08); transform:translateY(-1px); box-shadow:0 5px 16px rgba(0,0,0,.14); }
+
+    /* ── No campaign ─────────────────────────────────────────────────────── */
+    .no-camp {
+      text-align:center; padding:32px 24px; color:var(--muted); font-size:.88rem;
+    }
+    .no-camp .no-camp-icon { font-size:2.4rem; margin-bottom:10px; }
+
+    /* ── Toast ───────────────────────────────────────────────────────────── */
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); opacity:0; transition:all .25s; background:var(--ink); color:#fff; padding:12px 22px; border-radius:999px; font-size:.88rem; font-weight:600; z-index:9999; pointer-events:none; white-space:nowrap; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.error { background:#dc2626; }
+
+    /* ── Skeleton loading ────────────────────────────────────────────────── */
+    .skeleton { background:linear-gradient(90deg,rgba(255,255,255,.25) 25%,rgba(255,255,255,.4) 50%,rgba(255,255,255,.25) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:6px; display:inline-block; }
+    @keyframes shimmer { to { background-position:-200% 0; } }
+
+    /* ── Powered by ──────────────────────────────────────────────────────── */
+    .powered-by {
+      text-align:center; padding:20px 0 40px; font-size:.75rem; color:#94a3b8;
+    }
+    .powered-by a { color:#1a3a8a; font-weight:700; text-decoration:none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="mobilisation-hub.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span id="org-nom-header">Chargement…</span>
+      </a>
+      <nav>
+        <a href="mobilisation-hub.html">← Toutes les professions</a>
+        <a href="espace-membre.html">Mon espace GM</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="org-hero">
+    <div class="org-hero-inner">
+      <div class="eyebrow">Mon espace participation</div>
+      <div class="org-hero-emoji" id="org-emoji">💊</div>
+      <h1 id="org-titre">Chargement…</h1>
+      <p class="accroche" id="org-desc"></p>
+      <div class="counter-box">
+        <div class="counter-num" id="counter-num">—</div>
+        <div class="counter-label" id="counter-label">professionnels mobilisés</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BACK -->
+  <div class="hub-back">
+    <a href="mobilisation-hub.html">← Toutes les professions</a>
+  </div>
+
+  <div class="page-inner">
+
+    <!-- VÉRIFIER MA PARTICIPATION -->
+    <div class="card">
+      <div class="card-icon">🔍</div>
+      <h2>Vérifier ma participation</h2>
+      <p class="card-desc">Entrez le numéro de référence reçu lors de votre déclaration (ex&nbsp;: <code>ORG-LH9KD4</code>) pour confirmer que votre participation est bien enregistrée.</p>
+
+      <div class="ref-row">
+        <div class="ref-input-wrap">
+          <input type="text" id="ref-input" placeholder="ORG-XXXXXX" maxlength="20"
+                 oninput="onRefInput()" onkeydown="onRefKeydown(event)" autocomplete="off" autocorrect="off" spellcheck="false">
+        </div>
+        <button class="btn-verif" id="btn-verif" onclick="verifierParticipation()">Vérifier</button>
+      </div>
+
+      <div class="verif-result" id="verif-result">
+        <span class="verif-icon" id="verif-icon"></span>
+        <span class="verif-text" id="verif-text"></span>
+      </div>
+    </div>
+
+    <!-- CAMPAGNE EN COURS -->
+    <div id="camp-section">
+      <!-- Injecté dynamiquement -->
+    </div>
+
+    <!-- CTA RE-DÉCLARER -->
+    <div class="redeclare-card" id="redeclare-card" style="display:none">
+      <div class="rd-text">
+        <h3 id="redeclare-emoji-title">Vous souhaitez (re-)déclarer votre participation ?</h3>
+        <p>La campagne est ouverte — accédez au formulaire de déclaration en un clic.</p>
+      </div>
+      <a href="#" class="btn-redeclare" id="btn-redeclare">✊ Re-déclarer ma participation</a>
+    </div>
+
+  </div>
+
+  <!-- POWERED BY -->
+  <div class="powered-by">
+    Plateforme propulsée par <a href="index.html">Générations Médecins Île-de-France</a>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="mobilisation-hub.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Mobilisation Santé</span>
+        </a>
+        <p class="footer-copy">Hub interprofessionnel · Générations Médecins</p>
+      </div>
+      <div class="footer-links">
+        <a href="mobilisation-hub.html">Toutes les professions</a>
+        <a href="greve.html">Médecins en Grève</a>
+        <a href="index.html">generations-medecins.fr</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+  (function () {
+    const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    const $ = id => document.getElementById(id);
+
+    const ORG_SLUG = new URLSearchParams(location.search).get('org') || 'pharmaciens';
+
+    let org = null;
+    let campagne = null;
+
+    // ── Utilitaires ──────────────────────────────────────────────────────────
+    function toast(msg, isErr) {
+      const t = $('toast');
+      t.textContent = msg; t.className = 'toast show' + (isErr ? ' error' : '');
+      setTimeout(() => t.className = 'toast', 3200);
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    // ── Branding ─────────────────────────────────────────────────────────────
+    function applyBranding(o) {
+      document.documentElement.style.setProperty('--org-c1', o.couleur || '#0f766e');
+      document.documentElement.style.setProperty('--org-c2', o.couleur2 || '#14b8a6');
+      document.documentElement.style.setProperty('--org-grad',
+        `linear-gradient(135deg,${o.couleur || '#0f766e'},${o.couleur2 || '#14b8a6'})`);
+
+      if ($('org-emoji'))      $('org-emoji').textContent      = o.emoji || '💊';
+      if ($('org-titre'))      $('org-titre').textContent      = o.nom || '';
+      if ($('org-desc'))       $('org-desc').textContent       = o.description || '';
+      if ($('org-nom-header')) $('org-nom-header').textContent = o.nom || '';
+      if ($('counter-label'))  $('counter-label').textContent  = (o.profession || 'professionnels') + ' mobilisés';
+      document.title = (o.nom || '') + ' — Mon espace participation';
+    }
+
+    // ── Compteur ─────────────────────────────────────────────────────────────
+    function renderCounter(count) {
+      $('counter-num').textContent = Number(count || 0).toLocaleString('fr-FR');
+      if (campagne?.objectif) {
+        $('progress-fill').style.width = Math.min(100, (count / campagne.objectif) * 100) + '%';
+      }
+    }
+
+    // ── Section campagne ─────────────────────────────────────────────────────
+    function renderCampagne(camp, orgData) {
+      const section = $('camp-section');
+      if (!camp) {
+        section.innerHTML = `
+          <div class="card">
+            <div class="no-camp">
+              <div class="no-camp-icon">📭</div>
+              <p>Aucune campagne active pour le moment.</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const today = new Date().toISOString().slice(0, 10);
+      let status, badgeClass, badgeLabel;
+      if (!camp.actif) {
+        status = 'closed'; badgeClass = 'closed'; badgeLabel = 'Déclarations fermées';
+      } else if (camp.date_debut && today < camp.date_debut) {
+        status = 'soon'; badgeClass = 'soon'; badgeLabel = 'Ouverture prochaine';
+      } else if (camp.date_fin && today > camp.date_fin) {
+        status = 'closed'; badgeClass = 'closed'; badgeLabel = 'Campagne terminée';
+      } else {
+        status = 'open'; badgeClass = 'open'; badgeLabel = 'Déclarations ouvertes';
+      }
+
+      section.innerHTML = `
+        <div class="card">
+          <div class="card-icon">📋</div>
+          <h2>Campagne en cours</h2>
+          <p class="card-desc">${escHtml(camp.titre || '')}</p>
+          <span class="badge-open ${badgeClass}">
+            <span class="badge-dot"></span> ${badgeLabel}
+          </span>
+          <div class="camp-meta">
+            <div class="camp-meta-item">
+              <div class="camp-meta-label">Ouverture</div>
+              <div class="camp-meta-value">${fmtDate(camp.date_debut)}</div>
+            </div>
+            <div class="camp-meta-item">
+              <div class="camp-meta-label">Clôture</div>
+              <div class="camp-meta-value">${fmtDate(camp.date_fin)}</div>
+            </div>
+            ${camp.objectif ? `
+            <div class="camp-meta-item">
+              <div class="camp-meta-label">Objectif</div>
+              <div class="camp-meta-value">${Number(camp.objectif).toLocaleString('fr-FR')} participants</div>
+            </div>` : ''}
+            <div class="camp-meta-item">
+              <div class="camp-meta-label">Participants</div>
+              <div class="camp-meta-value">${Number(camp.declaration_count || 0).toLocaleString('fr-FR')}</div>
+            </div>
+          </div>
+        </div>`;
+
+      // Afficher CTA re-déclarer si campagne ouverte
+      if (status === 'open') {
+        const btn = $('btn-redeclare');
+        if (btn) {
+          btn.href = `mobilisation-org.html?org=${encodeURIComponent(ORG_SLUG)}`;
+          btn.textContent = (orgData?.emoji || '✊') + ' Re-déclarer ma participation';
+        }
+        const rdCard = $('redeclare-card');
+        if (rdCard) rdCard.style.display = 'flex';
+      }
+    }
+
+    // ── Initialisation ───────────────────────────────────────────────────────
+    async function init() {
+      // Charger l'organisation
+      const { data: orgData, error: orgErr } = await sb
+        .from('organisations')
+        .select('*')
+        .eq('slug', ORG_SLUG)
+        .single();
+
+      if (orgErr || !orgData) {
+        $('org-titre').textContent = 'Organisation introuvable';
+        $('org-desc').textContent  = 'Vérifiez l\'URL ou revenez au hub.';
+        $('camp-section').innerHTML = '';
+        return;
+      }
+
+      org = orgData;
+      applyBranding(org);
+
+      // Charger la campagne active
+      const { data: campData } = await sb
+        .from('greve_campagnes')
+        .select('*')
+        .eq('org_id', org.id)
+        .eq('archived', false)
+        .eq('actif', true)
+        .single();
+
+      campagne = campData || null;
+      renderCampagne(campagne, org);
+      if (campagne) renderCounter(campagne.declaration_count || 0);
+    }
+
+    // ── Vérification de participation ────────────────────────────────────────
+    window.onRefInput = function () {
+      const v = $('ref-input').value.toUpperCase().replace(/[^A-Z0-9\-]/g, '');
+      $('ref-input').value = v;
+      // Masquer résultat précédent
+      const res = $('verif-result');
+      res.className = 'verif-result';
+    };
+
+    window.onRefKeydown = function (e) {
+      if (e.key === 'Enter') verifierParticipation();
+    };
+
+    window.verifierParticipation = async function () {
+      const ref = $('ref-input').value.trim().toUpperCase();
+      const res = $('verif-result');
+      const btn = $('btn-verif');
+
+      if (!ref) {
+        toast('Entrez un numéro de référence', true);
+        return;
+      }
+      if (!/^[A-Z]+-[A-Z0-9]+$/.test(ref)) {
+        res.className = 'verif-result err';
+        $('verif-icon').textContent = '✗';
+        $('verif-text').innerHTML = 'Format de référence invalide.<small>Les références ressemblent à ORG-LH9KD4</small>';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '…';
+
+      try {
+        const response = await fetch('/.netlify/functions/verifier-participation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orgSlug: ORG_SLUG, ref }),
+        });
+        const json = await response.json();
+
+        if (!response.ok) throw new Error(json.error || 'Erreur serveur');
+
+        if (json.found) {
+          res.className = 'verif-result ok';
+          $('verif-icon').textContent = '✓';
+          $('verif-text').innerHTML = `Votre participation est bien enregistrée.<small>Référence ${escHtml(ref)} · ${escHtml(json.orgNom || org?.nom || '')}</small>`;
+        } else {
+          res.className = 'verif-result err';
+          $('verif-icon').textContent = '✗';
+          $('verif-text').innerHTML = `Référence introuvable.<small>Vérifiez la référence ou re-déclarez votre participation.</small>`;
+        }
+      } catch (e) {
+        toast(e.message || 'Erreur de connexion', true);
+        res.className = 'verif-result';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Vérifier';
+      }
+    };
+
+    // ── Échappement HTML ─────────────────────────────────────────────────────
+    function escHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    init();
+  })();
+  </script>
+  <script src="auth-header.js"></script>
+</body>
+</html>
