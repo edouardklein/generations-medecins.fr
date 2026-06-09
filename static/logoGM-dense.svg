@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110" width="72" height="72" aria-hidden="true">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="100" y2="0" gradientUnits="userSpaceOnUse">
-      <stop offset="20%" stop-color="#236598"/>
-      <stop offset="80%" stop-color="#7FD297"/>
+      <stop offset="20%" stop-color="var(--primary-dark)"/>
+      <stop offset="80%" stop-color="var(--accent-lighter)"/>
     </linearGradient>
   </defs>
   <circle cx="50" cy="50" r="40" fill="none" stroke="url(#g)" stroke-width="20" stroke-dasharray="122.25 3.86 97.74 21.94 5.98" stroke-dashoffset="0"/>

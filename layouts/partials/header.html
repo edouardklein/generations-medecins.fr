@@ -1,7 +1,8 @@
 <header class="site-header">
   <a class="brand" href="/" aria-label="Générations Médecins Île-de-France">
-    <img src="/logoGM.jpeg" width="72" height="72" alt="">
-    <span>Générations Médecins</span>
+    {{ readFile "static/logoGM-dense.svg" | safeHTML }}
+    <span class="brand-text-primary">Générations</span>
+    <span class="brand-text-accent">Médecins</span>
   </a>
   <nav class="site-nav" aria-label="Navigation principale">
     <ul class="nav">
