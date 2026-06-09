@@ -37,7 +37,7 @@ Aujourd'hui, trop de décisions sont prises sans consultation, trop de positions
 
 Nous défendons les intérêts **concrets, individuels et collectifs** des médecins, avec une ligne claire et assumée.
 
-## Ce que nous faisons
+## Ce que nous faisons {#actions}
 
 - Défense et accompagnement des médecins sur le terrain
 - Représentation auprès des institutions régionales
