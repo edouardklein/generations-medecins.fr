@@ -311,15 +311,90 @@
   const CAT = {
     avenant:      { grad: 'linear-gradient(135deg,#17365f,#326aa2)', label: 'Convention' },
     convention:   { grad: 'linear-gradient(135deg,#17365f,#326aa2)', label: 'Convention' },
-    plfss:        { grad: 'linear-gradient(135deg,#1a5c5c,#58aab3)', label: 'PLFSS' },
+    plfss:        { grad: 'linear-gradient(135deg,#134e4a,#0d9488)', label: 'PLFSS' },
     decret:       { grad: 'linear-gradient(135deg,#3b1f6e,#6b42b3)', label: 'Décret' },
     jurisprudence:{ grad: 'linear-gradient(135deg,#1a4a2e,#2d7a4f)', label: 'Jurisprudence' },
-    urssaf:       { grad: 'linear-gradient(135deg,#5a2d00,#b06c00)', label: 'URSSAF' },
-    numerique:    { grad: 'linear-gradient(135deg,#2d1a5a,#5a3ea0)', label: 'Numérique en santé' },
+    urssaf:       { grad: 'linear-gradient(135deg,#7c2d12,#ea580c)', label: 'URSSAF' },
+    numerique:    { grad: 'linear-gradient(135deg,#3b0764,#7c3aed)', label: 'Numérique en santé' },
     observatoire: { grad: 'linear-gradient(135deg,#0d3b2e,#1a7a5e)', label: 'Observatoire' },
-    urgence:      { grad: 'linear-gradient(135deg,#7c1b1b,#dc2626)', label: 'Urgent' },
+    urgence:      { grad: 'linear-gradient(135deg,#7f1d1d,#dc2626)', label: 'Urgent' },
   };
   const DEFAULT_CAT = { grad: 'linear-gradient(135deg,#17365f,#326aa2)', label: 'Décrypteur' };
+
+  // Couleurs par thématique (7 familles chromatiques)
+  // Bleu     — Convention & institutions de régulation
+  // Orange   — Finances, tarifs & cotisations
+  // Vert     — Démographie, installation & formation
+  // Rouge    — Hôpital, urgences & responsabilité
+  // Violet   — Numérique, télémédecine & RGPD
+  // Teal     — Législatif, PLFSS & politique de santé
+  // Cramoisi — Syndicats, mobilisation & représentation
+  const THEME_GRAD = {
+    'convention-medicale':           'linear-gradient(135deg,#0f2a5e,#2563eb)',
+    'negociations-conventionnelles': 'linear-gradient(135deg,#0f2a5e,#2563eb)',
+    'secteurs-conventionnels':       'linear-gradient(135deg,#0f2a5e,#2563eb)',
+    'assurance-maladie-cnam':        'linear-gradient(135deg,#0f2a5e,#2563eb)',
+    'tarifs-honoraires':             'linear-gradient(135deg,#7c2d12,#ea580c)',
+    'tiers-payant':                  'linear-gradient(135deg,#7c2d12,#ea580c)',
+    'urssaf-cotisations':            'linear-gradient(135deg,#7c2d12,#ea580c)',
+    'retraite-carmf':                'linear-gradient(135deg,#7c2d12,#ea580c)',
+    'medicaments-remboursement':     'linear-gradient(135deg,#7c2d12,#ea580c)',
+    'deserts-medicaux':              'linear-gradient(135deg,#14532d,#16a34a)',
+    'demographie-medicale':          'linear-gradient(135deg,#14532d,#16a34a)',
+    'numerus-apertus':               'linear-gradient(135deg,#14532d,#16a34a)',
+    'installation-liberale':         'linear-gradient(135deg,#14532d,#16a34a)',
+    'medecine-liberale':             'linear-gradient(135deg,#14532d,#16a34a)',
+    'msp-exercice-groupe':           'linear-gradient(135deg,#14532d,#16a34a)',
+    'internes-formation':            'linear-gradient(135deg,#14532d,#16a34a)',
+    'reforme-etudes-medicales':      'linear-gradient(135deg,#14532d,#16a34a)',
+    'hopital-public':                'linear-gradient(135deg,#7f1d1d,#dc2626)',
+    'urgences':                      'linear-gradient(135deg,#7f1d1d,#dc2626)',
+    'permanence-des-soins':          'linear-gradient(135deg,#7f1d1d,#dc2626)',
+    'responsabilite-medicale':       'linear-gradient(135deg,#7f1d1d,#dc2626)',
+    'telemedecine':                  'linear-gradient(135deg,#3b0764,#7c3aed)',
+    'numerique-sante':               'linear-gradient(135deg,#3b0764,#7c3aed)',
+    'donnees-de-sante-rgpd':         'linear-gradient(135deg,#3b0764,#7c3aed)',
+    'plfss-lfss':                    'linear-gradient(135deg,#134e4a,#0d9488)',
+    'ministere-sante':               'linear-gradient(135deg,#134e4a,#0d9488)',
+    'syndicats':                     'linear-gradient(135deg,#4a0f1c,#be1234)',
+    'greve-mobilisation':            'linear-gradient(135deg,#4a0f1c,#be1234)',
+    'urps-representativite':         'linear-gradient(135deg,#4a0f1c,#be1234)',
+    'ordre-des-medecins':            'linear-gradient(135deg,#1e293b,#475569)',
+  };
+
+  // Couleurs pills par famille
+  const PILL_COLORS = {
+    'convention-medicale':           ['rgba(37,99,235,0.10)','#1d4ed8'],
+    'negociations-conventionnelles': ['rgba(37,99,235,0.10)','#1d4ed8'],
+    'secteurs-conventionnels':       ['rgba(37,99,235,0.10)','#1d4ed8'],
+    'assurance-maladie-cnam':        ['rgba(37,99,235,0.10)','#1d4ed8'],
+    'tarifs-honoraires':             ['rgba(234,88,12,0.10)','#c2410c'],
+    'tiers-payant':                  ['rgba(234,88,12,0.10)','#c2410c'],
+    'urssaf-cotisations':            ['rgba(234,88,12,0.10)','#c2410c'],
+    'retraite-carmf':                ['rgba(234,88,12,0.10)','#c2410c'],
+    'medicaments-remboursement':     ['rgba(234,88,12,0.10)','#c2410c'],
+    'deserts-medicaux':              ['rgba(22,163,74,0.10)','#15803d'],
+    'demographie-medicale':          ['rgba(22,163,74,0.10)','#15803d'],
+    'numerus-apertus':               ['rgba(22,163,74,0.10)','#15803d'],
+    'installation-liberale':         ['rgba(22,163,74,0.10)','#15803d'],
+    'medecine-liberale':             ['rgba(22,163,74,0.10)','#15803d'],
+    'msp-exercice-groupe':           ['rgba(22,163,74,0.10)','#15803d'],
+    'internes-formation':            ['rgba(22,163,74,0.10)','#15803d'],
+    'reforme-etudes-medicales':      ['rgba(22,163,74,0.10)','#15803d'],
+    'hopital-public':                ['rgba(220,38,38,0.10)','#b91c1c'],
+    'urgences':                      ['rgba(220,38,38,0.10)','#b91c1c'],
+    'permanence-des-soins':          ['rgba(220,38,38,0.10)','#b91c1c'],
+    'responsabilite-medicale':       ['rgba(220,38,38,0.10)','#b91c1c'],
+    'telemedecine':                  ['rgba(124,58,237,0.10)','#6d28d9'],
+    'numerique-sante':               ['rgba(124,58,237,0.10)','#6d28d9'],
+    'donnees-de-sante-rgpd':         ['rgba(124,58,237,0.10)','#6d28d9'],
+    'plfss-lfss':                    ['rgba(13,148,136,0.10)','#0f766e'],
+    'ministere-sante':               ['rgba(13,148,136,0.10)','#0f766e'],
+    'syndicats':                     ['rgba(190,18,52,0.10)','#9f1239'],
+    'greve-mobilisation':            ['rgba(190,18,52,0.10)','#9f1239'],
+    'urps-representativite':         ['rgba(190,18,52,0.10)','#9f1239'],
+    'ordre-des-medecins':            ['rgba(71,85,105,0.10)','#334155'],
+  };
 
   // State
   let allArticles = [];
@@ -337,14 +412,23 @@
     const rest = tags.length - 4;
     let html = visible.map(slug => {
       const label = tagsMap[slug] || slug;
-      return `<span class="tag-pill">${label}</span>`;
+      const c = PILL_COLORS[slug];
+      const style = c ? ` style="background:${c[0]};color:${c[1]}"` : '';
+      return `<span class="tag-pill"${style}>${label}</span>`;
     }).join('');
     if (rest > 0) html += `<span class="tag-pill-more">+${rest}</span>`;
     return `<div class="article-tags">${html}</div>`;
   }
 
   function card(a) {
-    const cat = CAT[a.categorie] || DEFAULT_CAT;
+    // Couleur du bandeau : premier tag thématique reconnu, sinon catégorie
+    let display = CAT[a.categorie] || DEFAULT_CAT;
+    if (a.tags) {
+      for (const slug of a.tags) {
+        const g = THEME_GRAD[slug];
+        if (g) { display = { grad: g, label: tagsMap[slug] || display.label }; break; }
+      }
+    }
     const chip = '';
     const sourcePart = a.source ? `${a.source} · ` : '';
     const datePart = fmt(a.publie_le);
@@ -353,8 +437,8 @@
       : '';
     return `
       <a href="decrypteur.html?slug=${a.slug}" class="article-card">
-        <div class="article-top" style="background:${cat.grad}">
-          <span class="article-cat">${cat.label}</span>
+        <div class="article-top" style="background:${display.grad}">
+          <span class="article-cat">${display.label}</span>
         </div>
         <div class="article-body">
           <div class="article-title">${a.titre}</div>
