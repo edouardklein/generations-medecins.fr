@@ -1064,9 +1064,10 @@
       btn.disabled = true; btn.textContent = '⏳ Reformulation…';
 
       try {
+        const { data: { session } } = await sb.auth.getSession();
         const res = await fetch('/.netlify/functions/reformuler-texte', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
           body: JSON.stringify({ text, fieldKey: varName }),
         });
         const data = await res.json();
