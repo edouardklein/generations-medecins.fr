@@ -1,6 +1,19 @@
 // Reformulation de texte via OpenAI GPT-4o-mini
-// POST { text: string, fieldKey: string }
+// POST { text: string, fieldKey: string }  — requires valid Supabase JWT
 // Returns { reformule: string }
+
+const SB   = process.env.SUPABASE_URL;
+const ANON = process.env.SUPABASE_ANON_KEY;
+
+async function isAuthenticated(token) {
+  if (!token || !SB || !ANON) return false;
+  const res = await fetch(`${SB}/auth/v1/user`, {
+    headers: { Authorization: `Bearer ${token}`, apikey: ANON },
+  });
+  if (!res.ok) return false;
+  const user = await res.json();
+  return !!user?.id;
+}
 
 const PROMPTS = {
   motifs:
@@ -33,6 +46,11 @@ const DEFAULT_PROMPT =
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
+  }
+
+  const token = (event.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
+  if (!(await isAuthenticated(token))) {
+    return { statusCode: 403, body: JSON.stringify({ error: 'Authentification requise' }) };
   }
 
   const apiKey = process.env.OPENAI_API_KEY;

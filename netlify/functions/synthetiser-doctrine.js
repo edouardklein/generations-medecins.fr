@@ -10,9 +10,27 @@
 
 const SB  = process.env.SUPABASE_URL;
 const SSK = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const ANON = process.env.SUPABASE_ANON_KEY;
 
 function srvHeaders(extra = {}) {
   return { apikey: SSK, Authorization: `Bearer ${SSK}`, 'Content-Type': 'application/json', ...extra };
+}
+
+async function requireAdmin(token) {
+  if (!token) return false;
+  const userRes = await fetch(`${SB}/auth/v1/user`, {
+    headers: { Authorization: `Bearer ${token}`, apikey: ANON },
+  });
+  if (!userRes.ok) return false;
+  const user = await userRes.json();
+  if (!user?.id) return false;
+  const adminRes = await fetch(
+    `${SB}/rest/v1/admins?user_id=eq.${user.id}&select=id`,
+    { headers: srvHeaders() },
+  );
+  if (!adminRes.ok) return false;
+  const rows = await adminRes.json();
+  return Array.isArray(rows) && rows.length > 0;
 }
 
 const MAX_REPONSE_LENGTH = 15000;
@@ -27,6 +45,11 @@ exports.handler = async (event) => {
   };
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers };
   if (event.httpMethod !== 'POST')    return { statusCode: 405, headers, body: '{"error":"Method not allowed"}' };
+
+  const token = (event.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
+  if (!(await requireAdmin(token))) {
+    return { statusCode: 403, headers, body: '{"error":"Accès réservé aux administrateurs"}' };
+  }
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {

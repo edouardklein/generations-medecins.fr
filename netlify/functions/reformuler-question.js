@@ -10,9 +10,27 @@
 
 const SB  = process.env.SUPABASE_URL;
 const SSK = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const ANON = process.env.SUPABASE_ANON_KEY;
 
 function srvHeaders(extra = {}) {
   return { apikey: SSK, Authorization: `Bearer ${SSK}`, 'Content-Type': 'application/json', ...extra };
+}
+
+async function getMembre(token) {
+  if (!token) return null;
+  const userRes = await fetch(`${SB}/auth/v1/user`, {
+    headers: { Authorization: `Bearer ${token}`, apikey: ANON },
+  });
+  if (!userRes.ok) return null;
+  const user = await userRes.json();
+  if (!user?.id) return null;
+  const mRes = await fetch(
+    `${SB}/rest/v1/membres?user_id=eq.${user.id}&select=id`,
+    { headers: srvHeaders() },
+  );
+  if (!mRes.ok) return null;
+  const rows = await mRes.json();
+  return rows?.[0] || null;
 }
 
 const MAX_QUESTION_LENGTH = 5000;
@@ -31,6 +49,12 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers };
   if (event.httpMethod !== 'POST')    return { statusCode: 405, headers, body: '{"error":"Method not allowed"}' };
 
+  const token = (event.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
+  const membre = await getMembre(token);
+  if (!membre) {
+    return { statusCode: 403, headers, body: '{"error":"Authentification requise"}' };
+  }
+
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'OPENAI_API_KEY non configurée' }) };
@@ -44,16 +68,14 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: '{"error":"JSON invalide"}' };
   }
 
-  const { question, membreId, consultationId } = body;
+  const { question, consultationId } = body;
+  const membreId = membre.id;
 
   if (!question || typeof question !== 'string' || question.trim().length === 0) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Champ question manquant ou vide' }) };
   }
   if (question.length > MAX_QUESTION_LENGTH) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: `Question trop longue (max ${MAX_QUESTION_LENGTH} caractères)` }) };
-  }
-  if (!membreId) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: 'membreId requis' }) };
   }
   if (!consultationId) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'consultationId requis' }) };

@@ -2672,7 +2672,7 @@
     const tbody = document.getElementById('historique-tbody');
     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:32px">Chargement…</td></tr>';
     const { data, error } = await sb.from('communications').select('*').order('created_at', { ascending: false });
-    if (error) { tbody.innerHTML = `<tr><td colspan="4" style="color:#c0392b;padding:20px">Erreur : ${error.message}</td></tr>`; return; }
+    if (error) { tbody.innerHTML = `<tr><td colspan="4" style="color:#c0392b;padding:20px">Erreur : ${esc(error.message)}</td></tr>`; return; }
     if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:32px">Aucune communication envoyée.</td></tr>'; return; }
     tbody.innerHTML = data.map(c => {
       const badge = c.type === 'newsletter'
