@@ -704,7 +704,7 @@
             <input type="hidden" id="n-id">
             <div class="form-grid">
               <div class="form-group"><label>Titre</label><input type="text" id="n-titre" placeholder="Mobilisation du 12 juin…"></div>
-              <div class="form-group"><label>Slug (URL)</label><input type="text" id="n-slug" placeholder="mobilisation-12-juin"></div>
+              <div class="form-group"><label>Slug (URL) <span style="font-weight:500;color:var(--muted);font-size:.75rem">· généré depuis le titre</span></label><input type="text" id="n-slug" placeholder="mobilisation-12-juin"></div>
               <div class="form-group"><label>Catégorie</label>
                 <select id="n-categorie">
                   <option value="actualite">Actualité</option>
@@ -737,7 +737,23 @@
               </div>
 
               <div class="form-group full"><label>Résumé (chapô — repris dans les cartes)</label><textarea id="n-resume" placeholder="En quelques phrases…"></textarea></div>
-              <div class="form-group full"><label>Contenu (Markdown / HTML léger)</label><textarea id="n-contenu" style="min-height:200px" placeholder="## Sous-titre&#10;&#10;Corps de l'article…"></textarea></div>
+              <div class="form-group full">
+                <label>Contenu</label>
+                <div style="border:1.5px solid var(--line);border-radius:10px;overflow:hidden">
+                  <div style="display:flex;gap:4px;padding:7px 9px;background:var(--surface);border-bottom:1.5px solid var(--line);flex-wrap:wrap">
+                    <button type="button" class="news-fmt" onmousedown="event.preventDefault()" onclick="newsFmt('bold')" title="Gras" style="font-weight:800">B</button>
+                    <button type="button" class="news-fmt" onmousedown="event.preventDefault()" onclick="newsFmt('italic')" title="Italique" style="font-style:italic">I</button>
+                    <button type="button" class="news-fmt" onmousedown="event.preventDefault()" onclick="newsFmt('underline')" title="Souligné" style="text-decoration:underline">U</button>
+                    <button type="button" class="news-fmt" onmousedown="event.preventDefault()" onclick="newsFmt('formatBlock','h2')" title="Sous-titre">H2</button>
+                    <button type="button" class="news-fmt" onmousedown="event.preventDefault()" onclick="newsFmt('formatBlock','p')" title="Paragraphe">¶</button>
+                    <button type="button" class="news-fmt" onmousedown="event.preventDefault()" onclick="newsFmt('insertUnorderedList')" title="Liste à puces">•&nbsp;Liste</button>
+                    <button type="button" class="news-fmt" onmousedown="event.preventDefault()" onclick="newsFmt('insertOrderedList')" title="Liste numérotée">1.&nbsp;Liste</button>
+                    <button type="button" class="news-fmt" onmousedown="event.preventDefault()" onclick="newsFmt('createLink')" title="Insérer un lien">🔗&nbsp;Lien</button>
+                    <button type="button" class="news-fmt" onmousedown="event.preventDefault()" onclick="newsFmt('removeFormat')" title="Effacer la mise en forme">✕</button>
+                  </div>
+                  <div id="n-editor" contenteditable="true" data-placeholder="Rédigez votre article…" style="min-height:220px;padding:14px 16px;font-size:.9rem;line-height:1.65;outline:none"></div>
+                </div>
+              </div>
               <div class="form-group"><label>Auteur</label><input type="text" id="n-auteur" placeholder="Rédaction GM"></div>
               <div class="form-group"><label>Accès</label>
                 <select id="n-acces">
@@ -2020,8 +2036,27 @@
     setTimeout(() => { status.textContent = ''; }, 2500);
   };
 
+  // Slug auto depuis le titre (tant que l'admin n'a pas édité le slug à la main)
+  function slugify(s) {
+    return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+  }
+
+  // Éditeur de contenu (WYSIWYG, même approche que courrier-editeur)
+  window.newsFmt = function(cmd, val) {
+    document.getElementById('n-editor').focus();
+    if (cmd === 'createLink') {
+      const url = prompt('Adresse du lien (https://…) :');
+      if (url) document.execCommand('createLink', false, url);
+      return;
+    }
+    document.execCommand(cmd, false, val || null);
+  };
+
   function resetNewsForm() {
-    ['n-id','n-titre','n-slug','n-resume','n-contenu','n-auteur'].forEach(id => document.getElementById(id).value = '');
+    ['n-id','n-titre','n-slug','n-resume','n-auteur'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('n-editor').innerHTML = '';
+    document.getElementById('n-slug').dataset.touched = '';
     document.getElementById('n-categorie').value = 'actualite';
     document.getElementById('n-acces').value = 'public';
     document.getElementById('n-publie').checked = true;
@@ -2049,10 +2084,11 @@
     document.getElementById('n-id').value = data.id;
     document.getElementById('n-titre').value = data.titre || '';
     document.getElementById('n-slug').value = data.slug || '';
+    document.getElementById('n-slug').dataset.touched = '1';
     document.getElementById('n-categorie').value = data.categorie || 'actualite';
     document.getElementById('n-date').value = data.publie_le || '';
     document.getElementById('n-resume').value = data.resume || '';
-    document.getElementById('n-contenu').value = data.contenu || '';
+    document.getElementById('n-editor').innerHTML = data.contenu || '';
     document.getElementById('n-auteur').value = data.auteur || '';
     document.getElementById('n-acces').value = data.acces || 'public';
     document.getElementById('n-publie').checked = !!data.publie;
@@ -2078,7 +2114,7 @@
       categorie: document.getElementById('n-categorie').value,
       publie_le: document.getElementById('n-date').value || new Date().toISOString().slice(0,10),
       resume:    document.getElementById('n-resume').value.trim(),
-      contenu:   document.getElementById('n-contenu').value.trim(),
+      contenu:   document.getElementById('n-editor').innerHTML.trim(),
       auteur:    document.getElementById('n-auteur').value.trim() || 'Rédaction GM',
       acces:     document.getElementById('n-acces').value,
       image_url: document.getElementById('n-image-url').value || null,
@@ -2130,6 +2166,31 @@
         </td>
       </tr>`).join('');
   }
+
+  // Init formulaire News : styles éditeur + slug auto
+  (function initNewsForm() {
+    if (!document.getElementById('news-editor-style')) {
+      const st = document.createElement('style');
+      st.id = 'news-editor-style';
+      st.textContent = `
+        .news-fmt{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 9px;font-size:.8rem;cursor:pointer;font-family:inherit;color:var(--ink)}
+        .news-fmt:hover{background:var(--surface)}
+        #n-editor:empty:before{content:attr(data-placeholder);color:var(--muted)}
+        #n-editor h2{font-size:1.15rem;font-weight:800;color:var(--blue-dark);margin:16px 0 8px}
+        #n-editor p{margin:0 0 10px}
+        #n-editor ul,#n-editor ol{margin:0 0 10px 22px}
+        #n-editor a{color:var(--blue);text-decoration:underline}
+      `;
+      document.head.appendChild(st);
+    }
+    try { document.execCommand('defaultParagraphSeparator', false, 'p'); } catch (e) {}
+    const titre = document.getElementById('n-titre');
+    const slug  = document.getElementById('n-slug');
+    if (titre && slug) {
+      titre.addEventListener('input', () => { if (!slug.dataset.touched) slug.value = slugify(titre.value); });
+      slug.addEventListener('input', () => { slug.dataset.touched = slug.value ? '1' : ''; });
+    }
+  })();
 
   // ── Plaidoyer ───────────────────────────────────────────────
   async function loadPlaidoyer() {

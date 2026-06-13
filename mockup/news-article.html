@@ -260,7 +260,10 @@
           <a href="adherer.html" class="btn btn-primary">Adhérer gratuitement →</a>
         </div>`;
     } else if (a.contenu) {
-      bodyHtml += `<div class="article-body-text">${mdToHtml(a.contenu)}</div>`;
+      // Le contenu est du HTML produit par l'éditeur de l'admin ; ancien contenu
+      // Markdown (sans balises) reste géré par mdToHtml en repli.
+      const isHtml = /<[a-z][\s\S]*>/i.test(a.contenu);
+      bodyHtml += `<div class="article-body-text">${isHtml ? a.contenu : mdToHtml(a.contenu)}</div>`;
     }
 
     document.getElementById('article-body-zone').innerHTML = `<div class="article-content">${bodyHtml}</div>`;
