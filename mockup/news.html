@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News — Générations Médecins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoGM.jpeg">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 44px;
+      padding: 20px 24px;
+      background: white;
+      border: 1.5px solid var(--line);
+      border-radius: var(--r);
+      align-items: center;
+    }
+    .filter-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+    .filter-select {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1.5px solid var(--line);
+      font-family: inherit;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--ink);
+      background: var(--surface);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 28px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+    .filter-select:focus { outline: none; border-color: var(--blue); }
+    .filter-reset {
+      margin-left: auto;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: color 0.15s;
+    }
+    .filter-reset:hover { color: var(--blue); }
+
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .article-card {
+      border-radius: var(--r);
+      border: 1px solid var(--line);
+      background: white;
+      overflow: hidden;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+    }
+    .article-card:hover {
+      box-shadow: 0 8px 32px rgba(50,106,162,0.1);
+      transform: translateY(-2px);
+    }
+    .article-top {
+      height: 160px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: flex-end;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .article-top.has-img::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(15,30,55,0.55), rgba(15,30,55,0.05));
+    }
+    .article-cat {
+      padding: 4px 10px;
+      background: rgba(255,255,255,0.22);
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      backdrop-filter: blur(4px);
+      position: relative;
+      z-index: 1;
+    }
+    .article-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .article-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 8px;
+      line-height: 1.38;
+    }
+    .article-excerpt {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 12px;
+    }
+    .article-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 14px;
+    }
+    .tag-pill {
+      background: rgba(42,109,184,0.08);
+      color: var(--blue);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .tag-pill-more {
+      background: rgba(100,116,139,0.08);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .article-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: auto;
+    }
+    .article-source-date { font-size: 0.72rem; color: var(--muted); }
+
+    .no-results {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 760px) {
+      .articles-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 520px) {
+      .articles-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+        <span>Générations<br>Médecins</span>
+      </a>
+      <nav>
+        <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="news.html" class="active">News</a>
+        <a href="observatoire.html">Observatoire</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="communaute.html">Communauté</a>
+        <a href="regions.html">Régions</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="greve.html" style="color:#dc2626;font-weight:800;">✊ Grève</a>
+      </nav>
+      <a href="connexion.html" id="header-login-link" style="font-size:.85rem;font-weight:700;color:var(--blue-dark);text-decoration:none;white-space:nowrap;">Se connecter</a>
+      <a href="adherer.html" class="btn btn-primary">Adhérer →</a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <span class="badge badge-blue">📣 Actualités du mouvement</span>
+      <h1>News</h1>
+      <p>Les actualités, prises de position et analyses rédigées par l'équipe de Générations Médecins.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+
+      <!-- Filtres -->
+      <div class="filter-bar">
+        <span class="filter-label">Filtrer par</span>
+        <select id="filter-theme" class="filter-select">
+          <option value="">Tous les thèmes</option>
+        </select>
+        <select id="filter-specialite" class="filter-select">
+          <option value="">Toutes les spécialités</option>
+        </select>
+        <select id="filter-region" class="filter-select">
+          <option value="">Toutes les régions</option>
+        </select>
+        <button id="filter-reset" class="filter-reset">Réinitialiser</button>
+      </div>
+
+      <div id="articles-grid" class="articles-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:0.9rem">Chargement…</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Rejoignez le mouvement.</h2>
+    <p>Recevez nos actualités et participez à une représentation qui vous ressemble.</p>
+    <a href="adherer.html" class="btn btn-white btn-lg">Adhérer maintenant →</a>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:6px">
+          <div class="logo-badge"><img src="logoGM.jpeg" alt="GM"></div>
+          <span>Générations Médecins Île-de-France</span>
+        </a>
+        <p class="footer-copy">Mouvement médical indépendant · Île-de-France</p>
+      </div>
+      <div class="footer-links">
+        <a href="decrypteurs.html">Décrypteurs</a>
+        <a href="news.html">News</a>
+        <a href="plaidoyer.html">Plaidoyer</a>
+        <a href="outils.html">Outils</a>
+        <a href="bureau.html">Bureau</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+<script>
+(function () {
+  const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  // Familles chromatiques par thématique (fallback quand pas d'image)
+  const THEME_GRAD = {
+    'convention-medicale':'linear-gradient(135deg,#0f2a5e,#2563eb)','negociations-conventionnelles':'linear-gradient(135deg,#0f2a5e,#2563eb)','secteurs-conventionnels':'linear-gradient(135deg,#0f2a5e,#2563eb)','assurance-maladie-cnam':'linear-gradient(135deg,#0f2a5e,#2563eb)',
+    'tarifs-honoraires':'linear-gradient(135deg,#7c2d12,#ea580c)','tiers-payant':'linear-gradient(135deg,#7c2d12,#ea580c)','urssaf-cotisations':'linear-gradient(135deg,#7c2d12,#ea580c)','retraite-carmf':'linear-gradient(135deg,#7c2d12,#ea580c)','medicaments-remboursement':'linear-gradient(135deg,#7c2d12,#ea580c)',
+    'deserts-medicaux':'linear-gradient(135deg,#14532d,#16a34a)','demographie-medicale':'linear-gradient(135deg,#14532d,#16a34a)','numerus-apertus':'linear-gradient(135deg,#14532d,#16a34a)','installation-liberale':'linear-gradient(135deg,#14532d,#16a34a)','medecine-liberale':'linear-gradient(135deg,#14532d,#16a34a)','msp-exercice-groupe':'linear-gradient(135deg,#14532d,#16a34a)','internes-formation':'linear-gradient(135deg,#14532d,#16a34a)','reforme-etudes-medicales':'linear-gradient(135deg,#14532d,#16a34a)',
+    'hopital-public':'linear-gradient(135deg,#7f1d1d,#dc2626)','urgences':'linear-gradient(135deg,#7f1d1d,#dc2626)','permanence-des-soins':'linear-gradient(135deg,#7f1d1d,#dc2626)','responsabilite-medicale':'linear-gradient(135deg,#7f1d1d,#dc2626)',
+    'telemedecine':'linear-gradient(135deg,#3b0764,#7c3aed)','numerique-sante':'linear-gradient(135deg,#3b0764,#7c3aed)','donnees-de-sante-rgpd':'linear-gradient(135deg,#3b0764,#7c3aed)',
+    'plfss-lfss':'linear-gradient(135deg,#134e4a,#0d9488)','ministere-sante':'linear-gradient(135deg,#134e4a,#0d9488)',
+    'syndicats':'linear-gradient(135deg,#4a0f1c,#be1234)','greve-mobilisation':'linear-gradient(135deg,#4a0f1c,#be1234)','urps-representativite':'linear-gradient(135deg,#4a0f1c,#be1234)','ordre-des-medecins':'linear-gradient(135deg,#1e293b,#475569)',
+  };
+  const DEFAULT_GRAD = 'linear-gradient(135deg,#17365f,#326aa2)';
+
+  let allArticles = [];
+  let tagsMap = {};
+  let activeFilters = { theme: '', specialite: '', region: '' };
+
+  function fmt(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+  function gradFor(a) {
+    for (const slug of (a.tags || [])) { if (THEME_GRAD[slug]) return THEME_GRAD[slug]; }
+    return DEFAULT_GRAD;
+  }
+  function labelFor(a) {
+    for (const slug of (a.tags || [])) { if (tagsMap[slug]) return tagsMap[slug]; }
+    return a.categorie || 'Actualité';
+  }
+
+  function renderTagPills(tags) {
+    if (!tags || tags.length === 0) return '';
+    const visible = tags.slice(0, 4);
+    const rest = tags.length - 4;
+    let html = visible.map(slug => `<span class="tag-pill">${esc(tagsMap[slug] || slug)}</span>`).join('');
+    if (rest > 0) html += `<span class="tag-pill-more">+${rest}</span>`;
+    return `<div class="article-tags">${html}</div>`;
+  }
+
+  function card(a) {
+    const topStyle = a.image_url
+      ? `background-image:url('${esc(a.image_url)}')`
+      : `background:${gradFor(a)}`;
+    const hasImg = a.image_url ? ' has-img' : '';
+    return `
+      <a href="news-article.html?slug=${encodeURIComponent(a.slug)}" class="article-card">
+        <div class="article-top${hasImg}" style="${topStyle}">
+          <span class="article-cat">${esc(labelFor(a))}</span>
+        </div>
+        <div class="article-body">
+          <div class="article-title">${esc(a.titre)}</div>
+          <p class="article-excerpt">${esc(a.resume || '')}</p>
+          ${renderTagPills(a.tags)}
+          <div class="article-meta">
+            <span class="article-source-date">${esc(a.auteur || '')}${a.auteur ? ' · ' : ''}${fmt(a.publie_le)}</span>
+          </div>
+        </div>
+      </a>`;
+  }
+
+  function applyFilters() {
+    const grid = document.getElementById('articles-grid');
+    const { theme, specialite, region } = activeFilters;
+    const filtered = allArticles.filter(a => {
+      const tags = a.tags || [];
+      if (theme && !tags.includes(theme)) return false;
+      if (specialite && !tags.includes(specialite)) return false;
+      if (region && !tags.includes(region)) return false;
+      return true;
+    });
+    grid.innerHTML = filtered.length
+      ? filtered.map(card).join('')
+      : '<div class="no-results">Aucune actualité ne correspond à ces filtres.</div>';
+  }
+
+  function populateSelects(tagsRef) {
+    function fill(selectId, items) {
+      const sel = document.getElementById(selectId);
+      items.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.slug; opt.textContent = t.label; sel.appendChild(opt);
+      });
+    }
+    fill('filter-theme', tagsRef.filter(t => t.type === 'theme'));
+    fill('filter-specialite', tagsRef.filter(t => t.type === 'specialite'));
+    fill('filter-region', tagsRef.filter(t => t.type === 'region'));
+  }
+
+  function bindFilters() {
+    ['filter-theme', 'filter-specialite', 'filter-region'].forEach(id => {
+      document.getElementById(id).addEventListener('change', function () {
+        activeFilters[id.replace('filter-', '')] = this.value;
+        applyFilters();
+      });
+    });
+    document.getElementById('filter-reset').addEventListener('click', function () {
+      activeFilters = { theme: '', specialite: '', region: '' };
+      ['filter-theme','filter-specialite','filter-region'].forEach(id => document.getElementById(id).value = '');
+      applyFilters();
+    });
+  }
+
+  async function load() {
+    const tagsRes = await sb.from('tags_ref').select('slug,label,type');
+    if (tagsRes.data) {
+      tagsRes.data.forEach(t => { tagsMap[t.slug] = t.label; });
+      populateSelects(tagsRes.data);
+    }
+    const grid = document.getElementById('articles-grid');
+    const { data, error } = await sb.from('news')
+      .select('id,titre,slug,resume,categorie,tags,image_url,auteur,publie_le')
+      .eq('publie', true)
+      .order('publie_le', { ascending: false })
+      .limit(60);
+    if (error || !data || data.length === 0) {
+      grid.innerHTML = '<div class="no-results">Aucune actualité publiée pour le moment.</div>';
+      return;
+    }
+    allArticles = data;
+    applyFilters();
+  }
+
+  bindFilters();
+  load();
+})();
+</script>
+  <script src="auth-header.js"></script>
+</body>
+</html>

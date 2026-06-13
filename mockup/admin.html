@@ -420,7 +420,7 @@
       <div class="sidebar-section-label">Contenu</div>
 
       <button class="sidebar-link" onclick="showSection('decrypteurs-admin')" id="nav-decrypteurs-admin">
-        <span class="icon">📰</span><span>Décrypteurs</span>
+        <span class="icon">📰</span><span>Articles</span>
       </button>
       <button class="sidebar-link super-admin-only" onclick="showSection('veille')" id="nav-veille" style="display:none">
         <span class="icon">🔍</span><span>Veille</span>
@@ -616,67 +616,154 @@
         </div>
       </div>
 
-      <!-- Section: Décrypteurs admin -->
+      <!-- Section: Articles admin (Décrypteurs + News) -->
       <div id="section-decrypteurs-admin" class="section-panel">
-        <div class="main-header" style="display:flex;align-items:center;justify-content:space-between">
+        <div class="main-header">
           <div>
-            <div class="main-title">Gérer les articles</div>
-            <div class="main-sub">Créer et gérer les articles manuels</div>
+            <div class="main-title">Articles</div>
+            <div class="main-sub">Décrypteurs (veille + manuels) et News rédigées à la main</div>
           </div>
-          <button id="btn-toggle-new-article" class="btn-primary-sm" onclick="toggleNewDecrypteur()">+ Nouvel article</button>
         </div>
 
-        <div class="banner-info" style="background:rgba(42,109,184,0.07);border:1.5px solid rgba(42,109,184,0.2);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:0.83rem;color:var(--blue-dark);display:flex;align-items:center;gap:10px">
-          <span style="font-size:1.1rem">ℹ️</span>
-          <span>Cette liste regroupe les articles <strong>importés par la veille</strong> (validés) et les articles écrits manuellement. Les articles de veille rejetés n'apparaissent pas ici. « + Nouvel article » permet d'en écrire un à la main.</span>
+        <!-- Onglets -->
+        <div style="display:flex;gap:0;margin-bottom:28px;border-bottom:2px solid var(--line)">
+          <button id="atab-decrypteur" onclick="showArticleTab('decrypteur')"
+            style="padding:10px 20px;font-family:inherit;font-size:.85rem;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:3px solid var(--blue);color:var(--blue);margin-bottom:-2px">
+            📰 Décrypteurs
+          </button>
+          <button id="atab-news" onclick="showArticleTab('news')"
+            style="padding:10px 20px;font-family:inherit;font-size:.85rem;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted);margin-bottom:-2px">
+            📣 News
+          </button>
         </div>
 
-        <div id="new-decrypteur-form" style="display:none" class="card-form">
-          <h3>Nouvel article</h3>
-          <div class="form-grid">
-            <div class="form-group"><label>Titre</label><input type="text" id="d-titre" placeholder="Avenant n°9…"></div>
-            <div class="form-group"><label>Slug (URL)</label><input type="text" id="d-slug" placeholder="avenant-9-analyse"></div>
-            <div class="form-group"><label>Catégorie</label>
-              <select id="d-categorie">
-                <option value="avenant">Avenant</option>
-                <option value="plfss">PLFSS</option>
-                <option value="decret">Décret</option>
-                <option value="jurisprudence">Jurisprudence</option>
-                <option value="urssaf">URSSAF</option>
-                <option value="numerique">Numérique</option>
-              </select>
+        <!-- ===== Panel Décrypteurs ===== -->
+        <div id="apanel-decrypteur">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div class="main-sub" style="margin:0">Articles de veille validés + articles manuels.</div>
+            <button id="btn-toggle-new-article" class="btn-primary-sm" onclick="toggleNewDecrypteur()">+ Nouvel article</button>
+          </div>
+
+          <div class="banner-info" style="background:rgba(42,109,184,0.07);border:1.5px solid rgba(42,109,184,0.2);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:0.83rem;color:var(--blue-dark);display:flex;align-items:center;gap:10px">
+            <span style="font-size:1.1rem">ℹ️</span>
+            <span>Cette liste regroupe les articles <strong>importés par la veille</strong> (validés) et les articles écrits manuellement. Les articles de veille rejetés n'apparaissent pas ici. « + Nouvel article » permet d'en écrire un à la main.</span>
+          </div>
+
+          <div id="new-decrypteur-form" style="display:none" class="card-form">
+            <h3>Nouvel article</h3>
+            <div class="form-grid">
+              <div class="form-group"><label>Titre</label><input type="text" id="d-titre" placeholder="Avenant n°9…"></div>
+              <div class="form-group"><label>Slug (URL)</label><input type="text" id="d-slug" placeholder="avenant-9-analyse"></div>
+              <div class="form-group"><label>Catégorie</label>
+                <select id="d-categorie">
+                  <option value="avenant">Avenant</option>
+                  <option value="plfss">PLFSS</option>
+                  <option value="decret">Décret</option>
+                  <option value="jurisprudence">Jurisprudence</option>
+                  <option value="urssaf">URSSAF</option>
+                  <option value="numerique">Numérique</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Date de publication</label><input type="date" id="d-date"></div>
+              <div class="form-group full"><label>Résumé (chapô)</label><textarea id="d-resume" placeholder="En quelques phrases…"></textarea></div>
+              <div class="form-group full"><label>Contenu HTML</label><textarea id="d-contenu" style="min-height:160px" placeholder="<p>Corps de l'article…</p>"></textarea></div>
+              <div class="form-group"><label>Auteur</label><input type="text" id="d-auteur" placeholder="Rédaction GM"></div>
+              <div class="form-group"><label>Accès</label>
+                <select id="d-acces">
+                  <option value="public">Public</option>
+                  <option value="membres">Membres seulement</option>
+                </select>
+              </div>
             </div>
-            <div class="form-group"><label>Date de publication</label><input type="date" id="d-date"></div>
-            <div class="form-group full"><label>Résumé (chapô)</label><textarea id="d-resume" placeholder="En quelques phrases…"></textarea></div>
-            <div class="form-group full"><label>Contenu HTML</label><textarea id="d-contenu" style="min-height:160px" placeholder="<p>Corps de l'article…</p>"></textarea></div>
-            <div class="form-group"><label>Auteur</label><input type="text" id="d-auteur" placeholder="Rédaction GM"></div>
-            <div class="form-group"><label>Accès</label>
-              <select id="d-acces">
-                <option value="public">Public</option>
-                <option value="membres">Membres seulement</option>
-              </select>
+            <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
+              <button class="btn-primary-sm" onclick="saveDecrypteur()">Soumettre pour validation</button>
             </div>
           </div>
-          <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
-            <button class="btn-primary-sm" onclick="saveDecrypteur()">Soumettre pour validation</button>
+
+          <div id="decrypteurs-table-wrap" class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Titre</th><th>Catégorie</th><th>Date</th><th>Accès</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="decrypteurs-tbody">
+                <tr><td colspan="5" class="table-loading">Chargement…</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <div id="decrypteurs-table-wrap" class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Titre</th>
-                <th>Catégorie</th>
-                <th>Date</th>
-                <th>Accès</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="decrypteurs-tbody">
-              <tr><td colspan="5" class="table-loading">Chargement…</td></tr>
-            </tbody>
-          </table>
+        <!-- ===== Panel News ===== -->
+        <div id="apanel-news" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div class="main-sub" style="margin:0">Articles écrits à la main, publiés sur la page News du site et en page d'accueil.</div>
+            <button id="btn-toggle-new-news" class="btn-primary-sm" onclick="toggleNewNews()">+ Nouvelle News</button>
+          </div>
+
+          <div id="new-news-form" style="display:none" class="card-form">
+            <h3 id="news-form-title">Nouvelle News</h3>
+            <input type="hidden" id="n-id">
+            <div class="form-grid">
+              <div class="form-group"><label>Titre</label><input type="text" id="n-titre" placeholder="Mobilisation du 12 juin…"></div>
+              <div class="form-group"><label>Slug (URL)</label><input type="text" id="n-slug" placeholder="mobilisation-12-juin"></div>
+              <div class="form-group"><label>Catégorie</label>
+                <select id="n-categorie">
+                  <option value="actualite">Actualité</option>
+                  <option value="communique">Communiqué</option>
+                  <option value="analyse">Analyse</option>
+                  <option value="evenement">Événement</option>
+                  <option value="mobilisation">Mobilisation</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Date de publication</label><input type="date" id="n-date"></div>
+
+              <div class="form-group full">
+                <label>Image de couverture (reprise dans les cartes)</label>
+                <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+                  <div id="n-image-preview" style="width:160px;height:100px;border-radius:10px;border:1.5px dashed var(--line);background:#f0f4f9 center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.75rem;flex-shrink:0">Aucune image</div>
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <input type="file" id="n-image-file" accept="image/*" onchange="uploadNewsImage(this)" style="font-size:.82rem">
+                    <input type="hidden" id="n-image-url">
+                    <span id="n-image-status" style="font-size:.78rem;color:var(--muted)"></span>
+                    <button type="button" onclick="clearNewsImage()" style="font-size:.75rem;color:var(--muted);background:none;border:none;cursor:pointer;text-align:left;padding:0">Retirer l'image</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group full">
+                <label>Tags (thèmes, spécialités, régions — alimentent les filtres)</label>
+                <div id="n-tags-box" style="display:flex;flex-wrap:wrap;gap:6px;max-height:160px;overflow:auto;padding:10px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface)">
+                  <span style="color:var(--muted);font-size:.8rem">Chargement des tags…</span>
+                </div>
+              </div>
+
+              <div class="form-group full"><label>Résumé (chapô — repris dans les cartes)</label><textarea id="n-resume" placeholder="En quelques phrases…"></textarea></div>
+              <div class="form-group full"><label>Contenu (Markdown / HTML léger)</label><textarea id="n-contenu" style="min-height:200px" placeholder="## Sous-titre&#10;&#10;Corps de l'article…"></textarea></div>
+              <div class="form-group"><label>Auteur</label><input type="text" id="n-auteur" placeholder="Rédaction GM"></div>
+              <div class="form-group"><label>Accès</label>
+                <select id="n-acces">
+                  <option value="public">Public</option>
+                  <option value="membres">Membres seulement</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+              <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;color:var(--ink);cursor:pointer">
+                <input type="checkbox" id="n-publie" checked style="width:16px;height:16px"> Publier immédiatement
+              </label>
+              <button class="btn-primary-sm" onclick="saveNews()">Enregistrer</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Titre</th><th>Catégorie</th><th>Date</th><th>Statut</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="news-tbody">
+                <tr><td colspan="5" class="table-loading">Chargement…</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -1865,6 +1952,184 @@
     toast('Article supprimé', 'success');
     loadDecrypteurs();
   };
+
+  // ── News (articles écrits à la main) ────────────────────────
+  window.showArticleTab = function(tab) {
+    ['decrypteur','news'].forEach(t => {
+      document.getElementById('apanel-' + t).style.display = t === tab ? '' : 'none';
+      const btn = document.getElementById('atab-' + t);
+      btn.style.borderBottomColor = t === tab ? 'var(--blue)' : 'transparent';
+      btn.style.color = t === tab ? 'var(--blue)' : 'var(--muted)';
+    });
+    if (tab === 'news') loadNews();
+  };
+
+  let newsTagsLoaded = false;
+  async function loadNewsTags() {
+    const box = document.getElementById('n-tags-box');
+    const { data } = await sb.from('tags_ref').select('slug,label,type');
+    if (!data || !data.length) { box.innerHTML = '<span style="color:var(--muted);font-size:.8rem">Aucun tag.</span>'; return; }
+    if (!document.getElementById('news-chip-style')) {
+      const st = document.createElement('style');
+      st.id = 'news-chip-style';
+      st.textContent = '.news-tag-chip.on{background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important}';
+      document.head.appendChild(st);
+    }
+    const typeLabel = { theme:'Thèmes', specialite:'Spécialités', region:'Régions' };
+    let html = '';
+    ['theme','specialite','region'].forEach(tp => {
+      const items = data.filter(t => t.type === tp);
+      if (!items.length) return;
+      html += `<div style="width:100%;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:6px 0 2px">${typeLabel[tp] || tp}</div>`;
+      html += items.map(t => `<button type="button" class="news-tag-chip" data-slug="${esc(t.slug)}" onclick="this.classList.toggle('on')" style="border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:3px 11px;font-size:.76rem;font-weight:600;color:var(--ink);cursor:pointer;font-family:inherit">${esc(t.label)}</button>`).join('');
+    });
+    box.innerHTML = html;
+    newsTagsLoaded = true;
+  }
+  function selectedNewsTags() {
+    return [...document.querySelectorAll('#n-tags-box .news-tag-chip.on')].map(b => b.dataset.slug);
+  }
+  function setNewsTags(slugs) {
+    const set = new Set(slugs || []);
+    document.querySelectorAll('#n-tags-box .news-tag-chip').forEach(b => b.classList.toggle('on', set.has(b.dataset.slug)));
+  }
+
+  window.clearNewsImage = function() {
+    document.getElementById('n-image-url').value = '';
+    document.getElementById('n-image-file').value = '';
+    const pv = document.getElementById('n-image-preview');
+    pv.style.backgroundImage = '';
+    pv.textContent = 'Aucune image';
+  };
+
+  window.uploadNewsImage = async function(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const status = document.getElementById('n-image-status');
+    status.textContent = '⏳ Envoi…';
+    const ext = (file.name.split('.').pop() || 'jpg');
+    const path = `news/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await sb.storage.from('newsletter-images').upload(path, file, { contentType: file.type, upsert: false });
+    if (error) { status.textContent = '✗ ' + error.message; return; }
+    const url = sb.storage.from('newsletter-images').getPublicUrl(path).data.publicUrl;
+    document.getElementById('n-image-url').value = url;
+    const pv = document.getElementById('n-image-preview');
+    pv.style.backgroundImage = `url('${url}')`;
+    pv.textContent = '';
+    status.textContent = '✓ Image ajoutée';
+    setTimeout(() => { status.textContent = ''; }, 2500);
+  };
+
+  function resetNewsForm() {
+    ['n-id','n-titre','n-slug','n-resume','n-contenu','n-auteur'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('n-categorie').value = 'actualite';
+    document.getElementById('n-acces').value = 'public';
+    document.getElementById('n-publie').checked = true;
+    document.getElementById('news-form-title').textContent = 'Nouvelle News';
+    clearNewsImage();
+    setNewsTags([]);
+  }
+
+  window.toggleNewNews = function() {
+    const form = document.getElementById('new-news-form');
+    const btn  = document.getElementById('btn-toggle-new-news');
+    const showing = form.style.display !== 'none';
+    if (showing) { form.style.display = 'none'; btn.textContent = '+ Nouvelle News'; return; }
+    resetNewsForm();
+    if (!newsTagsLoaded) loadNewsTags();
+    form.style.display = '';
+    btn.textContent = '✕ Fermer';
+    document.getElementById('n-date').value = new Date().toISOString().slice(0,10);
+  };
+
+  window.editNews = async function(id) {
+    const { data, error } = await sb.from('news').select('*').eq('id', id).single();
+    if (error || !data) { toast('Erreur chargement', 'error'); return; }
+    if (!newsTagsLoaded) await loadNewsTags();
+    document.getElementById('n-id').value = data.id;
+    document.getElementById('n-titre').value = data.titre || '';
+    document.getElementById('n-slug').value = data.slug || '';
+    document.getElementById('n-categorie').value = data.categorie || 'actualite';
+    document.getElementById('n-date').value = data.publie_le || '';
+    document.getElementById('n-resume').value = data.resume || '';
+    document.getElementById('n-contenu').value = data.contenu || '';
+    document.getElementById('n-auteur').value = data.auteur || '';
+    document.getElementById('n-acces').value = data.acces || 'public';
+    document.getElementById('n-publie').checked = !!data.publie;
+    document.getElementById('news-form-title').textContent = 'Modifier la News';
+    if (data.image_url) {
+      document.getElementById('n-image-url').value = data.image_url;
+      const pv = document.getElementById('n-image-preview');
+      pv.style.backgroundImage = `url('${data.image_url}')`;
+      pv.textContent = '';
+    } else { clearNewsImage(); }
+    setNewsTags(data.tags || []);
+    const form = document.getElementById('new-news-form');
+    form.style.display = '';
+    document.getElementById('btn-toggle-new-news').textContent = '✕ Fermer';
+    form.scrollIntoView({ behavior:'smooth', block:'start' });
+  };
+
+  window.saveNews = async function() {
+    const id = document.getElementById('n-id').value;
+    const payload = {
+      titre:     document.getElementById('n-titre').value.trim(),
+      slug:      document.getElementById('n-slug').value.trim(),
+      categorie: document.getElementById('n-categorie').value,
+      publie_le: document.getElementById('n-date').value || new Date().toISOString().slice(0,10),
+      resume:    document.getElementById('n-resume').value.trim(),
+      contenu:   document.getElementById('n-contenu').value.trim(),
+      auteur:    document.getElementById('n-auteur').value.trim() || 'Rédaction GM',
+      acces:     document.getElementById('n-acces').value,
+      image_url: document.getElementById('n-image-url').value || null,
+      tags:      selectedNewsTags(),
+      publie:    document.getElementById('n-publie').checked,
+    };
+    if (!payload.titre || !payload.slug) { toast('Titre et slug requis', 'error'); return; }
+    let error;
+    if (id) ({ error } = await sb.from('news').update(payload).eq('id', id));
+    else    ({ error } = await sb.from('news').insert(payload));
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast(id ? 'News mise à jour ✓' : 'News créée ✓', 'success');
+    toggleNewNews();
+    loadNews();
+  };
+
+  window.togglePublishNews = async function(id, current) {
+    const { error } = await sb.from('news').update({ publie: !current }).eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast(!current ? 'News publiée ✓' : 'News dépubliée', 'success');
+    loadNews();
+  };
+
+  window.deleteNews = async function(id) {
+    if (!confirm('Supprimer cette News ?')) return;
+    const { error } = await sb.from('news').delete().eq('id', id);
+    if (error) { toast('Erreur : ' + error.message, 'error'); return; }
+    toast('News supprimée', 'success');
+    loadNews();
+  };
+
+  async function loadNews() {
+    const tbody = document.getElementById('news-tbody');
+    const { data, error } = await sb.from('news')
+      .select('id,titre,categorie,publie_le,publie,acces')
+      .order('publie_le', { ascending: false });
+    if (error) { tbody.innerHTML = `<tr><td colspan="5" style="color:#c0392b;padding:16px">Erreur : ${esc(error.message)}</td></tr>`; return; }
+    if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="5" class="table-empty">Aucune News. « + Nouvelle News » pour en écrire une.</td></tr>'; return; }
+    tbody.innerHTML = data.map(n => `
+      <tr>
+        <td style="font-weight:700">${esc(n.titre)}</td>
+        <td style="text-transform:capitalize;color:var(--muted)">${esc(n.categorie || '—')}</td>
+        <td style="color:var(--muted);font-size:.78rem">${fmtDate(n.publie_le)}</td>
+        <td>${n.publie ? '<span class="status-badge status-actif">Publié</span>' : '<span class="status-badge status-attente">Brouillon</span>'}</td>
+        <td style="white-space:nowrap">
+          <button class="btn-action" onclick="editNews('${n.id}')">Modifier</button>
+          <button class="btn-action" onclick="togglePublishNews('${n.id}', ${n.publie})">${n.publie ? 'Dépublier' : 'Publier'}</button>
+          <button class="btn-action btn-supprimer" onclick="deleteNews('${n.id}')">Supprimer</button>
+        </td>
+      </tr>`).join('');
+  }
 
   // ── Plaidoyer ───────────────────────────────────────────────
   async function loadPlaidoyer() {

@@ -220,6 +220,119 @@
     }
 
     /* ——— FEATURES GRID ——— */
+    /* ——— News « À la une » (cartes 3D) ——— */
+    .news3d-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 26px;
+      perspective: 1400px;
+    }
+    .news3d-card {
+      position: relative;
+      border-radius: 18px;
+      background: white;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 6px 24px rgba(23,54,95,0.08), 0 1px 3px rgba(23,54,95,0.06);
+      transform-style: preserve-3d;
+      transition: transform 0.25s cubic-bezier(.2,.7,.3,1), box-shadow 0.25s ease;
+      will-change: transform;
+    }
+    .news3d-card:hover {
+      transform: translateY(-10px) scale(1.035);
+      box-shadow: 0 28px 60px rgba(23,54,95,0.22), 0 8px 18px rgba(23,54,95,0.12);
+    }
+    .news3d-media {
+      height: 184px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      padding: 16px;
+    }
+    .news3d-media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(15,30,55,0.62), rgba(15,30,55,0.05));
+    }
+    .news3d-cat {
+      position: relative;
+      z-index: 1;
+      padding: 4px 11px;
+      background: rgba(255,255,255,0.22);
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      backdrop-filter: blur(5px);
+      transform: translateZ(40px);
+    }
+    .news3d-body {
+      padding: 22px 22px 24px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      transform: translateZ(25px);
+    }
+    .news3d-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      line-height: 1.34;
+      margin-bottom: 10px;
+    }
+    .news3d-excerpt {
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .news3d-meta {
+      margin-top: auto;
+      font-size: 0.74rem;
+      color: var(--muted);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .news3d-arrow {
+      margin-left: auto;
+      color: var(--blue);
+      font-weight: 800;
+      transition: transform 0.2s ease;
+    }
+    .news3d-card:hover .news3d-arrow { transform: translateX(4px); }
+    .news3d-voirplus {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 44px auto 0;
+      padding: 13px 30px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: white;
+      text-decoration: none;
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+      box-shadow: 0 10px 26px rgba(42,109,184,0.32);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .news3d-voirplus:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 36px rgba(42,109,184,0.42);
+    }
+    .news3d-voirplus span { transition: transform 0.2s ease; }
+    .news3d-voirplus:hover span { transform: translateX(4px); }
+    @media (max-width: 860px) { .news3d-grid { grid-template-columns: 1fr; } }
+
     .features-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -472,6 +585,7 @@
       </a>
       <nav>
         <a href="decrypteurs.html">Les Décrypteurs</a>
+        <a href="news.html">News</a>
         <a href="observatoire.html">Observatoire</a>
         <a href="plaidoyer.html">Plaidoyer</a>
         <a href="outils.html">Outils</a>
@@ -489,7 +603,6 @@
   <section>
     <div class="hero">
       <div>
-        <div class="hero-eyebrow">Collectif · Île-de-France</div>
         <h1>Redonner une <em>voix</em><br>aux médecins.</h1>
         <p class="hero-sub">Un mouvement indépendant qui traduit l'actualité médicale en impact concret sur votre pratique, défend vos intérêts et vous donne les outils pour exercer sereinement.</p>
         <div class="hero-actions">
@@ -563,6 +676,25 @@
           </div>
         </div>
 
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- NEWS À LA UNE -->
+  <section class="section" id="news-une">
+    <div class="section-inner">
+      <div class="section-label">À la une</div>
+      <h2 class="section-title">Les dernières actualités<br>du mouvement.</h2>
+      <p class="section-sub">Nos prises de position, analyses et temps forts, rédigés par l'équipe de Générations Médecins.</p>
+
+      <div id="news-une-grid" class="news3d-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);font-size:0.9rem">Chargement…</div>
+      </div>
+
+      <div style="text-align:center">
+        <a href="news.html" class="news3d-voirplus">Voir plus d'actualités <span>→</span></a>
       </div>
     </div>
   </section>
@@ -824,6 +956,81 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+  (function () {
+    const SUPABASE_URL  = 'https://faegpfkhlkkwmtaichin.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZWdwZmtobGtrd210YWljaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTEyODQsImV4cCI6MjA5NTY2NzI4NH0.pHJjb5RIuhRPRi1shnKvScnpLk5Wd8wOiDrmG2143xo';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    const THEME_GRAD = {
+      'convention-medicale':'linear-gradient(135deg,#0f2a5e,#2563eb)','negociations-conventionnelles':'linear-gradient(135deg,#0f2a5e,#2563eb)','secteurs-conventionnels':'linear-gradient(135deg,#0f2a5e,#2563eb)','assurance-maladie-cnam':'linear-gradient(135deg,#0f2a5e,#2563eb)',
+      'tarifs-honoraires':'linear-gradient(135deg,#7c2d12,#ea580c)','tiers-payant':'linear-gradient(135deg,#7c2d12,#ea580c)','urssaf-cotisations':'linear-gradient(135deg,#7c2d12,#ea580c)','retraite-carmf':'linear-gradient(135deg,#7c2d12,#ea580c)','medicaments-remboursement':'linear-gradient(135deg,#7c2d12,#ea580c)',
+      'deserts-medicaux':'linear-gradient(135deg,#14532d,#16a34a)','demographie-medicale':'linear-gradient(135deg,#14532d,#16a34a)','numerus-apertus':'linear-gradient(135deg,#14532d,#16a34a)','installation-liberale':'linear-gradient(135deg,#14532d,#16a34a)','medecine-liberale':'linear-gradient(135deg,#14532d,#16a34a)','msp-exercice-groupe':'linear-gradient(135deg,#14532d,#16a34a)','internes-formation':'linear-gradient(135deg,#14532d,#16a34a)','reforme-etudes-medicales':'linear-gradient(135deg,#14532d,#16a34a)',
+      'hopital-public':'linear-gradient(135deg,#7f1d1d,#dc2626)','urgences':'linear-gradient(135deg,#7f1d1d,#dc2626)','permanence-des-soins':'linear-gradient(135deg,#7f1d1d,#dc2626)','responsabilite-medicale':'linear-gradient(135deg,#7f1d1d,#dc2626)',
+      'telemedecine':'linear-gradient(135deg,#3b0764,#7c3aed)','numerique-sante':'linear-gradient(135deg,#3b0764,#7c3aed)','donnees-de-sante-rgpd':'linear-gradient(135deg,#3b0764,#7c3aed)',
+      'plfss-lfss':'linear-gradient(135deg,#134e4a,#0d9488)','ministere-sante':'linear-gradient(135deg,#134e4a,#0d9488)',
+      'syndicats':'linear-gradient(135deg,#4a0f1c,#be1234)','greve-mobilisation':'linear-gradient(135deg,#4a0f1c,#be1234)','urps-representativite':'linear-gradient(135deg,#4a0f1c,#be1234)','ordre-des-medecins':'linear-gradient(135deg,#1e293b,#475569)',
+    };
+    const DEFAULT_GRAD = 'linear-gradient(135deg,#17365f,#326aa2)';
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    const fmt = iso => iso ? new Date(iso).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' }) : '';
+
+    let tagsMap = {};
+    function gradFor(tags){ for (const s of (tags||[])) if (THEME_GRAD[s]) return THEME_GRAD[s]; return DEFAULT_GRAD; }
+    function labelFor(a){ for (const s of (a.tags||[])) if (tagsMap[s]) return tagsMap[s]; return a.categorie || 'Actualité'; }
+
+    function card(a) {
+      const media = a.image_url
+        ? `background-image:url('${esc(a.image_url)}')`
+        : `background:${gradFor(a.tags)}`;
+      return `
+        <a href="news-article.html?slug=${encodeURIComponent(a.slug)}" class="news3d-card">
+          <div class="news3d-media" style="${media}">
+            <span class="news3d-cat">${esc(labelFor(a))}</span>
+          </div>
+          <div class="news3d-body">
+            <div class="news3d-title">${esc(a.titre)}</div>
+            <p class="news3d-excerpt">${esc(a.resume || '')}</p>
+            <div class="news3d-meta">${esc(a.auteur || '')}${a.auteur ? ' · ' : ''}${fmt(a.publie_le)}<span class="news3d-arrow">→</span></div>
+          </div>
+        </a>`;
+    }
+
+    // Effet de tilt 3D suivant la souris
+    function bindTilt() {
+      document.querySelectorAll('.news3d-card').forEach(c => {
+        c.addEventListener('pointermove', e => {
+          const r = c.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width - 0.5;
+          const py = (e.clientY - r.top) / r.height - 0.5;
+          c.style.transform = `translateY(-10px) scale(1.035) rotateX(${(-py*7).toFixed(2)}deg) rotateY(${(px*9).toFixed(2)}deg)`;
+        });
+        c.addEventListener('pointerleave', () => { c.style.transform = ''; });
+      });
+    }
+
+    async function load() {
+      const grid = document.getElementById('news-une-grid');
+      if (!grid) return;
+      const [tagsRes, newsRes] = await Promise.all([
+        sb.from('tags_ref').select('slug,label'),
+        sb.from('news').select('titre,slug,resume,categorie,tags,image_url,auteur,publie_le')
+          .eq('publie', true).order('publie_le', { ascending: false }).limit(3),
+      ]);
+      if (tagsRes.data) tagsRes.data.forEach(t => { tagsMap[t.slug] = t.label; });
+      const data = newsRes.data || [];
+      if (!data.length) {
+        // Pas d'actu publiée : on masque proprement la section
+        const sec = document.getElementById('news-une');
+        if (sec) sec.style.display = 'none';
+        return;
+      }
+      grid.innerHTML = data.map(card).join('');
+      bindTilt();
+    }
+    load();
+  })();
+  </script>
   <script src="auth-header.js"></script>
 </body>
 </html>
